@@ -1,0 +1,13 @@
+data/data_raw/source
+data/data_raw/old
+data/data_clean/templates
+data/resultados/alpha_calibration/archive
+data/resultados/offline_operation/archive
+.DS_Store
+data/instances/artif_inst/archive
+data/resultados/instAD3/haversine/afred_run
+data/resultados/instAD4/haversine/afred_run
+
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]

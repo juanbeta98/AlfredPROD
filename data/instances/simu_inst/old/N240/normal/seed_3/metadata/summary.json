@@ -1,0 +1,79 @@
+{
+  "sim_day": "2026-11-11",
+  "n_services": 240,
+  "scenario": "normal",
+  "seed": 3,
+  "timestamp": "2025-12-04T01:32:16.776541+00:00",
+  "per_city": {
+    "1": {
+      "n_total": 44,
+      "historic_static_mean": 0.7788778877887789,
+      "historic_dynamic_mean": 0.22112211221122113,
+      "multiplier": 0.9171298334287249,
+      "static_prop_sim": 0.7143321474890398,
+      "dynamic_prop_sim": 0.28566785251096016,
+      "n_static": 31,
+      "n_dynamic": 13
+    },
+    "1004": {
+      "n_total": 47,
+      "historic_static_mean": 0.8136645962732919,
+      "historic_dynamic_mean": 0.18633540372670807,
+      "multiplier": 0.9473621013192199,
+      "static_prop_sim": 0.7708350016945206,
+      "dynamic_prop_sim": 0.22916499830547943,
+      "n_static": 36,
+      "n_dynamic": 11
+    },
+    "126": {
+      "n_total": 5,
+      "historic_static_mean": 0.7428571428571429,
+      "historic_dynamic_mean": 0.2571428571428571,
+      "multiplier": 1.0602548930412794,
+      "static_prop_sim": 0.7876179205449504,
+      "dynamic_prop_sim": 0.2123820794550496,
+      "n_static": 4,
+      "n_dynamic": 1
+    },
+    "149": {
+      "n_total": 139,
+      "historic_static_mean": 0.6715328467153284,
+      "historic_dynamic_mean": 0.3284671532846715,
+      "multiplier": 1.0164324072128736,
+      "static_prop_sim": 0.6825677479093749,
+      "dynamic_prop_sim": 0.3174322520906251,
+      "n_static": 95,
+      "n_dynamic": 44
+    },
+    "150": {
+      "n_total": 1,
+      "historic_static_mean": 0.42857142857142855,
+      "historic_dynamic_mean": 0.5714285714285714,
+      "multiplier": 0.9188257284480799,
+      "static_prop_sim": 0.3937824550491771,
+      "dynamic_prop_sim": 0.6062175449508229,
+      "n_static": 0,
+      "n_dynamic": 1
+    },
+    "830": {
+      "n_total": 0,
+      "historic_static_mean": 1.0,
+      "historic_dynamic_mean": 0.0,
+      "multiplier": 0.9866253880472948,
+      "static_prop_sim": 0.9866253880472948,
+      "dynamic_prop_sim": 0.013374611952705173,
+      "n_static": 0,
+      "n_dynamic": 0
+    },
+    "844": {
+      "n_total": 4,
+      "historic_static_mean": 0.5862068965517241,
+      "historic_dynamic_mean": 0.41379310344827586,
+      "multiplier": 0.9958102596281668,
+      "static_prop_sim": 0.5837508418509944,
+      "dynamic_prop_sim": 0.41624915814900565,
+      "n_static": 2,
+      "n_dynamic": 2
+    }
+  }
+}
