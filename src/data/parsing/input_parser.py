@@ -26,7 +26,7 @@ class InputParser:
             df: Pandas DataFrame with flattened records
             metadata: Remaining non-tabular JSON data
         """
-        if not isinstance(json_data, dict):
+        if not isinstance(json_data, list):
             raise ValueError("Input data must be a JSON object")
 
         records = InputParser._find_record_list(json_data)

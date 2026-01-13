@@ -1,12 +1,16 @@
+import pandas as pd
 import sys
 import logging
 from typing import Any, Dict, Tuple
 
 from src.config import Config
-from src.api_client.client import ALFREDAPIClient
-from src.api_client.sender import ResultSender
-from src.data_handlers.input_parser import InputParser
-from src.data_handlers.output_formatter import OutputFormatter
+from src.integration.client import ALFREDAPIClient
+from src.integration.sender import ResultSender
+from src.data.parsing.input_parser import InputParser
+from src.data.validation.validator import InputValidator
+from src.data.validation.rules.generic import RequiredFieldRule, NonEmptyRowRule
+from src.data.validation.rules.domain import CreatedBeforeScheduleRule
+from src.data.formatting.output_formatter import OutputFormatter
 from src.optimization.solver import OptimizationSolver
 
 
@@ -16,6 +20,7 @@ logger = logging.getLogger(__name__)
 # ======================================================
 # Entry point
 # ======================================================
+
 def main() -> int:
     """
     Main orchestration entrypoint.
@@ -40,7 +45,7 @@ def main() -> int:
     use_api = Config.USE_API
     request_id: str | None = None
 
-    raw_input: Dict[str, Any] | None = None
+    raw_input: list[dict[str | Any, str | Any]] | None = None
     input_df = None
     metadata: Dict[str, Any] = {}
 
@@ -63,7 +68,7 @@ def main() -> int:
 
         else:
             logger.info("Execution mode: LOCAL")
-            raw_input = load_local_input()
+            raw_input = load_local_input(Config.LOCAL_DATA_PATH)
 
     except Exception as exc:
         logger.exception("Failed to acquire input data")
@@ -98,7 +103,55 @@ def main() -> int:
         return 3
 
     # --------------------------------------------------
-    # 4. Run optimization
+    # 4. Validate input (business & data rules)
+    # --------------------------------------------------
+    try:
+        rules = [
+            NonEmptyRowRule(),
+            
+            RequiredFieldRule("service_id"),
+            RequiredFieldRule("labor_id"),
+            RequiredFieldRule("created_at"),
+            RequiredFieldRule("schedule_date"),
+            RequiredFieldRule("start_address_point"),
+            RequiredFieldRule("labor_name"),
+            RequiredFieldRule("end_address_point"),
+
+            CreatedBeforeScheduleRule(minimum_delta_hours=2.0),
+        ]
+
+        validator = InputValidator(rules=rules)
+        valid_df, invalid_df, validation_report = validator.validate(input_df)
+
+        logger.info(
+            "Input validation completed",
+            extra=validation_report,
+        )
+
+        # Optional: persist or report invalid rows
+        if not invalid_df.empty:
+            logger.warning(
+                "Some input records failed validation",
+                extra={"invalid_rows": len(invalid_df)},
+            )
+            # save_invalid_records(invalid_df, request_id)
+
+        if valid_df.empty:
+            raise ValueError("All input records failed validation")
+
+        input_df = valid_df
+
+    except Exception as exc:
+        logger.exception("Input validation failed")
+        report_failure_if_possible(
+            request_id=request_id,
+            error="INPUT_VALIDATION_FAILED",
+            details=str(exc),
+        )
+        return 4
+
+    # --------------------------------------------------
+    # 5. Run optimization
     # --------------------------------------------------
     try:
         solver = OptimizationSolver(input_df)
@@ -119,16 +172,17 @@ def main() -> int:
             error="OPTIMIZATION_FAILED",
             details=str(exc),
         )
-        return 4
+        return 5
 
     # --------------------------------------------------
-    # 5. Format output
+    # 6. Format output
     # --------------------------------------------------
     try:
         output_payload = OutputFormatter.format(
             results=results,
             metadata={
                 "metrics": metrics,
+                "validation": validation_report,
                 **metadata,
             },
             request_id=request_id,
@@ -142,10 +196,10 @@ def main() -> int:
             error="OUTPUT_FORMATTING_FAILED",
             details=str(exc),
         )
-        return 5
+        return 6
 
     # --------------------------------------------------
-    # 6. Deliver output
+    # 7. Deliver output
     # --------------------------------------------------
     try:
         if use_api:
@@ -169,10 +223,11 @@ def main() -> int:
             error="OUTPUT_DELIVERY_FAILED",
             details=str(exc),
         )
-        return 6
+        return 7
 
     logger.info("Optimization pipeline finished successfully")
     return 0
+
 
 
 # ======================================================
@@ -217,11 +272,32 @@ def report_failure_if_possible(
 # Local I/O helpers (intentionally abstract)
 # ======================================================
 
-def load_local_input() -> Dict[str, Any]:
+def load_local_input(
+    local_path: str,
+) -> list[dict[str | Any, str | Any]]:
     """
     Load local input for development/testing.
     """
-    raise NotImplementedError("Local input loading not implemented")
+    # raise NotImplementedError("Local input loading not implemented")
+    import csv
+    # import json  # optional if you want to output JSON
+
+    # Open the CSV file
+    with open(local_path, mode='r', newline='') as file:
+        # Use DictReader to read rows as dictionaries
+        csv_reader = csv.DictReader(file)
+        
+        # Convert to a list of dictionaries
+        data = [row for row in csv_reader]
+
+    # Print as Python dictionary
+    # print(data)
+
+    # Optional: Convert to JSON string
+    # json_data = json.dumps(data, indent=4)
+    # print(json_data)
+
+    return data
 
 
 def save_local_output(payload: Dict[str, Any]) -> None:
