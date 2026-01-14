@@ -6,6 +6,8 @@ from typing import Any, Dict, Tuple
 from src.config import Config
 from src.integration.client import ALFREDAPIClient
 from src.integration.sender import ResultSender
+from src.io.input_loader import load_local_input
+from src.io.output_writer import save_local_output
 from src.data.parsing.input_parser import InputParser
 from src.data.validation.validator import InputValidator
 from src.data.validation.rules.generic import RequiredFieldRule, NonEmptyRowRule
@@ -45,7 +47,7 @@ def main() -> int:
     use_api = Config.USE_API
     request_id: str | None = None
 
-    raw_input: list[dict[str | Any, str | Any]] | None = None
+    raw_input: dict[str, int | None | list[dict[str, Any]]] = {}
     input_df = None
     metadata: Dict[str, Any] = {}
 
@@ -64,11 +66,14 @@ def main() -> int:
             )
 
             raw_input = client.get_optimization_data()
-            request_id = raw_input.get("request_id")
+            request_id = raw_input.get("request_id")  # type: ignore
 
         else:
             logger.info("Execution mode: LOCAL")
-            raw_input = load_local_input(Config.LOCAL_DATA_PATH)
+            raw_input = load_local_input(
+                Config.LOCAL_DATA_PATH,
+                write_debug_json=True
+            )
 
     except Exception as exc:
         logger.exception("Failed to acquire input data")
@@ -266,45 +271,6 @@ def report_failure_if_possible(
     except Exception:
         # Never let failure reporting crash the process
         logger.error("Failed to report failure to API", exc_info=True)
-
-
-# ======================================================
-# Local I/O helpers (intentionally abstract)
-# ======================================================
-
-def load_local_input(
-    local_path: str,
-) -> list[dict[str | Any, str | Any]]:
-    """
-    Load local input for development/testing.
-    """
-    # raise NotImplementedError("Local input loading not implemented")
-    import csv
-    # import json  # optional if you want to output JSON
-
-    # Open the CSV file
-    with open(local_path, mode='r', newline='') as file:
-        # Use DictReader to read rows as dictionaries
-        csv_reader = csv.DictReader(file)
-        
-        # Convert to a list of dictionaries
-        data = [row for row in csv_reader]
-
-    # Print as Python dictionary
-    # print(data)
-
-    # Optional: Convert to JSON string
-    # json_data = json.dumps(data, indent=4)
-    # print(json_data)
-
-    return data
-
-
-def save_local_output(payload: Dict[str, Any]) -> None:
-    """
-    Persist output locally for development/testing.
-    """
-    raise NotImplementedError("Local output saving not implemented")
 
 
 # ======================================================
