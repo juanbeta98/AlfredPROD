@@ -40,6 +40,18 @@ class ValidationRule(ABC):
             reason: Failure reason if not passed, else None
         """
         raise NotImplementedError
+    
+    def validate_df(self, df: pd.DataFrame):
+        """
+        Dataset-level validation.
+
+        Args:
+            df: Pandas DataFrame representing the dataset
+
+        Returns:
+            errors: A list of (row_index, error_message).
+        """
+        return []
 
     def metadata(self) -> Dict[str, Any]:
         """

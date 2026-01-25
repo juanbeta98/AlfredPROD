@@ -124,3 +124,46 @@ class AllowedValuesRule(ValidationRule):
             )
 
         return True, None
+    
+
+class UniqueLaborIdRule(ValidationRule):
+    """
+    Validate that labor_id values are unique across the dataset.
+    """
+
+    name = "unique_labor_id"
+    blocking = True
+
+    def __init__(self, field: str = "labor_id"):
+        """
+        Args:
+            field: Name of the field that must be unique.
+        """
+        super().__init__(field=field)
+        self.field = field
+
+    def validate(self, row: pd.Series):
+        # Dataset-level rule; row-level validation always passes.
+        return True, None
+
+    def validate_df(self, df: pd.DataFrame):
+        if self.field not in df.columns:
+            return []
+
+        series = df[self.field].dropna()
+        duplicated_mask = series.duplicated(keep=False)
+
+        if not duplicated_mask.any():
+            return []
+
+        errors = []
+
+        for idx, labor_id in series.loc[duplicated_mask].items():
+            errors.append(
+                (
+                    idx,
+                    f"{self.field} '{labor_id}' is duplicated in dataset",
+                )
+            )
+
+        return errors

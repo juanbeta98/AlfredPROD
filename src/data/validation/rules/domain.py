@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional
+from typing import Iterable, Optional
 
 import pandas as pd
 
@@ -110,3 +110,40 @@ class CreatedBeforeScheduleRule(ValidationRule):
             return pd.to_datetime(value)
         except Exception:
             return None
+
+
+class ValidCitiesOnly(ValidationRule):
+    """
+    Validate that the city is only from the allowed list.
+    """
+
+    name = "valid_cities"
+    blocking = True
+
+    def __init__(self, field: str, valid_cities: Iterable[str]):
+        """
+        Args:
+            field: Field name to validate
+            valid_cities: Set of permitted values
+        """
+        super().__init__(field=field, valid_cities=valid_cities)
+        self.field = field
+        self.valid_cities = valid_cities
+
+    def validate(self, row: pd.Series):
+        if self.field not in row:
+            return True, None  # Let RequiredFieldRule handle missing fields
+
+        value = row[self.field]
+
+        if pd.isna(value):
+            return True, None  # Nullability handled elsewhere if needed
+
+        if value not in self.valid_cities:
+            return (
+                False,
+                f"Field '{self.field}' has invalid value '{value}' "
+                f"(allowed: {sorted(self.valid_cities)})",
+            )
+
+        return True, None
