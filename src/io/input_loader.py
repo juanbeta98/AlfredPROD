@@ -34,7 +34,7 @@ def load_local_input(
     if not csv_path.exists():
         raise FileNotFoundError(f"Input CSV not found: {csv_path}")
 
-    logger.info("Loading local input from CSV", extra={"path": str(csv_path)})
+    logger.debug("Loading local input from CSV", extra={"path": str(csv_path)})
 
     df = pd.read_csv(csv_path)
 
@@ -44,13 +44,13 @@ def load_local_input(
         "count": 0,
         "next": None,
         "previous": None,
-        "results": [],
+        "data": [],
     }
 
     for service_id, group in df.groupby("service_id"):
         try:
             record = _build_service_record(service_id, group)
-            payload["results"].append(record)
+            payload["data"].append(record)
             payload["count"] += 1
 
         except Exception as exc:
@@ -61,8 +61,8 @@ def load_local_input(
             raise
 
     logger.info(
-        "Local input loaded successfully",
-        extra={"services": payload["count"]},
+        "local_input_loaded services=%s",
+        payload["count"],
     )
 
     if write_debug_json:
