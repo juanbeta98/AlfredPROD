@@ -1,0 +1,4059 @@
+{
+    "data": [
+        {
+            "service_id": 349611,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-05T20:01:31.278138+00:00",
+            "start_address": {
+                "id": 176770,
+                "point": {
+                    "x": -76.5195243,
+                    "y": 3.4269836,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 30 # 26-10, El Jardin, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 75827,
+                "point": {
+                    "x": -76.53965687916794,
+                    "y": 3.4516627253884913,
+                    "srid": 4326
+                },
+                "name": "Auto Sura Cali, Autos Sura Centenario Av  2 Norte  3N -20",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 451654,
+                    "uuid": "42ded752-bef4-4691-9645-004f837842ab",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T12:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 359894,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-18T20:49:54.278438+00:00",
+            "start_address": {
+                "id": 179572,
+                "point": {
+                    "x": -76.51729,
+                    "y": 3.52256,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 75827,
+                "point": {
+                    "x": -76.53965687916794,
+                    "y": 3.4516627253884913,
+                    "srid": 4326
+                },
+                "name": "Auto Sura Cali, Autos Sura Centenario Av  2 Norte  3N -20",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 462337,
+                    "uuid": "8d881888-9104-4aeb-8736-16f66a7c7e4f",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 359896,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-18T20:51:19.554955+00:00",
+            "start_address": {
+                "id": 75827,
+                "point": {
+                    "x": -76.53965687916794,
+                    "y": 3.4516627253884913,
+                    "srid": 4326
+                },
+                "name": "Auto Sura Cali, Autos Sura Centenario Av  2 Norte  3N -20",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 179573,
+                "point": {
+                    "x": -76.51729,
+                    "y": 3.52256,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 462339,
+                    "uuid": "720ee330-7abf-4e37-b2d5-ad1b6872918d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T22:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 360345,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-19T15:46:07.213166+00:00",
+            "start_address": {
+                "id": 179718,
+                "point": {
+                    "x": -76.5012876,
+                    "y": 3.5130549,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #31-146, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 179719,
+                "point": {
+                    "x": -76.522241,
+                    "y": 3.4719572,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 35 Nte. #3 Norte-69, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 462809,
+                    "uuid": "d04a2e41-ca4e-44b9-bf2e-7c5227b90411",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T13:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 360353,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-19T15:50:58.697703+00:00",
+            "start_address": {
+                "id": 179719,
+                "point": {
+                    "x": -76.522241,
+                    "y": 3.4719572,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 35 Nte. #3 Norte-69, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 179718,
+                "point": {
+                    "x": -76.5012876,
+                    "y": 3.5130549,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #31-146, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 462817,
+                    "uuid": "069d5f84-337b-49a8-8df8-333e60d0896d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T21:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 362440,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-22T10:47:54.336772+00:00",
+            "start_address": {
+                "id": 127126,
+                "point": {
+                    "x": -74.12218299999999,
+                    "y": 4.559032999999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 10 # 50A-25, Rafael Uribe Uribe, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 127126,
+                "point": {
+                    "x": -74.12218299999999,
+                    "y": 4.559032999999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 10 # 50A-25, Rafael Uribe Uribe, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 464943,
+                    "uuid": "dff086cd-d5c0-4290-9b0d-1f3440ba8ac7",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2025-12-23T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 464944,
+                    "uuid": "dc849668-ee88-4744-bf70-b014e87b82c2",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2025-12-23T17:30:00+00:00",
+                    "shop": {
+                        "id": 881,
+                        "name": "Multiservicios Megamotors"
+                    },
+                    "shop_address": {
+                        "id": 132287,
+                        "point": {
+                            "x": -74.1257024196434,
+                            "y": 4.568297647307015,
+                            "srid": 4326
+                        },
+                        "name": "Multiservicios Megamotors, Dg. 49a Sur #13-86, Bogotá, Colombia",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 464945,
+                    "uuid": "94f8f125-4d8b-4659-9fe1-88f968891fec",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2025-12-23T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 362480,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2025-12-22T12:14:14.902443+00:00",
+            "start_address": {
+                "id": 156523,
+                "point": {
+                    "x": -74.137269,
+                    "y": 4.6028034,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 68d Bis #38C -26 SUR, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 156523,
+                "point": {
+                    "x": -74.137269,
+                    "y": 4.6028034,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 68d Bis #38C -26 SUR, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 464985,
+                    "uuid": "0d320a36-7b63-4e66-8705-a2f7f7398eea",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2025-12-24T22:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 464986,
+                    "uuid": "57fc3cba-c3f4-413d-b2ef-d4cfd7f6ea93",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2025-12-24T23:00:00+00:00",
+                    "shop": {
+                        "id": 837,
+                        "name": "Lavado en seco Limpoint Centro Mayor"
+                    },
+                    "shop_address": {
+                        "id": 57954,
+                        "point": {
+                            "x": -74.1245465,
+                            "y": 4.5925638,
+                            "srid": 4326
+                        },
+                        "name": "Lavado en seco Limpoint Centro Mayor, Calle 38A Sur # 34d - 51",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 464987,
+                    "uuid": "d8389699-1c82-41db-9b29-1cda3c4fb7de",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2025-12-25T00:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 371215,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-01T21:43:24.974714+00:00",
+            "start_address": {
+                "id": 162677,
+                "point": {
+                    "x": -76.538826,
+                    "y": 3.454956,
+                    "srid": 4326
+                },
+                "name": "Casa, Av. 9 Nte. # 6 -100, Normandia Sebastian de Belalcazar, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 162677,
+                "point": {
+                    "x": -76.538826,
+                    "y": 3.454956,
+                    "srid": 4326
+                },
+                "name": "Casa, Av. 9 Nte. # 6 -100, Normandia Sebastian de Belalcazar, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 473906,
+                    "uuid": "c7d9e733-1f6c-4299-8dfe-2f11c63dfb40",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-02T18:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 473907,
+                    "uuid": "763414b7-7735-4d26-b9ea-273b943ba543",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-02T19:30:00+00:00",
+                    "shop": {
+                        "id": 1081,
+                        "name": "Pits Detailing Wash - ZONA DE ALISTAMIENTO"
+                    },
+                    "shop_address": {
+                        "id": 85107,
+                        "point": {
+                            "x": -76.53012650000001,
+                            "y": 3.4665796,
+                            "srid": 4326
+                        },
+                        "name": "Pits Detailing Wash - Av Sexta Cali, Av 6 Norte # 24A - 25",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 473908,
+                    "uuid": "312d1ec2-8333-4d40-9130-348af9f3ac64",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-02T21:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 373077,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-05T04:11:46.526581+00:00",
+            "start_address": {
+                "id": 111696,
+                "point": {
+                    "x": -76.4716727,
+                    "y": 3.4206327,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 112 #26j-1, Manuela Beltran, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 111696,
+                "point": {
+                    "x": -76.4716727,
+                    "y": 3.4206327,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 112 #26j-1, Manuela Beltran, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 475831,
+                    "uuid": "e58c45d7-7f62-4895-b5d4-1f07820a7603",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 475832,
+                    "uuid": "cdecac8c-cec8-4a32-8940-d3046ee5c8c7",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:30:00+00:00",
+                    "shop": {
+                        "id": 237,
+                        "name": "Limpoint - Jumbo Chipichape"
+                    },
+                    "shop_address": {
+                        "id": 6305,
+                        "point": {
+                            "x": -76.5277709,
+                            "y": 3.4790086,
+                            "srid": 4326
+                        },
+                        "name": "Limpoint - Jumbo Chipichape, Calle 40 Norte # 6a - 45",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 475833,
+                    "uuid": "d5ba5419-85ed-4381-873d-7a9eeac14f5e",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 373441,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-05T16:13:12.946618+00:00",
+            "start_address": {
+                "id": 105787,
+                "point": {
+                    "x": -75.56955889999999,
+                    "y": 6.216781300000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 16 #41-210, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 105788,
+                "point": {
+                    "x": -75.5856515,
+                    "y": 6.183439799999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 48 #Calle 26 sur 27, Zona 1, Envigado, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 476208,
+                    "uuid": "1a2cfddd-0eb0-4cce-86cc-50720abb3847",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-03-04T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 373442,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-05T16:14:21.351483+00:00",
+            "start_address": {
+                "id": 105788,
+                "point": {
+                    "x": -75.5856515,
+                    "y": 6.183439799999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 48 #Calle 26 sur 27, Zona 1, Envigado, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 105787,
+                "point": {
+                    "x": -75.56955889999999,
+                    "y": 6.216781300000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 16 #41-210, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 476209,
+                    "uuid": "84735832-cf75-4ba8-9efb-20cf5bea137e",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-03-04T19:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 373586,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-05T18:00:08.686703+00:00",
+            "start_address": {
+                "id": 147197,
+                "point": {
+                    "x": -76.51783499999999,
+                    "y": 3.490263,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 62 Nte. # 3G-80, El Rincon, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 147197,
+                "point": {
+                    "x": -76.51783499999999,
+                    "y": 3.490263,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 62 Nte. # 3G-80, El Rincon, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 476359,
+                    "uuid": "6855a706-f3d7-4cc8-8e33-3eac014d343a",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-23T19:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 476360,
+                    "uuid": "a08611a0-da11-4dc1-96ca-d9718e53eae1",
+                    "labor_id": 4,
+                    "labor_type": "tecnomecanica",
+                    "labor_name": "Tecnomecanica",
+                    "labor_category": "SAFETI_INSPECTION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-23T19:30:00+00:00",
+                    "shop": {
+                        "id": 298,
+                        "name": "Tecnired - Vasquez Cobo"
+                    },
+                    "shop_address": {
+                        "id": 9414,
+                        "point": {
+                            "x": -76.52531479999999,
+                            "y": 3.4700408,
+                            "srid": 4326
+                        },
+                        "name": "Tecnired - Vasquez Cobo, Avenida 2b Norte # 28 N - 37",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 476361,
+                    "uuid": "6576b79b-57eb-4632-9c4a-44accef0c7fa",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-23T20:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 374467,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-06T17:44:43.178266+00:00",
+            "start_address": {
+                "id": 147417,
+                "point": {
+                    "x": -76.5244139,
+                    "y": 3.483754,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 46 Nte. # 5A-74, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 147417,
+                "point": {
+                    "x": -76.5244139,
+                    "y": 3.483754,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 46 Nte. # 5A-74, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 477270,
+                    "uuid": "999a0792-5044-4ed0-a6b1-7ebf89efd1ca",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 477271,
+                    "uuid": "f8306fb3-37e3-487d-9a9f-9347cf84e10d",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T17:30:00+00:00",
+                    "shop": {
+                        "id": 237,
+                        "name": "Limpoint - Jumbo Chipichape"
+                    },
+                    "shop_address": {
+                        "id": 6305,
+                        "point": {
+                            "x": -76.5277709,
+                            "y": 3.4790086,
+                            "srid": 4326
+                        },
+                        "name": "Limpoint - Jumbo Chipichape, Calle 40 Norte # 6a - 45",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 477272,
+                    "uuid": "01be18dd-cb7d-4ea2-9955-e699b1c60028",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 375123,
+            "state": "REQUESTED",
+            "created_at": "2026-01-07T16:36:21.554663+00:00",
+            "start_address": {
+                "id": 113984,
+                "point": {
+                    "x": -74.1305541,
+                    "y": 4.6880053,
+                    "srid": 4326
+                },
+                "name": "Bodega Massy, Avenida calle 26 # 100 - 55",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 128879,
+                "point": {
+                    "x": -74.0395382,
+                    "y": 4.7407077,
+                    "srid": 4326
+                },
+                "name": "MotorPro, Calle 161a # 16a - 58",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 477956,
+                    "uuid": "e351568a-1ef0-4024-b153-7f114dcbe871",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-07T20:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 477957,
+                    "uuid": "02003379-65c0-496f-a2f6-c8b3d2b9259a",
+                    "labor_id": 6,
+                    "labor_type": "general_mechanics",
+                    "labor_name": "General Mechanics",
+                    "labor_category": "GENERAL_MECHANICS",
+                    "alfred": null,
+                    "schedule_date": "2026-01-07T21:00:00+00:00",
+                    "shop": {
+                        "id": 4164,
+                        "name": "MotorPro"
+                    },
+                    "shop_address": {
+                        "id": 128879,
+                        "point": {
+                            "x": -74.0395382,
+                            "y": 4.7407077,
+                            "srid": 4326
+                        },
+                        "name": "MotorPro, Calle 161a # 16a - 58",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                }
+            ]
+        },
+        {
+            "service_id": 375308,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-07T19:32:16.519674+00:00",
+            "start_address": {
+                "id": 117056,
+                "point": {
+                    "x": -75.572257,
+                    "y": 6.195414400000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 7A Sur #38-59, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 135371,
+                "point": {
+                    "x": -75.5700834,
+                    "y": 6.227604400000001,
+                    "srid": 4326
+                },
+                "name": "Otros, Cl. 29 #43a-29, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 478148,
+                    "uuid": "dcda13bc-ca66-4e80-a3f0-77cd01f83923",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 375309,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-07T19:34:25.000975+00:00",
+            "start_address": {
+                "id": 135371,
+                "point": {
+                    "x": -75.5700834,
+                    "y": 6.227604400000001,
+                    "srid": 4326
+                },
+                "name": "Otros, Cl. 29 #43a-29, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 117056,
+                "point": {
+                    "x": -75.572257,
+                    "y": 6.195414400000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 7A Sur #38-59, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 478149,
+                    "uuid": "c4313453-b7c7-4507-a262-892f5465301c",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T21:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 376021,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-08T18:36:58.965431+00:00",
+            "start_address": {
+                "id": 79189,
+                "point": {
+                    "x": -75.5648764,
+                    "y": 6.2157468,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 15b #35a-90, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 4852,
+                "point": {
+                    "x": -75.56991479999999,
+                    "y": 6.2276503,
+                    "srid": 4326
+                },
+                "name": "Autolux Volvo, Calle 29 # 43a - 05",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 478896,
+                    "uuid": "8f119a19-522f-48db-ac00-3e2620a7327b",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-03-04T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 376023,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-08T18:37:54.909895+00:00",
+            "start_address": {
+                "id": 4852,
+                "point": {
+                    "x": -75.56991479999999,
+                    "y": 6.2276503,
+                    "srid": 4326
+                },
+                "name": "Autolux Volvo, Calle 29 # 43a - 05",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 79189,
+                "point": {
+                    "x": -75.5648764,
+                    "y": 6.2157468,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 15b #35a-90, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 478900,
+                    "uuid": "80247596-d01f-4169-b6d2-aa4ebd3b8182",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-03-04T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 376626,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-09T14:33:56.972586+00:00",
+            "start_address": {
+                "id": 134508,
+                "point": {
+                    "x": -76.519122,
+                    "y": 3.476273,
+                    "srid": 4326
+                },
+                "name": "Casa, Avenida 3A # 40 NORTE-8, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 134508,
+                "point": {
+                    "x": -76.519122,
+                    "y": 3.476273,
+                    "srid": 4326
+                },
+                "name": "Casa, Avenida 3A # 40 NORTE-8, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 479514,
+                    "uuid": "c931ba65-1ae8-403f-8c5b-de2d4d304841",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 479515,
+                    "uuid": "36d17a8f-9d7c-462a-961a-ab66efd1ce89",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:30:00+00:00",
+                    "shop": {
+                        "id": 237,
+                        "name": "Limpoint - Jumbo Chipichape"
+                    },
+                    "shop_address": {
+                        "id": 6305,
+                        "point": {
+                            "x": -76.5277709,
+                            "y": 3.4790086,
+                            "srid": 4326
+                        },
+                        "name": "Limpoint - Jumbo Chipichape, Calle 40 Norte # 6a - 45",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 479516,
+                    "uuid": "1faa4891-c10f-4c0d-9a54-bbf7457d80e7",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 376679,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-09T15:09:14.225400+00:00",
+            "start_address": {
+                "id": 7120,
+                "point": {
+                    "x": -74.0468575,
+                    "y": 4.7218353,
+                    "srid": 4326
+                },
+                "name": "Autos Sura 137, Carrera 19 # 137-21",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 141229,
+                "point": {
+                    "x": -74.1306713,
+                    "y": 4.672126599999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 22d #93-16, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 479569,
+                    "uuid": "f7a2bcca-9f2f-45eb-86a2-b19c6a138360",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-23T20:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 376986,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-09T19:14:03.795348+00:00",
+            "start_address": {
+                "id": 183460,
+                "point": {
+                    "x": -74.05583159999999,
+                    "y": 4.6454392,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 2 #62a-40, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 26356,
+                "point": {
+                    "x": -74.065145,
+                    "y": 4.7617788,
+                    "srid": 4326
+                },
+                "name": "Casa Toro Ford Calle 170, Avenida Boyaca # 170 - 97",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 479882,
+                    "uuid": "9d0cd8ad-53be-4e02-b981-78b138e507a8",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T12:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 377033,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-09T19:52:27.669998+00:00",
+            "start_address": {
+                "id": 183475,
+                "point": {
+                    "x": -74.05434079999999,
+                    "y": 4.6866316,
+                    "srid": 4326
+                },
+                "name": "Otros, Cra. 21 #100-20, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 183476,
+                "point": {
+                    "x": -74.07476129999999,
+                    "y": 4.6939351,
+                    "srid": 4326
+                },
+                "name": "Otros, Av de la Constitución #100-30, Suba, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 479932,
+                    "uuid": "28db00d6-80d6-4aa1-92d0-1f3b30d1815d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 377078,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-09T20:28:12.068005+00:00",
+            "start_address": {
+                "id": 65193,
+                "point": {
+                    "x": -74.03798479999999,
+                    "y": 4.8806987,
+                    "srid": 4326
+                },
+                "name": "Mazda Vardi Chía, KM 2.5 Via Cajica Chia costado occidental",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 183494,
+                "point": {
+                    "x": -74.0983406,
+                    "y": 4.6336938,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 22 Bis #45-51, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 479977,
+                    "uuid": "14615a4b-f3e2-4c70-b661-6224042b8301",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T19:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 377280,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-10T02:01:21.075837+00:00",
+            "start_address": {
+                "id": 126092,
+                "point": {
+                    "x": -76.4951938,
+                    "y": 3.530023,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #25a-467, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 126092,
+                "point": {
+                    "x": -76.4951938,
+                    "y": 3.530023,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #25a-467, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 480181,
+                    "uuid": "2173acfe-497b-4d0c-a360-5073de69c267",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 480182,
+                    "uuid": "6b035a3f-a6fe-46cb-a3c8-789d8d5eebda",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T17:30:00+00:00",
+                    "shop": {
+                        "id": 4232,
+                        "name": "Lava Autos Pipe - Yumbo"
+                    },
+                    "shop_address": {
+                        "id": 138751,
+                        "point": {
+                            "x": -76.48859480000002,
+                            "y": 3.5738969,
+                            "srid": 4326
+                        },
+                        "name": "Lava Autos Pipe - Yumbo, Cra. 12 #14a-88, Br. Puerto Isaac, Yumbo, Valle del Cauca",
+                        "city": "VALLE DEL CAUCA-YUMBO"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 480183,
+                    "uuid": "aaa58001-da16-4406-bbfe-c35393ced460",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 377281,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-10T02:01:46.533387+00:00",
+            "start_address": {
+                "id": 126092,
+                "point": {
+                    "x": -76.4951938,
+                    "y": 3.530023,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #25a-467, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 126092,
+                "point": {
+                    "x": -76.4951938,
+                    "y": 3.530023,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #25a-467, Arroyo Hondo, Yumbo, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 480184,
+                    "uuid": "fc390937-e077-4e64-b4db-76c59883be53",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-30T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 480185,
+                    "uuid": "24ad6639-dcc9-4ce4-8358-942bdca0b9fd",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-30T17:30:00+00:00",
+                    "shop": {
+                        "id": 4232,
+                        "name": "Lava Autos Pipe - Yumbo"
+                    },
+                    "shop_address": {
+                        "id": 138751,
+                        "point": {
+                            "x": -76.48859480000002,
+                            "y": 3.5738969,
+                            "srid": 4326
+                        },
+                        "name": "Lava Autos Pipe - Yumbo, Cra. 12 #14a-88, Br. Puerto Isaac, Yumbo, Valle del Cauca",
+                        "city": "VALLE DEL CAUCA-YUMBO"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 480186,
+                    "uuid": "3e62a524-fbcf-469e-89b4-72134e1bcc56",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-30T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 377490,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-10T14:42:37.296508+00:00",
+            "start_address": {
+                "id": 183567,
+                "point": {
+                    "x": -76.5201647,
+                    "y": 3.4924034,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 67 Nte. #4b-77, Menga, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 43815,
+                "point": {
+                    "x": -76.5062106,
+                    "y": 3.5024871,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede norte, Calle 15 # 35 -84 Acopi Yumbo",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 480403,
+                    "uuid": "aa59e5ef-8521-42ef-ab29-ea3ea8a7c808",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T13:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 377540,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-10T15:09:16.418113+00:00",
+            "start_address": {
+                "id": 7120,
+                "point": {
+                    "x": -74.0468575,
+                    "y": 4.7218353,
+                    "srid": 4326
+                },
+                "name": "Autos Sura 137, Carrera 19 # 137-21",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 181008,
+                "point": {
+                    "x": -74.0483775,
+                    "y": 4.7019667,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 18 C #122-28, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 480453,
+                    "uuid": "b915cf17-9b08-49e4-a485-cbac8fa1f754",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-23T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 377543,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-10T15:10:12.327194+00:00",
+            "start_address": {
+                "id": 149867,
+                "point": {
+                    "x": -76.528053,
+                    "y": 3.4641573,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Av. 5a Nte. #23N-46/57, San Vicente, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 43816,
+                "point": {
+                    "x": -76.5389012,
+                    "y": 3.38733,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede sur, Calle 13 # 78a - 150",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 480456,
+                    "uuid": "f3540fc1-352f-49cd-9c56-10a5d4d271df",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T12:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 378879,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T01:58:33.157692+00:00",
+            "start_address": {
+                "id": 156309,
+                "point": {
+                    "x": -74.0607148,
+                    "y": 4.644607199999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 59a Bis #5-13, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 156309,
+                "point": {
+                    "x": -74.0607148,
+                    "y": 4.644607199999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 59a Bis #5-13, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 481800,
+                    "uuid": "89994fad-f578-4bca-aff4-cba5d6a519d4",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 481801,
+                    "uuid": "c4146d2f-62ed-49b9-98f4-88ce8fdc1931",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:30:00+00:00",
+                    "shop": {
+                        "id": 4182,
+                        "name": "Quality - Centro Comercial Atlantis"
+                    },
+                    "shop_address": {
+                        "id": 130138,
+                        "point": {
+                            "x": -74.05587369999999,
+                            "y": 4.666076299999999,
+                            "srid": 4326
+                        },
+                        "name": "Quality - Centro Comercial Atlantis, Calle 80 # 13 - 06, sotano 2, costado suroriente",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 481802,
+                    "uuid": "1cd7ef12-707f-4baa-862a-9707e4556f99",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379023,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T13:41:16.897658+00:00",
+            "start_address": {
+                "id": 136963,
+                "point": {
+                    "x": -76.30498659999999,
+                    "y": 3.5229834,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a # 24-59, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 136963,
+                "point": {
+                    "x": -76.30498659999999,
+                    "y": 3.5229834,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a # 24-59, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 481954,
+                    "uuid": "32538ed3-26b2-47c9-a6fb-3029d7f8fb89",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 481955,
+                    "uuid": "1d0f267c-398b-489a-82a2-b7d1158c4e12",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T18:30:00+00:00",
+                    "shop": {
+                        "id": 4157,
+                        "name": "Palmotors - Lavados"
+                    },
+                    "shop_address": {
+                        "id": 127839,
+                        "point": {
+                            "x": -76.31507669999999,
+                            "y": 3.5385042,
+                            "srid": 4326
+                        },
+                        "name": "Palmotors - Lavados, Calle 42 # 45 - 47, Palmira",
+                        "city": "VALLE DEL CAUCA-PALMIRA"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 481956,
+                    "uuid": "4727e4ad-9757-4a26-9f31-3c5a5a2545b3",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T19:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379081,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T14:20:08.959602+00:00",
+            "start_address": {
+                "id": 172069,
+                "point": {
+                    "x": -74.1089909,
+                    "y": 4.611773400000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 39b #4-20, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 172069,
+                "point": {
+                    "x": -74.1089909,
+                    "y": 4.611773400000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 39b #4-20, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 482014,
+                    "uuid": "4ebc4423-1b33-4d90-9435-cf8e331f9bfa",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 482015,
+                    "uuid": "5b9fa885-0374-4218-8805-24bff1a9a93e",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T17:30:00+00:00",
+                    "shop": {
+                        "id": 4343,
+                        "name": "D´luxe Car Wash"
+                    },
+                    "shop_address": {
+                        "id": 165558,
+                        "point": {
+                            "x": -74.1379254,
+                            "y": 4.6258727,
+                            "srid": 4326
+                        },
+                        "name": "D´luxe Car Wash, Calle 3 # 71 g - 36",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 482016,
+                    "uuid": "a1d76624-6323-4d82-87a8-20a2b8b49a80",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379324,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T17:06:09.431732+00:00",
+            "start_address": {
+                "id": 183902,
+                "point": {
+                    "x": -74.08172060000001,
+                    "y": 4.721926799999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 81 #128b-11, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 2,
+                "point": {
+                    "x": -74.028923,
+                    "y": 4.704466,
+                    "srid": 4326
+                },
+                "name": "Autogermana taller 127, Calle 127b # 7-15",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 482279,
+                    "uuid": "b249251b-06d1-4492-80d1-213dc8649a10",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 379513,
+            "state": "REQUESTED",
+            "created_at": "2026-01-13T19:40:04.898704+00:00",
+            "start_address": {
+                "id": 183940,
+                "point": {
+                    "x": -74.046356,
+                    "y": 4.669551999999999,
+                    "srid": 4326
+                },
+                "name": "otro, Cra. 8 # 88-11, Chapinero, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 183940,
+                "point": {
+                    "x": -74.046356,
+                    "y": 4.669551999999999,
+                    "srid": 4326
+                },
+                "name": "otro, Cra. 8 # 88-11, Chapinero, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 482473,
+                    "uuid": "392c6030-e7b3-4d0b-bde6-266cc63df1d0",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 482474,
+                    "uuid": "14f37676-6a53-4db7-9e50-16280ade5cc6",
+                    "labor_id": 4,
+                    "labor_type": "tecnomecanica",
+                    "labor_name": "Tecnomecanica",
+                    "labor_category": "SAFETI_INSPECTION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T13:30:00+00:00",
+                    "shop": {
+                        "id": 14,
+                        "name": "Megaservice"
+                    },
+                    "shop_address": {
+                        "id": 14,
+                        "point": {
+                            "x": -74.0677628,
+                            "y": 4.657498599999999,
+                            "srid": 4326
+                        },
+                        "name": "Megaservice, Calle 68 No. 20 – 41",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 482475,
+                    "uuid": "b6787299-db75-4279-bdc0-f68467f13eca",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379728,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T22:33:57.595126+00:00",
+            "start_address": {
+                "id": 80405,
+                "point": {
+                    "x": -74.0301554,
+                    "y": 4.6983674,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 123 #7-7, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 132538,
+                "point": {
+                    "x": -74.1148716,
+                    "y": 4.672371,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Av. El Dorado #77-04, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 482697,
+                    "uuid": "c0ce55ce-1a61-46d7-a990-57988a5fe8c0",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T14:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 379768,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-13T23:58:25.480981+00:00",
+            "start_address": {
+                "id": 184017,
+                "point": {
+                    "x": -76.548327,
+                    "y": 3.3497312,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 6 #114-170, La Finca, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 43816,
+                "point": {
+                    "x": -76.5389012,
+                    "y": 3.38733,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede sur, Calle 13 # 78a - 150",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 482737,
+                    "uuid": "630d7a31-eb2c-46ca-811f-0ddca9ffdac3",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-27T15:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 379778,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T00:25:08.704622+00:00",
+            "start_address": {
+                "id": 156523,
+                "point": {
+                    "x": -74.137269,
+                    "y": 4.6028034,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 68d Bis #38C -26 SUR, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 156523,
+                "point": {
+                    "x": -74.137269,
+                    "y": 4.6028034,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 68d Bis #38C -26 SUR, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 482749,
+                    "uuid": "1cc5771c-b374-4dba-b52f-d7ac38303154",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 482750,
+                    "uuid": "67b5f795-81e3-4854-9b52-b874bc2ddef3",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:30:00+00:00",
+                    "shop": {
+                        "id": 837,
+                        "name": "Lavado en seco Limpoint Centro Mayor"
+                    },
+                    "shop_address": {
+                        "id": 57954,
+                        "point": {
+                            "x": -74.1245465,
+                            "y": 4.5925638,
+                            "srid": 4326
+                        },
+                        "name": "Lavado en seco Limpoint Centro Mayor, Calle 38A Sur # 34d - 51",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 482751,
+                    "uuid": "d802bd2e-409a-43e4-88f0-4f9686479445",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379981,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T14:09:38.597763+00:00",
+            "start_address": {
+                "id": 138570,
+                "point": {
+                    "x": -76.5426041,
+                    "y": 3.4549262,
+                    "srid": 4326
+                },
+                "name": "Casa, Normandía, Cl. 1b Oe. #4A Oeste 201, Normandia Sebastian de Belalcazar, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 138570,
+                "point": {
+                    "x": -76.5426041,
+                    "y": 3.4549262,
+                    "srid": 4326
+                },
+                "name": "Casa, Normandía, Cl. 1b Oe. #4A Oeste 201, Normandia Sebastian de Belalcazar, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 482960,
+                    "uuid": "eca02bb0-6d56-4f39-8ef0-7e143b8e138d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-24T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 482961,
+                    "uuid": "6fe98877-4bca-4e35-bc7c-aebaaaa93478",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-24T17:30:00+00:00",
+                    "shop": {
+                        "id": 1081,
+                        "name": "Pits Detailing Wash - ZONA DE ALISTAMIENTO"
+                    },
+                    "shop_address": {
+                        "id": 85107,
+                        "point": {
+                            "x": -76.53012650000001,
+                            "y": 3.4665796,
+                            "srid": 4326
+                        },
+                        "name": "Pits Detailing Wash - Av Sexta Cali, Av 6 Norte # 24A - 25",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 482962,
+                    "uuid": "52a09c2b-ac1c-4635-b40c-34ec6fb2aa32",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-24T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 379993,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T14:19:12.158582+00:00",
+            "start_address": {
+                "id": 69746,
+                "point": {
+                    "x": -76.5223585,
+                    "y": 3.4597405,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 1 #24-56, San Nicolas, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 43815,
+                "point": {
+                    "x": -76.5062106,
+                    "y": 3.5024871,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede norte, Calle 15 # 35 -84 Acopi Yumbo",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 482974,
+                    "uuid": "cfc323a1-d813-4544-a957-23143877e8ad",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T15:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380100,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T15:34:26.952175+00:00",
+            "start_address": {
+                "id": 184103,
+                "point": {
+                    "x": -75.5609087,
+                    "y": 6.2085509,
+                    "srid": 4326
+                },
+                "name": "Casa, Bosques de vizcaya, Cl 10 #30a-71, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 4852,
+                "point": {
+                    "x": -75.56991479999999,
+                    "y": 6.2276503,
+                    "srid": 4326
+                },
+                "name": "Autolux Volvo, Calle 29 # 43a - 05",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483082,
+                    "uuid": "34814fc2-3569-429f-8ce4-f7512f41d4b8",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T14:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380121,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T15:43:59.717940+00:00",
+            "start_address": {
+                "id": 4852,
+                "point": {
+                    "x": -75.56991479999999,
+                    "y": 6.2276503,
+                    "srid": 4326
+                },
+                "name": "Autolux Volvo, Calle 29 # 43a - 05",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 184103,
+                "point": {
+                    "x": -75.5609087,
+                    "y": 6.2085509,
+                    "srid": 4326
+                },
+                "name": "Casa, Bosques de vizcaya, Cl 10 #30a-71, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483103,
+                    "uuid": "a9ed71e5-de90-4428-b6dd-dd424fd39a0d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T19:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380127,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T15:45:57.113139+00:00",
+            "start_address": {
+                "id": 184108,
+                "point": {
+                    "x": -76.528409,
+                    "y": 3.376435,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 92 # 16-35, Comuna 17, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 75827,
+                "point": {
+                    "x": -76.53965687916794,
+                    "y": 3.4516627253884913,
+                    "srid": 4326
+                },
+                "name": "Auto Sura Cali, Autos Sura Centenario Av  2 Norte  3N -20",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483111,
+                    "uuid": "a6134bea-6044-4baf-835c-dcc6f2397c90",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T19:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380156,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T16:07:56.824802+00:00",
+            "start_address": {
+                "id": 123397,
+                "point": {
+                    "x": -74.04164800000001,
+                    "y": 4.6770823,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 8 #95-33, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 1488,
+                "point": {
+                    "x": -74.10500789999999,
+                    "y": 4.6304576,
+                    "srid": 4326
+                },
+                "name": "Autogermana Puente Aranda, Carrera 50 # 17 - 29",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483140,
+                    "uuid": "f35d3f28-2ca9-42da-8624-144af139306a",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380245,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T17:25:10.329780+00:00",
+            "start_address": {
+                "id": 184146,
+                "point": {
+                    "x": -74.066273,
+                    "y": 4.761134,
+                    "srid": 4326
+                },
+                "name": "Otros, Cl. 170 #6920, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184145,
+                "point": {
+                    "x": -74.1441163,
+                    "y": 4.643230099999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 80 #8c-85, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483229,
+                    "uuid": "bc31ad4a-c2a5-4d7c-8b2c-895cf8564348",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T16:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380258,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T17:36:18.285995+00:00",
+            "start_address": {
+                "id": 123807,
+                "point": {
+                    "x": -74.0529037,
+                    "y": 4.6917257,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 104a #19a-52, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 26356,
+                "point": {
+                    "x": -74.065145,
+                    "y": 4.7617788,
+                    "srid": 4326
+                },
+                "name": "Casa Toro Ford Calle 170, Avenida Boyaca # 170 - 97",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483242,
+                    "uuid": "46714361-f956-4c64-a300-cd82e8cbbe99",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T12:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380338,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T18:38:48.172432+00:00",
+            "start_address": {
+                "id": 183705,
+                "point": {
+                    "x": -76.5215896,
+                    "y": 3.4536185,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 23 #7-34, San Nicolas, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 183705,
+                "point": {
+                    "x": -76.5215896,
+                    "y": 3.4536185,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 23 #7-34, San Nicolas, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483326,
+                    "uuid": "cf4ba75c-38a9-407b-bc7c-15d7a244b864",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-27T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483327,
+                    "uuid": "ca653897-f5fa-436c-861a-ec50426aab6d",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-27T17:30:00+00:00",
+                    "shop": {
+                        "id": 3539,
+                        "name": "Lavadero La 39 - Cali"
+                    },
+                    "shop_address": {
+                        "id": 114928,
+                        "point": {
+                            "x": -76.5313527,
+                            "y": 3.4197604,
+                            "srid": 4326
+                        },
+                        "name": "Lavadero La 39 - Cali, Carrera 39 # 12C - 109, Pasoancho 39, esquina carril derecho",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483328,
+                    "uuid": "fa817b0b-a5a8-4e5c-ad46-b0cd5b2e3ce7",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-27T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380357,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T18:57:19.318240+00:00",
+            "start_address": {
+                "id": 184166,
+                "point": {
+                    "x": -74.06435979999999,
+                    "y": 4.7601933,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 170 #69-80, Suba, Bogotá, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184165,
+                "point": {
+                    "x": -74.04532689999999,
+                    "y": 4.6668645,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 6 #86-60, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483347,
+                    "uuid": "45f7444b-eda7-425c-bec5-0108c1b90149",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T21:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380493,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T20:21:59.508319+00:00",
+            "start_address": {
+                "id": 169812,
+                "point": {
+                    "x": -74.0506269,
+                    "y": 4.6725737,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 89 # 12-14, Chapinero, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 169812,
+                "point": {
+                    "x": -74.0506269,
+                    "y": 4.6725737,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 89 # 12-14, Chapinero, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483484,
+                    "uuid": "7fd4a584-1f29-433e-9c41-80fab6cc4515",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": 10500,
+                    "schedule_date": "2026-01-16T15:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483485,
+                    "uuid": "26faca72-6752-481b-b5a9-0861dd41349a",
+                    "labor_id": 6,
+                    "labor_type": "general_mechanics",
+                    "labor_name": "General Mechanics",
+                    "labor_category": "GENERAL_MECHANICS",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T16:00:00+00:00",
+                    "shop": {
+                        "id": 2120,
+                        "name": "City Autos Taller"
+                    },
+                    "shop_address": {
+                        "id": 105861,
+                        "point": {
+                            "x": -74.0723965,
+                            "y": 4.656636699999999,
+                            "srid": 4326
+                        },
+                        "name": "City Autos Taller, Calle 64 # 25 - 46, Bogotá",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483486,
+                    "uuid": "89f351a8-3f0e-4688-97f4-379543ece785",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T16:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380543,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T21:20:02.909093+00:00",
+            "start_address": {
+                "id": 161531,
+                "point": {
+                    "x": -74.0484869,
+                    "y": 4.764044699999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 185 #51-56, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 161531,
+                "point": {
+                    "x": -74.0484869,
+                    "y": 4.764044699999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 185 #51-56, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483538,
+                    "uuid": "7fb98753-dc05-4bae-ae9c-5df8ba52ae89",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483539,
+                    "uuid": "5a0a4153-2154-44ff-960b-698c13aded2f",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:30:00+00:00",
+                    "shop": {
+                        "id": 480,
+                        "name": "S.S. CAR WASH"
+                    },
+                    "shop_address": {
+                        "id": 22238,
+                        "point": {
+                            "x": -74.0425822,
+                            "y": 4.7500697,
+                            "srid": 4326
+                        },
+                        "name": "CAR WASH 24 HS, CALLE 170 # 19 B - 41",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483540,
+                    "uuid": "13bdfab1-5f1b-40cd-a9b3-de89d781c2eb",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380573,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T21:39:19.230805+00:00",
+            "start_address": {
+                "id": 184220,
+                "point": {
+                    "x": -74.0914847,
+                    "y": 4.8086322,
+                    "srid": 4326
+                },
+                "name": "Casa, Variante de Cota #Km. 1.5, Cota, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 2,
+                "point": {
+                    "x": -74.028923,
+                    "y": 4.704466,
+                    "srid": 4326
+                },
+                "name": "Autogermana taller 127, Calle 127b # 7-15",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 483572,
+                    "uuid": "13557850-c7fe-4a79-b3eb-9df5b7cc4a55",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T15:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380624,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-14T21:55:42.973746+00:00",
+            "start_address": {
+                "id": 138878,
+                "point": {
+                    "x": -75.56492639999999,
+                    "y": 6.1877187,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 11 Sur #29d-27, El Poblado, Medellín, El Poblado, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 4852,
+                "point": {
+                    "x": -75.56991479999999,
+                    "y": 6.2276503,
+                    "srid": 4326
+                },
+                "name": "Autolux Volvo, Calle 29 # 43a - 05",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483624,
+                    "uuid": "dcdcfe34-f7bb-467c-915c-e998286843d6",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380754,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T01:45:45.795233+00:00",
+            "start_address": {
+                "id": 164017,
+                "point": {
+                    "x": -76.3050497,
+                    "y": 3.5230008,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a #2459, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 164017,
+                "point": {
+                    "x": -76.3050497,
+                    "y": 3.5230008,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a #2459, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483757,
+                    "uuid": "20b63f74-4023-4103-ab52-c1f7d36768a4",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483758,
+                    "uuid": "c89641d5-b16a-4bc8-8ca4-a9dcb0122dc4",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T17:30:00+00:00",
+                    "shop": {
+                        "id": 4275,
+                        "name": "Lavadero Los Pri"
+                    },
+                    "shop_address": {
+                        "id": 148094,
+                        "point": {
+                            "x": -76.2984561,
+                            "y": 3.5369569,
+                            "srid": 4326
+                        },
+                        "name": "Lavadero Los Pri, Calle 41 # 29 - 31, Palmira",
+                        "city": "VALLE DEL CAUCA-PALMIRA"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483759,
+                    "uuid": "ea35a8a7-2354-4597-95a0-a437eb901401",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380756,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T01:47:19.279767+00:00",
+            "start_address": {
+                "id": 164017,
+                "point": {
+                    "x": -76.3050497,
+                    "y": 3.5230008,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a #2459, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 164017,
+                "point": {
+                    "x": -76.3050497,
+                    "y": 3.5230008,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra. 33a #2459, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483761,
+                    "uuid": "305635c6-b957-49fe-a399-33f8a4dad0ba",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-02-09T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483762,
+                    "uuid": "640487be-e021-48d1-8df1-960b1cba6851",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-02-09T17:30:00+00:00",
+                    "shop": {
+                        "id": 4275,
+                        "name": "Lavadero Los Pri"
+                    },
+                    "shop_address": {
+                        "id": 148094,
+                        "point": {
+                            "x": -76.2984561,
+                            "y": 3.5369569,
+                            "srid": 4326
+                        },
+                        "name": "Lavadero Los Pri, Calle 41 # 29 - 31, Palmira",
+                        "city": "VALLE DEL CAUCA-PALMIRA"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483763,
+                    "uuid": "a66e1084-5025-4228-b7dc-34ca2123f255",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-02-09T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380879,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T13:23:34.517882+00:00",
+            "start_address": {
+                "id": 75827,
+                "point": {
+                    "x": -76.53965687916794,
+                    "y": 3.4516627253884913,
+                    "srid": 4326
+                },
+                "name": "Auto Sura Cali, Autos Sura Centenario Av  2 Norte  3N -20",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 161640,
+                "point": {
+                    "x": -76.5388054,
+                    "y": 3.4380924,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 24 #4 OESTE 68, Miraflores, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483888,
+                    "uuid": "9b45f5b4-223d-4ed6-979e-faf4abbb38ec",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380919,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T13:54:27.212644+00:00",
+            "start_address": {
+                "id": 166327,
+                "point": {
+                    "x": -76.4960699,
+                    "y": 3.4665607,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 166327,
+                "point": {
+                    "x": -76.4960699,
+                    "y": 3.4665607,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483929,
+                    "uuid": "2f4834eb-f638-4fc5-b194-076208c8a00d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-31T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483930,
+                    "uuid": "ab4defc1-33ec-4951-9e41-97f960fd9f05",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-31T17:30:00+00:00",
+                    "shop": {
+                        "id": 1081,
+                        "name": "Pits Detailing Wash - ZONA DE ALISTAMIENTO"
+                    },
+                    "shop_address": {
+                        "id": 85107,
+                        "point": {
+                            "x": -76.53012650000001,
+                            "y": 3.4665796,
+                            "srid": 4326
+                        },
+                        "name": "Pits Detailing Wash - Av Sexta Cali, Av 6 Norte # 24A - 25",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483931,
+                    "uuid": "9ff10451-be9e-4668-a9dd-4bc7e72f0e73",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-31T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380926,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T13:58:32.813445+00:00",
+            "start_address": {
+                "id": 166327,
+                "point": {
+                    "x": -76.4960699,
+                    "y": 3.4665607,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 166327,
+                "point": {
+                    "x": -76.4960699,
+                    "y": 3.4665607,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483938,
+                    "uuid": "52e3bbed-cff1-4cb4-aa48-4025f511fe1e",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-02-07T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 483939,
+                    "uuid": "6c54ed87-c20a-4bc9-8f87-b9e0d03fe88a",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-02-07T17:30:00+00:00",
+                    "shop": {
+                        "id": 1081,
+                        "name": "Pits Detailing Wash - ZONA DE ALISTAMIENTO"
+                    },
+                    "shop_address": {
+                        "id": 85107,
+                        "point": {
+                            "x": -76.53012650000001,
+                            "y": 3.4665796,
+                            "srid": 4326
+                        },
+                        "name": "Pits Detailing Wash - Av Sexta Cali, Av 6 Norte # 24A - 25",
+                        "city": "VALLE DEL CAUCA-CALI"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 483940,
+                    "uuid": "1a6530de-5094-49e2-8d92-5daddbbdc77d",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-02-07T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 380976,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T14:39:31.269424+00:00",
+            "start_address": {
+                "id": 128621,
+                "point": {
+                    "x": -76.4192423,
+                    "y": 3.505773699999999,
+                    "srid": 4326
+                },
+                "name": "Otros, Palmira - Cali, Palmira, El Faro, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 43815,
+                "point": {
+                    "x": -76.5062106,
+                    "y": 3.5024871,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede norte, Calle 15 # 35 -84 Acopi Yumbo",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483995,
+                    "uuid": "80dc7249-310e-4f12-9623-24b32def9d2d",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-24T15:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380977,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T14:40:52.364742+00:00",
+            "start_address": {
+                "id": 43815,
+                "point": {
+                    "x": -76.5062106,
+                    "y": 3.5024871,
+                    "srid": 4326
+                },
+                "name": "Toyota Norte y Sur - sede norte, Calle 15 # 35 -84 Acopi Yumbo",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 128621,
+                "point": {
+                    "x": -76.4192423,
+                    "y": 3.505773699999999,
+                    "srid": 4326
+                },
+                "name": "Otros, Palmira - Cali, Palmira, El Faro, Palmira, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 483996,
+                    "uuid": "bd281a74-6ff8-4532-8402-773723431d32",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-26T22:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 380992,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T14:53:01.118257+00:00",
+            "start_address": {
+                "id": 184313,
+                "point": {
+                    "x": -74.0478036,
+                    "y": 4.6924152,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 17 # 106-51, Usaquén, Bogotá, D.C., Bogotá, Bogotá, D.C., Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 17793,
+                "point": {
+                    "x": -74.05576889999999,
+                    "y": 4.712595600000001,
+                    "srid": 4326
+                },
+                "name": "Autonal Volvo, Carrera 47 # 128 - 21",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484012,
+                    "uuid": "93633716-da48-4b44-80fe-d113b4429f63",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-22T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381019,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:14:46.366021+00:00",
+            "start_address": {
+                "id": 129982,
+                "point": {
+                    "x": -76.5046109,
+                    "y": 3.5555811,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 8 #20b-173, Br. Las Americas, Guabinas, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 129982,
+                "point": {
+                    "x": -76.5046109,
+                    "y": 3.5555811,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 8 #20b-173, Br. Las Americas, Guabinas, Arroyo Hondo, Yumbo, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484040,
+                    "uuid": "79ed28dd-56ca-4dcd-a41a-db858766a7c2",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-29T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 484041,
+                    "uuid": "a6551e15-7d9d-4986-8d56-bf53237c5bcc",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-29T17:30:00+00:00",
+                    "shop": {
+                        "id": 4232,
+                        "name": "Lava Autos Pipe - Yumbo"
+                    },
+                    "shop_address": {
+                        "id": 138751,
+                        "point": {
+                            "x": -76.48859480000002,
+                            "y": 3.5738969,
+                            "srid": 4326
+                        },
+                        "name": "Lava Autos Pipe - Yumbo, Cra. 12 #14a-88, Br. Puerto Isaac, Yumbo, Valle del Cauca",
+                        "city": "VALLE DEL CAUCA-YUMBO"
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 484042,
+                    "uuid": "df3ac23e-cb1b-4eab-a145-aa72065fb3c4",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-29T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 381040,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:23:22.674153+00:00",
+            "start_address": {
+                "id": 184326,
+                "point": {
+                    "x": -74.08352339999999,
+                    "y": 4.682835799999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cra 68C #76a-57, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 26356,
+                "point": {
+                    "x": -74.065145,
+                    "y": 4.7617788,
+                    "srid": 4326
+                },
+                "name": "Casa Toro Ford Calle 170, Avenida Boyaca # 170 - 97",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484063,
+                    "uuid": "21513850-7683-40e3-87b5-3dfd791010ef",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-02-05T13:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381063,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:40:58.045856+00:00",
+            "start_address": {
+                "id": 91106,
+                "point": {
+                    "x": -74.0541934,
+                    "y": 4.6738139,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 16 #88-22, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 2,
+                "point": {
+                    "x": -74.028923,
+                    "y": 4.704466,
+                    "srid": 4326
+                },
+                "name": "Autogermana taller 127, Calle 127b # 7-15",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484086,
+                    "uuid": "a6817f87-cd7a-4731-ad32-fb9c5219e240",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T15:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381069,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:48:08.429144+00:00",
+            "start_address": {
+                "id": 184332,
+                "point": {
+                    "x": -74.0684512,
+                    "y": 4.7044159,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 119a #57 - 35, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184333,
+                "point": {
+                    "x": -74.11450529999999,
+                    "y": 4.6717962,
+                    "srid": 4326
+                },
+                "name": "Otros, Av. El Dorado #77-04, Engativá, Bogotá, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484092,
+                    "uuid": "e48dbb29-789e-4a81-88fa-bdb670c4bd96",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381081,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:53:53.504872+00:00",
+            "start_address": {
+                "id": 184334,
+                "point": {
+                    "x": -74.131805,
+                    "y": 4.648132299999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 15 #72-95, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 674,
+                "point": {
+                    "x": -74.1145559,
+                    "y": 4.6716483,
+                    "srid": 4326
+                },
+                "name": "Shop, Avenida el Dorado # 77-04",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484104,
+                    "uuid": "81c00fe8-7873-445d-9b9a-6a4906c450ce",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-21T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381083,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:54:48.052165+00:00",
+            "start_address": {
+                "id": 184335,
+                "point": {
+                    "x": -74.0490272,
+                    "y": 4.6504613,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra 2 Este #70A-91, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184336,
+                "point": {
+                    "x": -74.02394079999999,
+                    "y": 4.728333399999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cr 7 # 153A - 08, Usaquén, Bogotá, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484106,
+                    "uuid": "5f01a8f8-1391-41b5-b9d1-81f3db22f4bb",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T13:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381086,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T15:57:45.802945+00:00",
+            "start_address": {
+                "id": 184336,
+                "point": {
+                    "x": -74.02394079999999,
+                    "y": 4.728333399999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cr 7 # 153A - 08, Usaquén, Bogotá, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184335,
+                "point": {
+                    "x": -74.0490272,
+                    "y": 4.6504613,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra 2 Este #70A-91, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484109,
+                    "uuid": "2e1b64c9-1808-411f-877f-d82d96160089",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-20T21:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381105,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:08:36.669668+00:00",
+            "start_address": {
+                "id": 184341,
+                "point": {
+                    "x": -76.5464806,
+                    "y": 3.3545956,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 113 #8-20, La Finca, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 184342,
+                "point": {
+                    "x": -76.5378511,
+                    "y": 3.3957187,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Av. Pasoancho #68-13, Quintas De Don Simon, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484130,
+                    "uuid": "bfe3eac1-9550-4540-843e-9adf67900abb",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-27T14:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381106,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:08:42.521493+00:00",
+            "start_address": {
+                "id": 184330,
+                "point": {
+                    "x": -75.59864639999999,
+                    "y": 6.237867199999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 32EE #78-24, Medellín, Belén, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 117281,
+                "point": {
+                    "x": -75.56979539999999,
+                    "y": 6.2198631,
+                    "srid": 4326
+                },
+                "name": "Autoland Mazda El Poblado, Carrera 43b # 17 - 221",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484131,
+                    "uuid": "6654b82d-6bba-48d0-a5b9-c2d8f5fb357c",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T12:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381115,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:14:17.135435+00:00",
+            "start_address": {
+                "id": 117281,
+                "point": {
+                    "x": -75.56979539999999,
+                    "y": 6.2198631,
+                    "srid": 4326
+                },
+                "name": "Autoland Mazda El Poblado, Carrera 43b # 17 - 221",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 184330,
+                "point": {
+                    "x": -75.59864639999999,
+                    "y": 6.237867199999999,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl. 32EE #78-24, Medellín, Belén, Medellín, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484140,
+                    "uuid": "8eadc894-69c0-474a-9c00-0d24920d80eb",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-28T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381119,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:15:27.177389+00:00",
+            "start_address": {
+                "id": 160507,
+                "point": {
+                    "x": -74.0741992,
+                    "y": 4.6945752,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Av de la Constitución #101-22, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 65193,
+                "point": {
+                    "x": -74.03798479999999,
+                    "y": 4.8806987,
+                    "srid": 4326
+                },
+                "name": "Mazda Vardi Chía, KM 2.5 Via Cajica Chia costado occidental",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484144,
+                    "uuid": "6f7dd92f-514d-44fc-93c9-2341e4390038",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T14:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381128,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:21:05.349985+00:00",
+            "start_address": {
+                "id": 184347,
+                "point": {
+                    "x": -74.1565279,
+                    "y": 4.602003900000001,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 64b #55-31 sur, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 674,
+                "point": {
+                    "x": -74.1145559,
+                    "y": 4.6716483,
+                    "srid": 4326
+                },
+                "name": "Shop, Avenida el Dorado # 77-04",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484153,
+                    "uuid": "504f19d6-8770-4509-a9ad-763f41c54e0c",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T16:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381154,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T16:48:30.740050+00:00",
+            "start_address": {
+                "id": 169287,
+                "point": {
+                    "x": -74.0673432,
+                    "y": 4.6168,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 30a #6-10, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 169287,
+                "point": {
+                    "x": -74.0673432,
+                    "y": 4.6168,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 30a #6-10, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484179,
+                    "uuid": "431bbfb0-b741-4aea-9529-f8a785f40063",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 484180,
+                    "uuid": "ef86d5dc-dd28-4078-80e3-e5dfba220a99",
+                    "labor_id": 3,
+                    "labor_type": "wash_and_polish",
+                    "labor_name": "Wash and Polish",
+                    "labor_category": "WASH_AND_POLISH",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T17:30:00+00:00",
+                    "shop": {
+                        "id": 215,
+                        "name": "Polish Car Calle 63"
+                    },
+                    "shop_address": {
+                        "id": 4885,
+                        "point": {
+                            "x": -74.07294885404518,
+                            "y": 4.650544279518066,
+                            "srid": 4326
+                        },
+                        "name": "Polish Car Calle 63, Carrera 24 # 62 - 39",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 484181,
+                    "uuid": "7fc890ad-27a6-496b-8776-12410e53f590",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-16T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 381177,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T17:07:39.655674+00:00",
+            "start_address": {
+                "id": 166937,
+                "point": {
+                    "x": -74.0642453,
+                    "y": 4.761771,
+                    "srid": 4326
+                },
+                "name": "Trabajo, calle 173. 70-60 BOGOTA Bogotá D.C BOGOTA Bogotá, D.C, Suba, Cundinamarca, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 169502,
+                "point": {
+                    "x": -74.12727629999999,
+                    "y": 4.7122629,
+                    "srid": 4326
+                },
+                "name": "Casa, Cl 72 #1 12, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484207,
+                    "uuid": "f6c72d73-ef96-459c-b19d-475f60017e32",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T21:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381196,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T17:22:07.415011+00:00",
+            "start_address": {
+                "id": 183908,
+                "point": {
+                    "x": -74.04334539999999,
+                    "y": 4.680411299999999,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Cl. 97a #9a-50, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 25894,
+                "point": {
+                    "x": -74.0451975,
+                    "y": 4.747778600000001,
+                    "srid": 4326
+                },
+                "name": "Autocipres Toberin, Carrera 22 # 166 - 44",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484227,
+                    "uuid": "83106b58-fcdc-4e68-b2e5-618e96894876",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T14:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381200,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T17:26:42.939995+00:00",
+            "start_address": {
+                "id": 184373,
+                "point": {
+                    "x": -75.4481129,
+                    "y": 6.2839832,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 53 #56-286, Guarne, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "end_address": {
+                "id": 127779,
+                "point": {
+                    "x": -75.42363569999999,
+                    "y": 6.123404499999999,
+                    "srid": 4326
+                },
+                "name": "Autoland Ford y Mazda - Rionegro, Vía Llanogrande sector 3 puertas",
+                "city": "ANTIOQUIA-RIONEGRO"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484232,
+                    "uuid": "cde32a49-f401-4820-a86e-1e78d16046e6",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T15:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381204,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T17:29:39.647213+00:00",
+            "start_address": {
+                "id": 127779,
+                "point": {
+                    "x": -75.42363569999999,
+                    "y": 6.123404499999999,
+                    "srid": 4326
+                },
+                "name": "Autoland Ford y Mazda - Rionegro, Vía Llanogrande sector 3 puertas",
+                "city": "ANTIOQUIA-RIONEGRO"
+            },
+            "end_address": {
+                "id": 184373,
+                "point": {
+                    "x": -75.4481129,
+                    "y": 6.2839832,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 53 #56-286, Guarne, Antioquia, Colombia",
+                "city": "ANTIOQUIA-MEDELLIN"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484236,
+                    "uuid": "bb3e324d-e7ba-4469-88f5-8baecf3554be",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-19T20:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        },
+        {
+            "service_id": 381226,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T17:45:48.784690+00:00",
+            "start_address": {
+                "id": 184200,
+                "point": {
+                    "x": -74.0490516,
+                    "y": 4.6623648,
+                    "srid": 4326
+                },
+                "name": "otro, Ak 7 #81-26, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "end_address": {
+                "id": 184200,
+                "point": {
+                    "x": -74.0490516,
+                    "y": 4.6623648,
+                    "srid": 4326
+                },
+                "name": "otro, Ak 7 #81-26, Chapinero, Bogotá, Colombia",
+                "city": "CUNDINAMARCA-BOGOTA D.C."
+            },
+            "serviceLabors": [
+                {
+                    "id": 484258,
+                    "uuid": "0a211d5c-0ecf-421c-8033-10037682fc47",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": 2036,
+                    "schedule_date": "2026-01-17T14:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                },
+                {
+                    "id": 484259,
+                    "uuid": "01ba40c1-6f1a-4964-8938-70344b91bb66",
+                    "labor_id": 6,
+                    "labor_type": "general_mechanics",
+                    "labor_name": "General Mechanics",
+                    "labor_category": "GENERAL_MECHANICS",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T15:00:00+00:00",
+                    "shop": {
+                        "id": 2120,
+                        "name": "City Autos Taller"
+                    },
+                    "shop_address": {
+                        "id": 105861,
+                        "point": {
+                            "x": -74.0723965,
+                            "y": 4.656636699999999,
+                            "srid": 4326
+                        },
+                        "name": "City Autos Taller, Calle 64 # 25 - 46, Bogotá",
+                        "city": "CUNDINAMARCA-BOGOTA D.C."
+                    },
+                    "labor_sequence": 2
+                },
+                {
+                    "id": 484260,
+                    "uuid": "1a532771-e5a2-44d3-8791-ad6203addb3b",
+                    "labor_id": 2,
+                    "labor_type": "alfred_transport",
+                    "labor_name": "Alfred Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-17T18:00:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 3
+                }
+            ]
+        },
+        {
+            "service_id": 381330,
+            "state": "TO_BE_CONFIRMED",
+            "created_at": "2026-01-15T19:23:53.323592+00:00",
+            "start_address": {
+                "id": 94975,
+                "point": {
+                    "x": -76.5330578,
+                    "y": 3.4129671,
+                    "srid": 4326
+                },
+                "name": "Trabajo, Taller Nissan pasoancho, Cl. 13, Santa Domingo, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "end_address": {
+                "id": 64169,
+                "point": {
+                    "x": -76.54856219999999,
+                    "y": 3.3243025,
+                    "srid": 4326
+                },
+                "name": "Casa, Cra. 138 #3-60, Brisas Del Pance, Cali, Valle del Cauca, Colombia",
+                "city": "VALLE DEL CAUCA-CALI"
+            },
+            "serviceLabors": [
+                {
+                    "id": 484365,
+                    "uuid": "5cc4ac4d-3e7c-41e6-8914-ea1ad3cb4054",
+                    "labor_id": 12,
+                    "labor_type": "alfred_initial_transport",
+                    "labor_name": "Alfred Initial Transport",
+                    "labor_category": "VEHICLE_TRANSPORTATION",
+                    "alfred": null,
+                    "schedule_date": "2026-01-29T21:30:00+00:00",
+                    "shop": null,
+                    "shop_address": null,
+                    "labor_sequence": 1
+                }
+            ]
+        }
+    ]
+}
