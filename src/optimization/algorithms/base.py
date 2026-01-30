@@ -13,6 +13,7 @@ class OptimizationAlgorithm(ABC):
     Contract:
     - Input: canonical pandas DataFrame (parser + validator + solver prep)
     - Output: DataFrame (same rows as input with additional columns) + metrics dict
+    - Optional: algorithms may also return a third dict of artifacts (e.g., moves_df)
     """
 
     name: str = "BASE"

@@ -41,6 +41,7 @@ class OptimizationSolver:
 
         # store algo metrics after run
         self._algo_metrics: Dict[str, Any] = {}
+        self._algo_artifacts: Dict[str, Any] = {}
 
         self._validate_input()
 
@@ -50,7 +51,7 @@ class OptimizationSolver:
         self.master_data = load_master_data(self.settings.master_data)
 
 
-    def solve(self) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def solve(self) -> Tuple[pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
         logger.debug("Solver execution started", extra={"run_id": self.run_id})
 
         self._start_timer()
@@ -82,9 +83,23 @@ class OptimizationSolver:
 
             algorithm = get_algorithm(algo_name, algo_params)
 
-            results_df, algo_metrics = algorithm.solve(self.input_df)
+            solve_result = algorithm.solve(self.input_df)
+            if not isinstance(solve_result, tuple):
+                raise SolverExecutionError("Algorithm did not return a tuple")
+            if len(solve_result) == 2:
+                results_df, algo_metrics = solve_result
+                algo_artifacts = {}
+            elif len(solve_result) == 3:
+                results_df, algo_metrics, algo_artifacts = solve_result
+                if not isinstance(algo_artifacts, dict):
+                    raise SolverExecutionError("Algorithm artifacts must be a dict")
+            else:
+                raise SolverExecutionError("Algorithm returned an unexpected tuple shape")
 
             self._algo_metrics = algo_metrics or {}
+            self._algo_artifacts = algo_artifacts or {}
+            if "dist_dict" not in self._algo_artifacts and self.master_data is not None:
+                self._algo_artifacts["dist_dict"] = self.master_data.dist_dict
 
             results_df = self._postprocess_results(results_df)
 
@@ -99,7 +114,7 @@ class OptimizationSolver:
         metrics = self._collect_metrics(results_df)
 
         logger.debug("Solver execution finished", extra={"run_id": self.run_id})
-        return results_df, metrics
+        return results_df, metrics, self._algo_artifacts
 
     # --------------------------------------------------
     # Solver preconditions (minimal)
@@ -190,9 +205,23 @@ class OptimizationSolver:
         algorithm = get_algorithm(algo_name, algo_params)
 
         # algorithms still receive DataFrame
-        results_df, algo_metrics = algorithm.solve(self.input_df)
+        solve_result = algorithm.solve(self.input_df)
+        if not isinstance(solve_result, tuple):
+            raise SolverExecutionError("Algorithm did not return a tuple")
+        if len(solve_result) == 2:
+            results_df, algo_metrics = solve_result
+            algo_artifacts = {}
+        elif len(solve_result) == 3:
+            results_df, algo_metrics, algo_artifacts = solve_result
+            if not isinstance(algo_artifacts, dict):
+                raise SolverExecutionError("Algorithm artifacts must be a dict")
+        else:
+            raise SolverExecutionError("Algorithm returned an unexpected tuple shape")
 
         self._algo_metrics = algo_metrics or {}
+        self._algo_artifacts = algo_artifacts or {}
+        if "dist_dict" not in self._algo_artifacts and self.master_data is not None:
+            self._algo_artifacts["dist_dict"] = self.master_data.dist_dict
         return results_df
 
     # --------------------------------------------------

@@ -59,6 +59,32 @@ def save_local_validation_outputs(
     )
 
 
+def save_local_solution_validation_outputs(
+    issues_df: pd.DataFrame,
+    validation_report: Dict[str, Any],
+    *,
+    output_dir: str | Path,
+) -> None:
+    """
+    Persist solution validation artifacts (issues + report).
+    """
+    path = _normalize_output_dir(output_dir)
+    path.mkdir(parents=True, exist_ok=True)
+
+    issues_path = path / "solution_validation_issues.csv"
+    report_path = path / "solution_validation_report.json"
+
+    issues_df.to_csv(issues_path, index=False)
+    with report_path.open("w", encoding="utf-8") as f:
+        json.dump(validation_report, f, indent=2)
+
+    logger.info(
+        "solution_validation_outputs_saved issues=%s report=%s",
+        issues_path.name,
+        report_path.name,
+    )
+
+
 def _normalize_output_dir(output_dir: str | Path) -> Path:
     """
     Normalize output directory path, handling file-like inputs.

@@ -44,13 +44,14 @@ class OfflineAlgorithm(OptimizationAlgorithm):
             max_iterations_by_city=max_iterations,
         )
 
-    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
         """
         Execute offline baseline algorithm.
 
         Returns:
             results_df: DataFrame (same base as df, plus added columns)
             metrics: algorithm metrics
+            artifacts: auxiliary outputs (e.g., moves_df)
         """
         t0 = perf_counter()
 
@@ -111,7 +112,12 @@ class OfflineAlgorithm(OptimizationAlgorithm):
             "moves_rows": len(moves_df) if hasattr(moves_df, "__len__") else None,
         }
 
-        return results_df, metrics
+        artifacts = {
+            "moves_df": moves_df,
+            "distance_method": self.config.distance_method,
+        }
+
+        return results_df, metrics, artifacts
 
     # --------------------------------------------------
     # Internal methods (wrap your existing functions here)

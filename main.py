@@ -13,7 +13,11 @@ from src.integration.client import ALFREDAPIClient
 from src.integration.sender import ResultSender
 from src.io.input_loader import load_local_input
 from src.io.request_loader import build_settings_from_request, load_request
-from src.io.output_writer import save_local_output, save_local_validation_outputs
+from src.io.output_writer import (
+    save_local_output,
+    save_local_validation_outputs,
+    save_local_solution_validation_outputs,
+)
 from src.data.parsing.input_parser import InputParser
 from src.data.validation.validator import InputValidator
 from src.data.validation.rules.generic import RequiredFieldRule, NonEmptyRowRule, UniqueLaborIdRule
@@ -21,6 +25,7 @@ from src.data.validation.rules.domain import CreatedBeforeScheduleRule, ValidCit
 from src.data.formatting.output_formatter import OutputFormatter
 from src.optimization.solver import OptimizationSolver
 from src.optimization.settings.solver_settings import OptimizationSettings
+from src.optimization.validation.solution_validator import validate_solution
 from src.logging_utils import ContextFilter, set_run_id, setup_logging_context
 
 logger = logging.getLogger(__name__)
@@ -302,6 +307,7 @@ def main() -> int:
     # --------------------------------------------------
     # 7. Run optimization
     # --------------------------------------------------
+    algo_artifacts: Dict[str, Any] = {}
     try:
         context: Dict[str, Any] = {}
         if request_payload:
@@ -324,11 +330,12 @@ def main() -> int:
                 "input_rows": 0,
                 "output_rows": len(results),
             }
+            algo_artifacts = {}
         else:
             solver = OptimizationSolver(input_df, settings=settings, context=context)
 
             with log_step("solve"):
-                results, metrics = solver.solve()
+                results, metrics, algo_artifacts = solver.solve()
 
             if not preassigned_df.empty:
                 results = pd.concat([preassigned_df, results], axis=0, ignore_index=True)
@@ -346,8 +353,75 @@ def main() -> int:
         )
         return 5
 
+    moves_df = algo_artifacts.get("moves_df", pd.DataFrame()) if isinstance(algo_artifacts, dict) else pd.DataFrame()
+    dist_dict = algo_artifacts.get("dist_dict") if isinstance(algo_artifacts, dict) else None
+
+    if not preassigned_moves_df.empty:
+        if moves_df is None or moves_df.empty:
+            moves_df = preassigned_moves_df
+        else:
+            moves_df = pd.concat([preassigned_moves_df, moves_df], axis=0, ignore_index=True)
+
     # --------------------------------------------------
-    # 7. Format output (API only)
+    # 8. Validate solution
+    # --------------------------------------------------
+    try:
+        solution_validation_report: Dict[str, Any] = {}
+        solution_validation_issues = pd.DataFrame()
+        with log_step("validate_solution"):
+            solution_validation_report, solution_validation_issues = validate_solution(
+                labors_df=results,
+                moves_df=moves_df,
+                model_params=settings.model_params,
+                dist_method=str(algo_artifacts.get("distance_method", "haversine"))
+                if isinstance(algo_artifacts, dict)
+                else "haversine",
+                dist_dict=dist_dict,
+                strict_time_check=False,
+            )
+
+        output_dir = Config.LOCAL_OUTPUT_DIR
+        if request_payload and request_payload.output.path:
+            output_dir = request_payload.output.path
+
+        with log_step("write_solution_validation_outputs", output_dir=output_dir):
+            save_local_solution_validation_outputs(
+                solution_validation_issues,
+                solution_validation_report,
+                output_dir=output_dir,
+            )
+
+        if solution_validation_report.get("blocking_failed"):
+            blocking = solution_validation_report.get("blocking_issues", {})
+            logger.error(
+                _format_log_message(
+                    "solution_validation_blocking_failed",
+                    issues=len(solution_validation_issues) if hasattr(solution_validation_issues, "__len__") else None,
+                    blocking=blocking,
+                )
+            )
+            raise ValueError("solution_validation_blocking_failed")
+
+        if solution_validation_report.get("summary", {}).get("total_issues", 0) > 0:
+            logger.warning(
+                _format_log_message(
+                    "solution_validation_non_blocking_issues",
+                    issues=solution_validation_report.get("summary", {}).get("total_issues", 0),
+                )
+            )
+
+    except Exception as exc:
+        logger.exception("solution_validation_failed")
+        report_failure_if_possible(
+            request_id=request_id,
+            error="SOLUTION_VALIDATION_FAILED",
+            details=str(exc),
+            use_api=use_api,
+        )
+        return 8
+
+    # --------------------------------------------------
+    # 9. Format output (API only)
     # --------------------------------------------------
     output_payload: Dict[str, Any] = {}
     if use_api:
@@ -375,7 +449,7 @@ def main() -> int:
             return 6
 
     # --------------------------------------------------
-    # 8. Deliver output
+    # 10. Deliver output
     # --------------------------------------------------
     try:
         if use_api:
