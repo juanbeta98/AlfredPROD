@@ -5,10 +5,25 @@ from dataclasses import dataclass
 from time import perf_counter
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.location import series_location_key
 from src.optimization.algorithms.base import OptimizationAlgorithm
 from src.optimization.algorithms.offline.offline_algorithms import run_assignment_algorithm
+from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD
 
 logger = logging.getLogger(__name__)
+
+
+def _city_dist_slice(dist_dict_all: Any, city_key: Any) -> Dict[Any, Any]:
+    if not isinstance(dist_dict_all, dict):
+        return {}
+    if city_key in dist_dict_all:
+        value = dist_dict_all.get(city_key, {})
+        return value if isinstance(value, dict) else {}
+    city_key_txt = str(city_key)
+    for key, value in dist_dict_all.items():
+        if str(key) == city_key_txt:
+            return value if isinstance(value, dict) else {}
+    return {}
 
 
 @dataclass(frozen=True)
@@ -17,9 +32,9 @@ class OfflineAlgoConfig:
     Configuration for OFFLINE baseline algorithm.
     Keep this minimal and expand as you migrate experiment knobs.
     """
-    distance_method: str = "haversine"
+    distance_method: str = DEFAULT_DISTANCE_METHOD
     n_processes: Optional[int] = None
-    max_iterations_by_city: Optional[Dict[Any, int]] = None  # city -> max_iter
+    max_iterations_by_city: Optional[Dict[Any, int]] = None  # city_key -> max_iter
 
 
 class OfflineAlgorithm(OptimizationAlgorithm):
@@ -39,7 +54,7 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         params = params or {}
         max_iterations = params.get("max_iterations_by_city", params.get("max_iterations"))
         self.config = OfflineAlgoConfig(
-            distance_method=params.get("distance_method") or "haversine",
+            distance_method=params.get("distance_method") or DEFAULT_DISTANCE_METHOD,
             n_processes=params.get("n_processes"),
             max_iterations_by_city=max_iterations,
         )
@@ -66,22 +81,25 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         if not dist_dict_all and master_data:
             dist_dict_all = master_data.dist_dict
         alpha = prepared.get("alpha", self.params.get("alpha", 1)) if isinstance(prepared, dict) else self.params.get("alpha", 1)
-        cities = df['city'].drop_duplicates().unique().tolist()
+        city_keys = self._city_keys(df)
+        cities = city_keys.dropna().drop_duplicates().tolist()
 
         run_results: List[Tuple[pd.DataFrame, pd.DataFrame]] = []
         postponed_labors: List[Any] = []
 
-        for city in cities:
-            df_city = df[df["city"] == city]
+        for city_key in cities:
+            df_city = df[city_keys == city_key]
+            if df_city.empty:
+                continue
 
-            dist_dict = dist_dict_all.get(city, {})
+            dist_dict = _city_dist_slice(dist_dict_all, city_key)
         
-            max_iter = self._get_max_iter(city)
+            max_iter = self._get_max_iter(city_key)
             iter_args = [
                 {
-                    "city": city,
+                    "city_key": city_key,
                     "iter_idx": i,
-                    "labors_df": df,
+                    "labors_df": df_city,
                     "dist_dict": dist_dict,
                     "directorio_df": directorio_df,
                     "duraciones_df": duraciones_df,
@@ -124,10 +142,20 @@ class OfflineAlgorithm(OptimizationAlgorithm):
     # --------------------------------------------------
 
     def _validate_preconditions(self, df: pd.DataFrame) -> None:
-        required_cols = {"city", "schedule_date", "labor_id", "service_id"}
+        required_cols = {
+            "department_code",
+            "schedule_date",
+            "labor_id",
+            "service_id",
+        }
         missing = required_cols - set(df.columns)
         if missing:
             raise ValueError(f"OFFLINE algorithm missing required columns: {sorted(missing)}")
+
+    def _city_keys(self, df: pd.DataFrame) -> pd.Series:
+        keys = series_location_key(df)
+        keys = keys.astype("string").str.strip()
+        return keys.where(keys.notna() & keys.ne(""), pd.NA)
 
     def _prepare_inputs(self, df: pd.DataFrame) -> Dict[str, Any]:
         """
@@ -250,7 +278,7 @@ def _run_single_iteration(args: Dict[str, Any]) -> Dict[str, Any]:
     labors_df = args.get("labors_df")
     if labors_df is None or labors_df.empty:
         return {
-            "city": args.get("city"),
+            "city_key": args.get("city_key"),
             "iter": args.get("iter_idx"),
             "results": pd.DataFrame(),
             "moves": pd.DataFrame(),
@@ -259,20 +287,21 @@ def _run_single_iteration(args: Dict[str, Any]) -> Dict[str, Any]:
         }
 
     day_str = args.get("day_str") or _infer_day_str(labors_df)
-    ciudad = args.get("city")
+    city_key = args.get("city_key")
 
     results_df, moves_df, postponed_labors = run_assignment_algorithm(
         labors_df=labors_df,
         day_str=day_str,
-        ciudad=ciudad,
+        city_key=city_key,
         dist_method=args.get("distance_method"),
         alpha=args.get("alpha", 1),
+        iter_idx=args.get("iter_idx", 0),
         model_params=args.get("model_params"),
         master_data=args.get("master_data")
     )
 
     return {
-        "city": ciudad,
+        "city_key": city_key,
         "iter": args.get("iter_idx"),
         "results": results_df,
         "moves": moves_df,

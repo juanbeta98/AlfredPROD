@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import random
+import hashlib
 
 import math
 from datetime import datetime, timedelta, time
@@ -9,12 +10,65 @@ from typing import Any, Dict, List, Optional, Tuple
 from ...common.distance_utils import parse_point, distance
 from ...common.utils import compute_workday_end
 from ...settings.model_params import ModelParams
-from ....data.master_data_loader import MasterData
+from ...settings.solver_settings import DEFAULT_DISTANCE_METHOD
+from ....data.id_normalization import normalize_id_value
+from ....data.loading.master_data_loader import MasterData
 
 
 DistDict = Dict[str, Any] | None
 DriverState = Dict[str, Any]
 Candidate = Dict[str, Any]
+
+
+def _location_fields(row: pd.Series) -> Dict[str, Any]:
+    return {
+        "city_code": row.get("city_code"),
+        "department_code": row.get("department_code"),
+        "city_name": row.get("city_name"),
+        "department_name": row.get("department_name"),
+    }
+
+
+def _filter_drivers_by_city(directorio_df: pd.DataFrame, city: Any) -> pd.DataFrame:
+    if directorio_df is None or directorio_df.empty:
+        return pd.DataFrame()
+
+    # Backward-compatible name: matching is department-based by design.
+    department_key = str(city).strip()
+    if not department_key:
+        return directorio_df.iloc[0:0].copy()
+
+    candidate_masks: List[pd.Series] = []
+    if "department_code" in directorio_df.columns:
+        candidate_masks.append(
+            directorio_df["department_code"].astype(str).str.strip() == department_key
+        )
+    if "department_name" in directorio_df.columns:
+        candidate_masks.append(
+            directorio_df["department_name"].astype(str).str.strip() == department_key
+        )
+    if "city" in directorio_df.columns:
+        candidate_masks.append(
+            directorio_df["city"].astype(str).str.strip() == department_key
+        )
+
+    for mask in candidate_masks:
+        df_city = directorio_df.loc[mask].copy()
+        if not df_city.empty:
+            return df_city
+
+    return directorio_df.iloc[0:0].copy()
+
+
+def _extract_driver_key(driver_row: pd.Series) -> Optional[str]:
+    for col in ("driver_id", "ALFRED'S"):
+        if col in driver_row.index:
+            value = driver_row.get(col)
+            if pd.notna(value):
+                key = str(value).strip()
+                if key:
+                    return key
+    return None
 
 
 '''
@@ -25,8 +79,8 @@ def run_assignment_algorithm(
     master_data: MasterData,
     labors_df: pd.DataFrame,
     day_str: str,
-    ciudad: str,
-    dist_method: str = "haversine",
+    city_key: str,
+    dist_method: str = DEFAULT_DISTANCE_METHOD,
     dist_dict: Optional[DistDict] = None,
     alpha: float = 1.0,
     **kwargs: Any,
@@ -50,6 +104,10 @@ def run_assignment_algorithm(
     if model_params is None:
         model_params = ModelParams()
     model_params.validate()
+    iteration_index = kwargs.pop("iter_idx", 0)
+    seed_material = f"{model_params.seed}|{day_str}|{city_key}|{iteration_index}"
+    run_seed = int(hashlib.sha256(seed_material.encode("utf-8")).hexdigest()[:16], 16)
+    rng = random.Random(run_seed)
     kwargs["osrm_url"] = model_params.osrm_url
 
     directorio_df = master_data.directorio_df
@@ -74,7 +132,7 @@ def run_assignment_algorithm(
     distances = [0] * len(labors_df)
     service_end_times: Dict[Any, Optional[pd.Timestamp]] = {}
 
-    drivers = init_drivers(df_sorted, directorio_df=directorio_df, city=ciudad, **kwargs)
+    drivers = init_drivers(df_sorted, directorio_df=directorio_df, city=city_key, **kwargs)
 
     workday_end_dt = compute_workday_end(
         day_str=day_str,
@@ -88,7 +146,11 @@ def run_assignment_algorithm(
 
     # --- Lógica de asignación principal ---
     for _, row in df_sorted.iterrows():
-        original_idx = row['original_idx']
+        original_idx = int(row['original_idx'])
+        if original_idx < 0 or original_idx >= len(assigned):
+            raise IndexError(
+                f"Invalid original_idx={original_idx} for labors_df with {len(assigned)} rows."
+            )
         service_id = row['service_id']
 
         if service_end_times.get(service_id) is pd.NaT:
@@ -135,6 +197,7 @@ def run_assignment_algorithm(
                 dist_method, 
                 dist_dict,
                 alpha, 
+                rng=rng,
                 **kwargs
             )
 
@@ -175,7 +238,7 @@ def run_assignment_algorithm(
 
             # Buscar primero por ciudad + labor_type
             dur_row = duraciones_df[
-                (duraciones_df["city"] == ciudad) &
+                (duraciones_df["city"] == city_key) &
                 (duraciones_df["labor_type"] == row["labor_type"])
             ]
 
@@ -202,8 +265,14 @@ def run_assignment_algorithm(
     
     df_result['dist_km'] = distances
 
-    failed_services = [value for key,value in service_end_times.items() if value is pd.NaT]    
-    df_result['actual_status'] = df_result['service_id'].apply(lambda x: 'FAILED' if x in failed_services else 'COMPLETED')
+    failed_services = {
+        service_id
+        for service_id, service_end in service_end_times.items()
+        if pd.isna(service_end)
+    }
+    df_result['actual_status'] = df_result['service_id'].apply(
+        lambda service_id: 'FAILED' if service_id in failed_services else 'COMPLETED'
+    )
     
     solution_cols = ['assigned_driver', 'actual_start', 'actual_end']
     for col in solution_cols:
@@ -218,7 +287,7 @@ def run_assignment_algorithm(
         dist_method=dist_method, 
         dist_dict=dist_dict, 
         ALFRED_SPEED=alfred_speed, 
-        city_name=ciudad, 
+        city_key=city_key,
         **kwargs)
 
     return df_result, df_moves, postponed_labors
@@ -292,7 +361,12 @@ def get_candidate_drivers(
     return cands, dist_dict_local
 
 
-def select_from_candidates(cands: List[Candidate], alpha: float) -> Optional[Candidate]:
+def select_from_candidates(
+    cands: List[Candidate],
+    alpha: float,
+    *,
+    rng: Optional[random.Random] = None,
+) -> Optional[Candidate]:
     """
     Selecciona un candidato de la lista usando el criterio GRASP con RCL,
     pero ahora basado en la *distancia* (dist_km) en lugar del tiempo de llegada.
@@ -317,6 +391,8 @@ def select_from_candidates(cands: List[Candidate], alpha: float) -> Optional[Can
     if not cands:
         return None
 
+    chooser = rng if rng is not None else random
+
     # --- 1. Extraer las distancias de cada candidato ---
     costs = [c['dist_km'] for c in cands]
 
@@ -329,7 +405,7 @@ def select_from_candidates(cands: List[Candidate], alpha: float) -> Optional[Can
 
     # Si todas las distancias son iguales, elegir uno al azar
     if min_cost == max_cost:
-        return random.choice(cands)
+        return chooser.choice(cands)
 
     # --- 4. Umbral de inclusión en la RCL ---
     # Se permiten candidatos con costo <= thr
@@ -339,7 +415,7 @@ def select_from_candidates(cands: List[Candidate], alpha: float) -> Optional[Can
     RCL = [c for c, cost in zip(cands, costs) if cost <= thr]
 
     # --- 6. Selección final (aleatoria dentro de la RCL) ---
-    return random.choice(RCL)
+    return chooser.choice(RCL)
 
 
 '''
@@ -362,8 +438,8 @@ def init_drivers(
         DataFrame con las labores programadas, debe incluir la columna 'schedule_date'.
     directorio_df : pd.DataFrame
         DataFrame con la información de los conductores, incluyendo:
-        - 'city' (ciudad de operación)
-        - 'ALFRED'S' (nombre del conductor)
+        - 'city_id'
+        - 'driver_id'
         - 'latitud', 'longitud' (coordenadas iniciales)
         - 'start_time' (hora de inicio de jornada, formato 'HH:MM:SS')
     ciudad : str, opcional
@@ -396,11 +472,15 @@ def init_drivers(
         raise ValueError("No se pudo determinar la fecha mínima en 'schedule_date'.")
     
     # Filtrar conductores por ciudad
-    df_ciudad = directorio_df[directorio_df['city'] == city].copy()
+    df_ciudad = _filter_drivers_by_city(directorio_df, city)
     
     conductores: Dict[str, DriverState] = {}
     for _, conductor in df_ciudad.iterrows():
         if pd.isna(conductor['latitud']) or pd.isna(conductor['longitud']):
+            continue
+
+        driver_key = _extract_driver_key(conductor)
+        if driver_key is None:
             continue
         
         if ignore_schedule:
@@ -409,11 +489,11 @@ def init_drivers(
             try:
                 hora_inicio = datetime.strptime(conductor['start_time'], '%H:%M:%S').time()
             except ValueError:
-                raise ValueError(f'Formato inválido de hora para el conductor {conductor["ALFRED'S"]}')
+                raise ValueError(f"Formato invalido de hora para el conductor {driver_key}")
         
         disponibilidad = datetime.combine(first_date, hora_inicio)
         
-        conductores[conductor["ALFRED'S"]] = {
+        conductores[driver_key] = {
             "position": f"POINT ({conductor['longitud']} {conductor['latitud']})",
             "available": pd.Timestamp(disponibilidad).tz_localize(tz),
             "work_start": hora_inicio,
@@ -423,9 +503,11 @@ def init_drivers(
 
 
 def prepare_iteration_data(df_cleaned: pd.DataFrame) -> pd.DataFrame:
-    df = df_cleaned.copy().reset_index(drop=False)
-    df = df.rename(columns={"index": "original_idx"})
-    df = df.sort_values(["schedule_date", 'service_id', 'labor_sequence'], kind="stable").reset_index(drop=True)
+    # Keep a stable positional index for write-back into assignment arrays.
+    # The incoming DataFrame index may be sparse/non-contiguous after filtering.
+    df = df_cleaned.copy().reset_index(drop=True)
+    df["original_idx"] = range(len(df))
+    df = df.sort_values(["schedule_date", "service_id", "labor_sequence"], kind="stable").reset_index(drop=True)
 
     return df
 
@@ -473,6 +555,7 @@ def get_driver_wrapper(
     dist_method: str,
     dist_dict: Optional[DistDict],
     alpha: float,
+    rng: Optional[random.Random] = None,
     **kwargs: Any,
 ) -> Tuple[Optional[Candidate], DistDict]:
     """
@@ -517,7 +600,7 @@ def get_driver_wrapper(
         dist_dict=dist_dict,
         **kwargs
     )
-    return select_from_candidates(cands, alpha), updated_dist_dict
+    return select_from_candidates(cands, alpha, rng=rng), updated_dist_dict
 
 
 ''' POSTPONING LABORS'''
@@ -601,7 +684,7 @@ def build_driver_movements(
     dist_method: str,
     dist_dict: Optional[DistDict],
     ALFRED_SPEED: float,
-    city_name: str,
+    city_key: str,
     **kwargs: Any,
 ) -> pd.DataFrame:
     """
@@ -630,7 +713,7 @@ def build_driver_movements(
     directory_df : pd.DataFrame
         Directory containing driver start positions and hours.
         Must include:
-        - ['ALFRED\'S', 'latitud', 'longitud', 'city', 'start_time']
+        - ['driver_id', 'latitud', 'longitud', 'city_id', 'start_time']
     day_str : str
         Simulation date (YYYY-MM-DD)
     DISTANCE_METHOD : str
@@ -681,15 +764,20 @@ def build_driver_movements(
     # 3. Initialize driver positions and starting times
     # --------------------------------------------------------------------------
     driver_pos, driver_end, driver_has_departed = {}, {}, {}
-    df_city = directory_df[directory_df['city'] == city_name]
+    df_city = _filter_drivers_by_city(directory_df, city_key)
     for _, d in df_city.iterrows():
         if pd.isna(d['latitud']):
             continue
-        drv = d["ALFRED'S"]
+
+        drv = _extract_driver_key(d)
+        if drv is None:
+            continue
+
         driver_pos[drv] = f"POINT ({d['longitud']} {d['latitud']})"
         start_t = datetime.strptime(d['start_time'], '%H:%M:%S').time()
         st = datetime.combine(day_dt, start_t)
         driver_end[drv] = pd.Timestamp(st, tz=tz)
+        driver_has_departed[drv] = False
 
     # --------------------------------------------------------------------------
     # 4. Build standardized movement records
@@ -697,8 +785,14 @@ def build_driver_movements(
     records: List[Dict[str, Any]] = []
 
     for _, row in labors_df.dropna(subset=[start_col]).sort_values(start_col).iterrows():
-        drv = row[driver_col]
-        if pd.isna(drv):
+        driver_value = row[driver_col]
+        if pd.isna(driver_value):
+            continue
+        drv = str(driver_value).strip()
+        if not drv:
+            continue
+        labor_id = normalize_id_value(row.get("labor_id"))
+        if labor_id is None:
             continue
 
         prev_end = driver_end.get(drv)
@@ -739,8 +833,8 @@ def build_driver_movements(
         # free_end = depart
         records.append({
             'service_id': row.get('service_id', np.nan),
-            'labor_id': row['labor_id'],
-            'labor_context_id': f"{int(row['labor_id'])}_free",
+            'labor_id': labor_id,
+            'labor_context_id': f"{labor_id}_free",
             'labor_name': 'FREE_TIME',
             'labor_category': 'FREE_TIME',
             driver_col: drv,
@@ -750,7 +844,7 @@ def build_driver_movements(
             'start_point': prev_pos,
             'end_point': prev_pos,
             'distance_km': 0.0,
-            'city': row['city']
+            **_location_fields(row),
         })
 
         # ------------------------------------------------------------------
@@ -760,8 +854,8 @@ def build_driver_movements(
         # move_end = row[start_col]
         records.append({
             'service_id': row.get('service_id', np.nan),
-            'labor_id': row['labor_id'],
-            'labor_context_id': f"{int(row['labor_id'])}_move",
+            'labor_id': labor_id,
+            'labor_context_id': f"{labor_id}_move",
             'labor_name': 'DRIVER_MOVE',
             'labor_category': 'DRIVER_MOVE',
             driver_col: drv,
@@ -771,7 +865,7 @@ def build_driver_movements(
             'start_point': prev_pos,
             'end_point': row['map_start_point'],
             'distance_km': move_dkm,
-            'city': row['city']
+            **_location_fields(row),
         })
 
         # ------------------------------------------------------------------
@@ -779,8 +873,8 @@ def build_driver_movements(
         # ------------------------------------------------------------------
         records.append({
             'service_id': row.get('service_id', np.nan),
-            'labor_id': row['labor_id'],
-            "labor_context_id": f"{row['labor_id']}_labor",
+            'labor_id': labor_id,
+            "labor_context_id": f"{labor_id}_labor",
             'labor_name': row['labor_name'],
             'labor_category': row['labor_category'],
             driver_col: drv,
@@ -790,7 +884,7 @@ def build_driver_movements(
             'start_point': row['map_start_point'],
             'end_point': row['map_end_point'],
             'distance_km': row['dist_km'],
-            'city': row['city']
+            **_location_fields(row),
         })
 
         # Update reference state

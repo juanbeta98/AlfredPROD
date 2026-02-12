@@ -1,0 +1,23 @@
+{
+  "summary": {
+    "labors_rows": 14,
+    "moves_rows": 39,
+    "overlaps": 0,
+    "moves_inconsistencies": 0,
+    "total_issues": 0,
+    "drivers_checked": 3,
+    "rows_checked": 39,
+    "pairs_checked": 39,
+    "distance_calls": 34,
+    "inconsistencies": 0
+  },
+  "issues_by_check": {},
+  "blocking_checks": [
+    "driver_overlap",
+    "time_discontinuity"
+  ],
+  "blocking_issues": {},
+  "blocking_failed": false,
+  "strict_time_check": false,
+  "dist_method": "haversine"
+}

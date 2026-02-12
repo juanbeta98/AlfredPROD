@@ -57,7 +57,12 @@ class InsertAlgorithm(OptimizationAlgorithm):
         raise NotImplementedError
 
     def _validate_preconditions(self, df: pd.DataFrame) -> None:
-        required_cols = {"city", "schedule_date", "labor_id", "service_id"}
+        required_cols = {
+            "department_code",
+            "schedule_date",
+            "labor_id",
+            "service_id",
+        }
         missing = required_cols - set(df.columns)
         if missing:
             raise ValueError(f"INSERT algorithm missing required columns: {sorted(missing)}")

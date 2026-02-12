@@ -1,0 +1,245 @@
+{
+  "data": [
+    {
+      "service_id": 397007,
+      "schedule_date": "2026-02-20T17:00:00+00:00",
+      "state": "TO_BE_CONFIRMED",
+      "created_at": "2026-02-01T02:52:36.806281+00:00",
+      "start_address": {
+        "id": 183705,
+        "point": {
+          "x": -76.5215896,
+          "y": 3.4536185,
+          "srid": 4326
+        },
+        "name": "Trabajo, Cl. 23 #7-34, San Nicolas, Cali, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "end_address": {
+        "id": 183705,
+        "point": {
+          "x": -76.5215896,
+          "y": 3.4536185,
+          "srid": 4326
+        },
+        "name": "Trabajo, Cl. 23 #7-34, San Nicolas, Cali, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "serviceLabors": [
+        {
+          "id": 500567,
+          "uuid": "4eb61a3c-9089-4702-9a3c-95d6eb61c39c",
+          "labor_id": 12,
+          "labor_type": "alfred_initial_transport",
+          "labor_name": "Alfred Initial Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-20T17:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 1
+        },
+        {
+          "id": 500568,
+          "uuid": "4260eae6-2187-4e26-83a5-2c4ebb22c987",
+          "labor_id": 3,
+          "labor_type": "wash_and_polish",
+          "labor_name": "Wash and Polish",
+          "labor_category": "WASH_AND_POLISH",
+          "alfred": null,
+          "schedule_date": "2026-02-20T17:30:00+00:00",
+          "shop": {
+            "id": 3539,
+            "name": "Lavadero La 39 - Cali"
+          },
+          "shop_address": {
+            "id": 114928,
+            "point": {
+              "x": -76.5313527,
+              "y": 3.4197604,
+              "srid": 4326
+            },
+            "name": "Lavadero La 39 - Cali, Carrera 39 # 12C - 109, Pasoancho 39, esquina carril derecho",
+            "city": "VALLE DEL CAUCA-CALI"
+          },
+          "labor_sequence": 2
+        },
+        {
+          "id": 500569,
+          "uuid": "56151c1d-306a-43c2-80a5-1991fd67f2f7",
+          "labor_id": 2,
+          "labor_type": "alfred_transport",
+          "labor_name": "Alfred Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-20T18:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 3
+        }
+      ],
+      "is_assignable": false
+    },
+    {
+      "service_id": 402549,
+      "schedule_date": "2026-02-21T17:00:00+00:00",
+      "state": "TO_BE_CONFIRMED",
+      "created_at": "2026-02-08T21:19:30.730313+00:00",
+      "start_address": {
+        "id": 166327,
+        "point": {
+          "x": -76.4960699,
+          "y": 3.4665607,
+          "srid": 4326
+        },
+        "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "end_address": {
+        "id": 166327,
+        "point": {
+          "x": -76.4960699,
+          "y": 3.4665607,
+          "srid": 4326
+        },
+        "name": "Casa, Cra. 4 # 58-27, Comuna 5, Cali, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "serviceLabors": [
+        {
+          "id": 506329,
+          "uuid": "db0eba59-9e1c-4ec2-8aaf-f3ca1d72a8dd",
+          "labor_id": 12,
+          "labor_type": "alfred_initial_transport",
+          "labor_name": "Alfred Initial Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-21T17:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 1
+        },
+        {
+          "id": 506330,
+          "uuid": "1739eaf0-f5ee-48e9-a610-5d5937eac2b1",
+          "labor_id": 3,
+          "labor_type": "wash_and_polish",
+          "labor_name": "Wash and Polish",
+          "labor_category": "WASH_AND_POLISH",
+          "alfred": null,
+          "schedule_date": "2026-02-21T17:30:00+00:00",
+          "shop": {
+            "id": 4402,
+            "name": "PACIFIC WASH"
+          },
+          "shop_address": {
+            "id": 187121,
+            "point": {
+              "x": -76.499544,
+              "y": 3.441305,
+              "srid": 4326
+            },
+            "name": "PACIFIC WASH NUEVA FLORESTA, Carrera 23 # 51 - 65",
+            "city": "VALLE DEL CAUCA-CALI"
+          },
+          "labor_sequence": 2
+        },
+        {
+          "id": 506331,
+          "uuid": "dcbe9788-24a2-42d9-b7c0-30a7394cc199",
+          "labor_id": 2,
+          "labor_type": "alfred_transport",
+          "labor_name": "Alfred Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-21T18:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 3
+        }
+      ],
+      "is_assignable": false
+    },
+    {
+      "service_id": 405263,
+      "schedule_date": "2026-02-20T17:00:00+00:00",
+      "state": "TO_BE_CONFIRMED",
+      "created_at": "2026-02-11T22:01:29.750112+00:00",
+      "start_address": {
+        "id": 145591,
+        "point": {
+          "x": -76.30498659999999,
+          "y": 3.5229834,
+          "srid": 4326
+        },
+        "name": "Trabajo, Cra. 33a # 24-59, Palmira, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "end_address": {
+        "id": 145591,
+        "point": {
+          "x": -76.30498659999999,
+          "y": 3.5229834,
+          "srid": 4326
+        },
+        "name": "Trabajo, Cra. 33a # 24-59, Palmira, Valle del Cauca, Colombia",
+        "city": "VALLE DEL CAUCA-CALI"
+      },
+      "serviceLabors": [
+        {
+          "id": 509205,
+          "uuid": "e6d81c2b-aea5-48bd-903c-55521cc78c8d",
+          "labor_id": 12,
+          "labor_type": "alfred_initial_transport",
+          "labor_name": "Alfred Initial Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-20T17:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 1
+        },
+        {
+          "id": 509206,
+          "uuid": "49605475-b63e-48d2-bd28-6aac135f2519",
+          "labor_id": 3,
+          "labor_type": "wash_and_polish",
+          "labor_name": "Wash and Polish",
+          "labor_category": "WASH_AND_POLISH",
+          "alfred": null,
+          "schedule_date": "2026-02-20T17:30:00+00:00",
+          "shop": {
+            "id": 4157,
+            "name": "Palmotors - Lavados"
+          },
+          "shop_address": {
+            "id": 127839,
+            "point": {
+              "x": -76.31507669999999,
+              "y": 3.5385042,
+              "srid": 4326
+            },
+            "name": "Palmotors - Lavados, Calle 42 # 45 - 47, Palmira",
+            "city": "VALLE DEL CAUCA-PALMIRA"
+          },
+          "labor_sequence": 2
+        },
+        {
+          "id": 509207,
+          "uuid": "970ec1b8-8ebc-4c7f-96ce-b696a300292f",
+          "labor_id": 2,
+          "labor_type": "alfred_transport",
+          "labor_name": "Alfred Transport",
+          "labor_category": "VEHICLE_TRANSPORTATION",
+          "alfred": null,
+          "schedule_date": "2026-02-20T18:00:00+00:00",
+          "shop": null,
+          "shop_address": null,
+          "labor_sequence": 3
+        }
+      ],
+      "is_assignable": false
+    }
+  ],
+  "count": 3
+}

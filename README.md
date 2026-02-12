@@ -17,12 +17,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+If you use micromamba (recommended in this repo), run everything through `scripts/mrun`:
+```bash
+export ALFRED_MAMBA_ENV=AlfredEnv   # optional (default is AlfredEnv)
+scripts/mrun python -V
+scripts/mrun python -m pip install -r requirements.txt
+```
+
 ### 2) Run locally with CSV input
 ```bash
 export USE_API=false
 export LOCAL_INPUT_FILE=./data/model_input/input.csv
 export LOCAL_OUTPUT_DIR=./data/model_output
+export WRITE_MODEL_SOLUTION=true
 python main.py
+```
+
+Equivalent with micromamba:
+```bash
+scripts/mrun python main.py
 ```
 
 ### 3) Run against API
@@ -36,10 +49,34 @@ export END_DATE="2025-12-31T23:59:59"
 python main.py
 ```
 
+Equivalent with micromamba:
+```bash
+scripts/mrun python main.py
+```
+
+### API Snapshot Scripts
+These helpers fetch raw API responses and write JSON snapshots under `data/api_snapshots`.
+Edit the filter constants at the top of each script as needed.
+
+```bash
+python scripts/api/fetch_optimization_input.py
+python scripts/api/fetch_driver_directory.py
+```
+or
+```bash
+scripts/mrun python scripts/api/fetch_optimization_input.py
+scripts/mrun python scripts/api/fetch_driver_directory.py
+```
+
 Optional: provide a request file (default `request.json`) to override mode and parameters.
 ```bash
 export REQUEST_PATH=./request.json
 python main.py
+```
+or
+```bash
+export REQUEST_PATH=./request.json
+scripts/mrun python main.py
 ```
 
 ---
@@ -57,10 +94,10 @@ The main entrypoint is `main.py` and the pipeline runs in these stages:
 5) **Validation** with rules (`src/data/validation`)
 6) **Preassigned reconstruction** if `assigned_driver` exists (`src/optimization/common/preassigned.py`)
 7) **Optimization solve** (`src/optimization/solver.py`)
-8) **Format output** (API payload) (`src/data/formatting/output_formatter.py`)
-9) **Delivery**
-   - API mode: `src/integration/sender.py`
-   - Local mode: `src/io/output_writer.py`
+8) **Format output payload** (`src/data/formatting/output_formatter.py`)
+9) **Delivery / persistence**
+   - Optional local artifacts: `src/io/output_writer.py`
+   - Optional API POST: `src/integration/sender.py`
 
 ---
 
@@ -72,7 +109,6 @@ Example `request.json`:
 ```json
 {
   "request_id": "sim-0001",
-  "input": { "source": "api", "path": null },
   "filters": {
     "department": "25",
     "start_date": "2024-01-01T00:00:00",
@@ -85,8 +121,7 @@ Example `request.json`:
 ```
 
 Behavior:
-- `input.source`: `"api"` or `"local"`, overrides `USE_API`.
-- `input.path`: local CSV path when `source=local`.
+- Runtime mode (`API` vs `LOCAL`) is controlled only by `USE_API` (env var).
 - `filters`: optional (department, start_date, end_date, city).
 - `algorithm`: name + params passed to solver.
 - `output.path`: overrides output directory or file.
@@ -103,17 +138,34 @@ start_address_id
 start_address_point
 end_address_id
 end_address_point
-city
 labor_id
 labor_type
 labor_name
 labor_category
 ```
 
+Location columns:
+- either `city` (legacy), or
+- canonical code fields: `city_code`, `department_code`
+- canonical name fields: `city_name`, `department_name`
+
 Notes:
 - `start_address_point` and `end_address_point` must be WKT `POINT (lon lat)`.
 - Each row represents a service + labor pairing; rows are grouped by `service_id`.
 - The loader emits an API-style JSON payload for the parser.
+
+### Build Local Inputs From Raw Files
+Use these scripts to generate local inputs before running `main.py` in `USE_API=false` mode:
+
+```bash
+python scripts/data_prep/build_input_csv_from_raw.py
+python scripts/data_prep/build_driver_directory_csv.py
+```
+
+Defaults:
+- Raw source directory: `data/model_input/raw_files`
+- Generated service input: `data/model_input/input.csv`
+- Generated driver directory: `data/model_input/driver_directory.csv`
 
 ---
 
@@ -165,16 +217,37 @@ The parser flattens this into a DataFrame with columns like:
 ```
 
 ### Local output
-Local mode writes:
-- `data/model_output/output_<timestamp>.csv`
-- Optional validation artifacts:
-  - `data/model_output/invalid_rows.csv`
-  - `data/model_output/validation_report.json`
+Local artifacts are controlled by flags (independent of `USE_API`):
+- `WRITE_MODEL_SOLUTION=true`
+  - `data/model_output/run-*/output__ts-*.csv`
+  - `data/model_output/run-*/output_payload__ts-*.json`
+- `WRITE_VALIDATION_REPORTS=true`
+  - `data/model_output/run-*/data_validation_invalid_rows__ts-*.csv`
+  - `data/model_output/run-*/data_validation_report__ts-*.json`
+  - `data/model_output/run-*/solution_validation_issues__ts-*.csv`
+  - `data/model_output/run-*/solution_validation_report__ts-*.json`
+- `WRITE_MODEL_SOLUTION=true`
+  - `data/model_output/run-*/solution_evaluation_report__ts-*.json`
+
+How to interpret solution performance metrics:
+- `docs/SOLUTION_PERFORMANCE_REPORT.md`
 
 Enable validation output with:
 ```bash
 export WRITE_VALIDATION_REPORTS=true
 ```
+
+Optional intermediate debug exports:
+```bash
+export WRITE_INTERMEDIATE_DATAFRAMES=true
+export INTERMEDIATE_EXPORT_BASE_DIR=./data/intermediate_exports
+```
+When enabled, each run writes:
+- `<base_dir>/run-<run_id>/input_df__ts-<timestamp>[__req-<request_id>].csv`
+- `<base_dir>/run-<run_id>/preassigned_df__ts-<timestamp>[__req-<request_id>].csv`
+- `<base_dir>/run-<run_id>/driver_directory__ts-<timestamp>[__req-<request_id>].csv`
+
+`input_df` export reflects the dataframe right before solver creation (after validation and after preassigned split).
 
 ---
 
@@ -186,7 +259,7 @@ Validation happens after parsing. Current default rules include:
 - Non-empty rows
 - Unique `labor_id`
 - `created_at` at least 2 hours before `schedule_date`
-- `city` must be in allowed list (hardcoded in `main.py`)
+- location key (`department_name-city_name`) must be in allowed list (hardcoded in `main.py`)
 
 When validation fails:
 - Invalid rows are separated out.
@@ -220,7 +293,7 @@ Algorithms load master data once per run:
 - `data/master_data/duraciones.{parquet|csv}`
 - `data/master_data/dist_dict.{parquet|pkl}`
 
-`src/data/master_data_loader.py` prefers parquet when available.
+`src/data/loading/master_data_loader.py` prefers parquet when available.
 
 ---
 
@@ -242,6 +315,7 @@ Filters:
 Local mode:
 - `LOCAL_INPUT_DIR`
 - `LOCAL_INPUT_FILE`
+- `LOCAL_DRIVER_DIRECTORY_FILE`
 - `LOCAL_OUTPUT_DIR`
 - `LOCAL_OUTPUT_FILE`
 
@@ -250,6 +324,12 @@ Execution:
 - `API_MAX_RETRIES`
 - `LOG_LEVEL`
 - `WRITE_VALIDATION_REPORTS`
+- `WRITE_INTERMEDIATE_DATAFRAMES` (true/false)
+- `INTERMEDIATE_EXPORT_BASE_DIR` (default `./data/intermediate_exports`)
+- `WRITE_MODEL_SOLUTION` (true/false; writes solver CSV + formatted payload JSON)
+
+Backward compatibility:
+- `EXPORT_INTERMEDIATE_DATAFRAMES` is still accepted as an alias of `WRITE_INTERMEDIATE_DATAFRAMES`.
 
 Model params:
 - `OSRM_URL` (optional; used by model params)

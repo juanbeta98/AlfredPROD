@@ -8,6 +8,7 @@ from src.config.config import *
 from src.algorithms.offline_algorithms import run_assignment_algorithm
 from src.utils.utils import get_city_name_from_code
 from src.data.metrics import compute_metrics_with_moves, compute_iteration_metrics
+from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD
 
 # ——————————————————————————
 # Función maestra por ciudad
@@ -19,7 +20,7 @@ def run_city_pipeline(
     directorio_df, 
     duraciones_df,
     alpha=1,
-    dist_method='haversine',
+    dist_method=DEFAULT_DISTANCE_METHOD,
     DIST_DICT=None,
     **kwargs
 ) -> tuple:
@@ -178,7 +179,7 @@ def _prepare_algo_baseline_pipeline(
     city_code: str, 
     start_date: str, 
     df_dist,
-    dist_method='haversine',
+    dist_method=DEFAULT_DISTANCE_METHOD,
     DIST_DICT=None,
     **kwargs
 ):

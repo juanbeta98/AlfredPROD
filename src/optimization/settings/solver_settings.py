@@ -4,10 +4,13 @@ from typing import Any, Dict, Optional
 from .model_params import ModelParams
 from .master_data import MasterDataParams
 
+DEFAULT_DISTANCE_METHOD = "haversine"
+
 
 @dataclass(frozen=True)
 class OptimizationSettings:
     algorithm: str = "OFFLINE"
+    distance_method: str = DEFAULT_DISTANCE_METHOD
 
     # shared hyperparameters
     alpha: float = 0.3
@@ -41,6 +44,7 @@ class OptimizationSettings:
         """
         base = {
             "alpha": self.alpha,
+            "distance_method": self.distance_method,
             "max_iterations": self.max_iterations,
             "n_processes": self.n_processes,
             "model_params": self.model_params,

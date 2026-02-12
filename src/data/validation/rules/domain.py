@@ -3,6 +3,7 @@ from typing import Iterable, Optional
 
 import pandas as pd
 
+from src.datetime_utils import utc_to_colombia_timestamp
 from .base import ValidationRule
 
 
@@ -107,20 +108,24 @@ class CreatedBeforeScheduleRule(ValidationRule):
         Safely parse a datetime-like value.
         """
         try:
-            return pd.to_datetime(value)
+            return utc_to_colombia_timestamp(value, errors="raise")
         except Exception:
             return None
 
 
 class ValidCitiesOnly(ValidationRule):
     """
-    Validate that the city is only from the allowed list.
+    Validate that a city field is only from the allowed list.
     """
 
     name = "valid_cities"
     blocking = True
 
-    def __init__(self, field: str, valid_cities: Iterable[str]):
+    def __init__(
+        self,
+        field: str,
+        valid_cities: Iterable[str],
+    ):
         """
         Args:
             field: Field name to validate
@@ -128,22 +133,117 @@ class ValidCitiesOnly(ValidationRule):
         """
         super().__init__(field=field, valid_cities=valid_cities)
         self.field = field
-        self.valid_cities = valid_cities
+        self.valid_cities = set(str(value).strip() for value in valid_cities if str(value).strip())
+
+    def validate(self, row: pd.Series):
+        if self.field not in row or pd.isna(row[self.field]):
+            return (
+                False,
+                f"Missing city information in '{self.field}'",
+            )
+        city_value = str(row[self.field]).strip()
+        if not city_value:
+            return False, f"Missing city information in '{self.field}'"
+
+        if city_value not in self.valid_cities:
+            return (
+                False,
+                f"Field '{self.field}' has invalid value '{city_value}' "
+                f"(allowed: {sorted(self.valid_cities)})",
+            )
+
+        return True, None
+
+
+class ValidDepartmentsOnly(ValidationRule):
+    """
+    Validate that a department field is only from the allowed list.
+    """
+
+    name = "valid_departments"
+    blocking = True
+
+    def __init__(
+        self,
+        field: str,
+        valid_departments: Iterable[str],
+    ):
+        """
+        Args:
+            field: Field name to validate
+            valid_departments: Set of permitted values
+        """
+        super().__init__(field=field, valid_departments=valid_departments)
+        self.field = field
+        self.valid_departments = set(
+            str(value).strip() for value in valid_departments if str(value).strip()
+        )
+
+    def validate(self, row: pd.Series):
+        if self.field not in row or pd.isna(row[self.field]):
+            return (
+                False,
+                f"Missing department information in '{self.field}'",
+            )
+        department_value = str(row[self.field]).strip()
+        if not department_value:
+            return False, f"Missing department information in '{self.field}'"
+
+        if department_value not in self.valid_departments:
+            return (
+                False,
+                f"Field '{self.field}' has invalid value '{department_value}' "
+                f"(allowed: {sorted(self.valid_departments)})",
+            )
+
+        return True, None
+
+
+class ValidLocationResolutionStatus(ValidationRule):
+    """
+    Validate location resolution status emitted by parsers.
+    """
+
+    name = "valid_location_resolution_status"
+    blocking = True
+
+    def __init__(
+        self,
+        field: str = "location_resolution_status",
+        valid_statuses: Iterable[str] = ("resolved", "resolved_department_only"),
+    ):
+        super().__init__(field=field, valid_statuses=valid_statuses)
+        self.field = field
+        self.valid_statuses = set(
+            str(value).strip() for value in valid_statuses if str(value).strip()
+        )
 
     def validate(self, row: pd.Series):
         if self.field not in row:
-            return True, None  # Let RequiredFieldRule handle missing fields
-
-        value = row[self.field]
-
-        if pd.isna(value):
-            return True, None  # Nullability handled elsewhere if needed
-
-        if value not in self.valid_cities:
             return (
                 False,
-                f"Field '{self.field}' has invalid value '{value}' "
-                f"(allowed: {sorted(self.valid_cities)})",
+                f"Missing location resolution field '{self.field}'",
+            )
+
+        value = row[self.field]
+        if pd.isna(value):
+            return (
+                False,
+                f"Missing location resolution status in '{self.field}'",
+            )
+
+        status = str(value).strip()
+        if not status:
+            return (
+                False,
+                f"Missing location resolution status in '{self.field}'",
+            )
+
+        if status not in self.valid_statuses:
+            return (
+                False,
+                f"Field '{self.field}' has invalid status '{status}' "
+                f"(allowed: {sorted(self.valid_statuses)})",
             )
 
         return True, None

@@ -1,0 +1,2 @@
+local run failed.
+RuntimeError: local run failed with code 4. See /Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/8/local/run.log

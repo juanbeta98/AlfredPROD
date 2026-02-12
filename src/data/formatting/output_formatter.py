@@ -1,15 +1,53 @@
-from typing import Any, Dict
-from datetime import datetime
+from __future__ import annotations
 
-import dataclasses
+import math
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
 
 
 class OutputFormatter:
     """
-    Formatter for optimization results into API-ready JSON.
+    Formatter for optimization results into API-ready JSON payloads.
     """
+
+    KPI_DECIMALS = 2
+    DIAGNOSTIC_ADD_DATA_FIELDS = (
+        "is_infeasible",
+        "is_warning",
+        "infeasibility_cause_code",
+        "infeasibility_cause_detail",
+        "reassignment_candidate",
+        "reassignment_priority",
+        "original_assigned_driver",
+        "preassignment_infeasible_detected",
+        "preassignment_infeasibility_cause_code",
+        "preassignment_infeasibility_cause_detail",
+        "preassignment_warning_detected",
+        "preassignment_warning_code",
+        "preassignment_warning_detail",
+        "warning_code",
+        "warning_detail",
+        "payload_schedule_reference",
+        "computed_arrival",
+        "previous_labor_end",
+        "feasible_window_end",
+        "driver_available_at",
+        "computed_travel_min",
+        "minutes_late_payload",
+        "minutes_after_window",
+    )
+
+    @staticmethod
+    def _round_kpi(value: float) -> float:
+        return round(float(value), OutputFormatter.KPI_DECIMALS)
+
+    @staticmethod
+    def _add_add_data_value(add_data: Dict[str, Any], key: str, value: float | None) -> None:
+        if value is None:
+            return
+        add_data[key] = OutputFormatter._round_kpi(value)
 
     @staticmethod
     def format(
@@ -17,240 +55,284 @@ class OutputFormatter:
         metadata: Dict[str, Any] | None = None,
         request_id: str | None = None,
         status: str = "completed",
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, Any] | Any:
         """
-        Formats optimization output into a generic JSON structure.
+        Format optimization output into the payload expected by the API.
 
         Args:
             results: Optimization output (DataFrame, list, dict)
-            metadata: Optional metadata from input
-            request_id: Optional request identifier
-            status: Execution status
+            metadata: Unused for now (kept for compatibility)
+            request_id: Unused for now (kept for compatibility)
+            status: Unused for now (kept for compatibility)
 
         Returns:
-            JSON-serializable dict
+            JSON-serializable payload matching API contract directly.
         """
-        if isinstance(results, pd.DataFrame):
-            results_payload = OutputFormatter._format_results_df(results)
-        else:
-            results_payload = results if results is not None else []
+        _ = metadata
+        _ = request_id
+        _ = status
 
-        return {
-            "request_id": request_id,
-            "timestamp": datetime.utcnow().isoformat(),
-            "status": status,
-            "data": results_payload,
-            "metadata": OutputFormatter._sanitize_payload(metadata),
-        }
+        # Preserve already-structured non-completed payloads, e.g. failure reports.
+        if isinstance(results, dict) and "status" in results and "data" not in results:
+            return results
+
+        if isinstance(results, pd.DataFrame):
+            return {"data": OutputFormatter._format_results_df(results)}
+
+        if results is None:
+            return {"data": []}
+
+        if isinstance(results, dict) and "data" in results:
+            payload = dict(results)
+            if isinstance(payload.get("data"), dict):
+                payload["data"] = [payload["data"]]
+            elif payload.get("data") is None:
+                payload["data"] = []
+            return payload
+
+        if isinstance(results, list):
+            return {"data": results}
+
+        if isinstance(results, dict) and OutputFormatter._looks_like_service_payload(results):
+            return {"data": [results]}
+
+        return results
 
     @staticmethod
     def _format_results_df(df: pd.DataFrame) -> list[Dict[str, Any]]:
         if df.empty:
             return []
 
-        service_columns = {
-            "service_id",
-            "state",
-            "created_at",
-            "city",
-            "start_address_id",
-            "start_address_point",
-            "end_address_id",
-            "end_address_point",
-        }
-        labor_columns = {
-            "labor_id",
-            "labor_type",
-            "labor_name",
-            "labor_category",
-            "schedule_date",
-            "labor_sequence",
-            "shop_id",
-            "shop_address_id",
-            "shop_address_point",
-        }
-
         output: list[Dict[str, Any]] = []
 
         for service_id, group in df.groupby("service_id", sort=False):
             first = group.iloc[0]
+            service_schedule_date = OutputFormatter._service_schedule_date(first)
+
             service: Dict[str, Any] = {
-                "service_id": OutputFormatter._to_int(service_id),
+                "service_id": OutputFormatter._clean_int_id(service_id),
+                "schedule_date": OutputFormatter._format_dt_utc(service_schedule_date),
+                "serviceLabors": [],
             }
 
-            if "state" in df.columns:
-                service["state"] = OutputFormatter._clean_value(first.get("state"))
-            if "created_at" in df.columns:
-                service["created_at"] = OutputFormatter._format_dt(first.get("created_at"))
-
-            start_address = OutputFormatter._build_address(
-                first,
-                id_col="start_address_id",
-                point_col="start_address_point",
-                city_col="city",
-            )
-            if start_address:
-                service["start_address"] = start_address
-
-            end_address = OutputFormatter._build_address(
-                first,
-                id_col="end_address_id",
-                point_col="end_address_point",
-            )
-            if end_address:
-                service["end_address"] = end_address
-
-            service_labors: list[Dict[str, Any]] = []
             for _, row in group.iterrows():
-                labor: Dict[str, Any] = {}
+                labor_id = OutputFormatter._clean_int_id(row.get("labor_id"))
+                if labor_id is None:
+                    continue
 
-                if "labor_id" in df.columns:
-                    labor["id"] = OutputFormatter._clean_value(row.get("labor_id"))
-                if "labor_type" in df.columns:
-                    labor["labor_id"] = OutputFormatter._clean_value(row.get("labor_type"))
-                    labor["labor_type"] = OutputFormatter._clean_value(row.get("labor_type"))
-                if "labor_name" in df.columns:
-                    labor["labor_name"] = OutputFormatter._clean_value(row.get("labor_name"))
-                if "labor_category" in df.columns:
-                    labor["labor_category"] = OutputFormatter._clean_value(row.get("labor_category"))
-                if "schedule_date" in df.columns:
-                    labor["schedule_date"] = OutputFormatter._format_dt(row.get("schedule_date"))
-                if "labor_sequence" in df.columns:
-                    labor["labor_sequence"] = OutputFormatter._clean_value(row.get("labor_sequence"))
+                labor_schedule_date = OutputFormatter._labor_schedule_date(row)
+                if labor_schedule_date is None:
+                    continue
 
-                shop = OutputFormatter._build_shop(row)
-                if shop:
-                    labor["shop"] = shop
+                labor: Dict[str, Any] = {
+                    "id": labor_id,
+                    "schedule_date": labor_schedule_date,
+                }
 
-                shop_address = OutputFormatter._build_address(
-                    row,
-                    id_col="shop_address_id",
-                    point_col="shop_address_point",
-                )
-                if shop_address:
-                    labor["shop_address"] = shop_address
+                add_data = OutputFormatter._build_add_data(row)
+                if add_data is not None:
+                    labor["addData"] = add_data
 
-                for col in df.columns:
-                    if col in service_columns or col in labor_columns:
-                        continue
-                    if col in {"service_id", "city"}:
-                        continue
-                    if col in labor:
-                        continue
-                    labor[col] = OutputFormatter._clean_value(row.get(col))
+                driver_id = OutputFormatter._alfred_id_for_labor(row)
+                if driver_id is not None:
+                    labor["alfred"] = {"id": driver_id}
 
-                service_labors.append(labor)
+                service["serviceLabors"].append(labor)
 
-            service["serviceLabors"] = service_labors
-            output.append(service)
+            if service["serviceLabors"]:
+                output.append(service)
 
         return output
 
     @staticmethod
-    def _build_address(row: pd.Series, *, id_col: str, point_col: str, city_col: str | None = None) -> Dict[str, Any] | None:
-        address_id = row.get(id_col) if id_col in row.index else None
-        point_value = row.get(point_col) if point_col in row.index else None
-        city_value = row.get(city_col) if city_col and city_col in row.index else None
-
-        if pd.isna(address_id) and pd.isna(point_value) and pd.isna(city_value):
-            return None
-
-        address: Dict[str, Any] = {
-            "id": OutputFormatter._clean_value(address_id),
-        }
-
-        point = OutputFormatter._parse_point(point_value)
-        if point:
-            address["point"] = point
-
-        if city_col:
-            address["city"] = OutputFormatter._clean_value(city_value)
-
-        return address
-
-    @staticmethod
-    def _build_shop(row: pd.Series) -> Dict[str, Any] | None:
-        if "shop_id" not in row.index:
-            return None
-        shop_id = row.get("shop_id")
-        if pd.isna(shop_id):
-            return None
-        return {"id": OutputFormatter._clean_value(shop_id)}
-
-    @staticmethod
-    def _parse_point(value: Any) -> Dict[str, Any] | None:
-        if value is None or (isinstance(value, float) and pd.isna(value)):
-            return None
-        if not isinstance(value, str):
-            return None
-        text = value.strip()
-        if not text:
-            return None
-        if text.startswith("POINT"):
-            cleaned = (
-                text.replace("POINT", "")
-                .replace("(", "")
-                .replace(")", "")
-                .strip()
-            )
-            parts = cleaned.split()
-            if len(parts) != 2:
-                return None
-            try:
-                lon = float(parts[0])
-                lat = float(parts[1])
-            except ValueError:
-                return None
-            return {"x": lon, "y": lat, "srid": 4326}
+    def _service_schedule_date(row: pd.Series) -> Any:
+        # Preserve service-level schedule_date from input payload when available.
+        if "service_schedule_date" in row.index and not OutputFormatter._is_missing(row.get("service_schedule_date")):
+            return row.get("service_schedule_date")
+        if "schedule_date" in row.index:
+            return row.get("schedule_date")
         return None
 
     @staticmethod
-    def _format_dt(value: Any) -> Any:
-        if value is None or (isinstance(value, float) and pd.isna(value)):
-            return None
-        if isinstance(value, pd.Timestamp):
-            return value.isoformat()
-        if hasattr(value, "isoformat"):
-            return value.isoformat()
-        return value
+    def _labor_schedule_date(row: pd.Series) -> str | None:
+        for col in (
+            "actual_start",
+            "payload_labor_schedule_date",
+            "schedule_date",
+            "service_schedule_date",
+        ):
+            if col in row.index and not OutputFormatter._is_missing(row.get(col)):
+                value = OutputFormatter._format_dt_utc(row.get(col))
+                if value is not None:
+                    return value
+        return None
 
     @staticmethod
-    def _clean_value(value: Any) -> Any:
-        if value is None or value is pd.NaT or (isinstance(value, float) and pd.isna(value)):
+    def _alfred_id_for_labor(row: pd.Series) -> int | None:
+        if OutputFormatter._labor_has_shop(row):
             return None
-        if value is pd.NA or (isinstance(value, (np.generic,)) and pd.isna(value)):
+        return OutputFormatter._clean_int_id(row.get("assigned_driver"))
+
+    @staticmethod
+    def _labor_has_shop(row: pd.Series) -> bool:
+        if "shop_id" not in row.index:
+            return False
+        return not OutputFormatter._is_missing(row.get("shop_id"))
+
+    @staticmethod
+    def _build_add_data(row: pd.Series) -> Dict[str, Any] | None:
+        labor_distance_value = OutputFormatter._first_numeric(
+            row,
+            ("labor_distance_km", "dist_km", "distance_km", "labor_distance"),
+        )
+        driver_move_distance_value = OutputFormatter._first_numeric(
+            row,
+            ("driver_move_distance_km",),
+        )
+        duration_value = OutputFormatter._first_numeric(
+            row,
+            ("duration_min", "labor_duration"),
+        )
+        if duration_value is None:
+            duration_value = OutputFormatter._duration_from_actual_times(
+                row.get("actual_start"),
+                row.get("actual_end"),
+            )
+
+        add_data: Dict[str, Any] = {}
+        OutputFormatter._add_add_data_value(add_data, "distance_km", labor_distance_value)
+        OutputFormatter._add_add_data_value(add_data, "labor_distance_km", labor_distance_value)
+        OutputFormatter._add_add_data_value(add_data, "driver_move_distance_km", driver_move_distance_value)
+        OutputFormatter._add_add_data_value(add_data, "duration_min", duration_value)
+        OutputFormatter._add_diagnostics_add_data(add_data, row)
+
+        return add_data or None
+
+    @staticmethod
+    def _add_diagnostics_add_data(add_data: Dict[str, Any], row: pd.Series) -> None:
+        for key in OutputFormatter.DIAGNOSTIC_ADD_DATA_FIELDS:
+            if key not in row.index:
+                continue
+            cleaned = OutputFormatter._clean_add_data_scalar(row.get(key))
+            if cleaned is None:
+                continue
+            add_data[key] = cleaned
+
+    @staticmethod
+    def _clean_add_data_scalar(value: Any) -> Any | None:
+        if OutputFormatter._is_missing(value):
             return None
-        if isinstance(value, pd.Timestamp):
-            return value.isoformat()
-        if hasattr(value, "isoformat") and not isinstance(value, str):
-            return value.isoformat()
-        if isinstance(value, (np.integer,)):
-            return int(value)
-        if isinstance(value, (np.floating,)):
-            return float(value)
-        if isinstance(value, (np.bool_,)):
+
+        if isinstance(value, (np.bool_, bool)):
             return bool(value)
-        return value
+
+        if isinstance(value, pd.Timestamp):
+            return OutputFormatter._format_dt_utc(value)
+
+        if isinstance(value, (np.integer, int)) and not isinstance(value, bool):
+            return int(value)
+
+        numeric = OutputFormatter._clean_numeric(value)
+        if numeric is not None:
+            return OutputFormatter._round_kpi(numeric)
+
+        return str(value)
 
     @staticmethod
-    def _to_int(value: Any) -> Any:
-        if value is None or (isinstance(value, float) and pd.isna(value)):
+    def _first_numeric(row: pd.Series, columns: tuple[str, ...]) -> float | None:
+        for col in columns:
+            if col not in row.index:
+                continue
+            cleaned = OutputFormatter._clean_numeric(row.get(col))
+            if cleaned is not None:
+                return cleaned
+        return None
+
+    @staticmethod
+    def _duration_from_actual_times(actual_start: Any, actual_end: Any) -> float | None:
+        start_ts = pd.to_datetime(actual_start, errors="coerce", utc=True)
+        end_ts = pd.to_datetime(actual_end, errors="coerce", utc=True)
+        if pd.isna(start_ts) or pd.isna(end_ts):
+            return None
+
+        duration_min = (end_ts - start_ts).total_seconds() / 60.0
+        if duration_min < 0:
+            return None
+
+        return float(duration_min)
+
+    @staticmethod
+    def _format_dt_utc(value: Any) -> str | None:
+        ts = pd.to_datetime(value, errors="coerce", utc=True)
+        if pd.isna(ts):
+            return None
+        if isinstance(ts, pd.Timestamp):
+            return ts.isoformat()
+        return None
+
+    @staticmethod
+    def _clean_int_id(value: Any) -> int | None:
+        if OutputFormatter._is_missing(value):
+            return None
+
+        if isinstance(value, (np.integer, int)) and not isinstance(value, bool):
+            return int(value)
+
+        if isinstance(value, (np.floating, float)):
+            if pd.isna(value):
+                return None
+            return int(float(value))
+
+        txt = str(value).strip()
+        if not txt or txt.lower() in {"none", "null", "nan"}:
+            return None
+
+        try:
+            return int(txt)
+        except ValueError:
+            pass
+
+        try:
+            return int(float(txt))
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _clean_numeric(value: Any) -> float | None:
+        if OutputFormatter._is_missing(value):
+            return None
+
+        if isinstance(value, (np.integer, int)) and not isinstance(value, bool):
+            return float(value)
+
+        if isinstance(value, (np.floating, float)):
+            num = float(value)
+            if math.isnan(num):
+                return None
+            return num
+
+        txt = str(value).strip()
+        if not txt or txt.lower() in {"none", "null", "nan"}:
             return None
         try:
-            return int(value)
-        except (TypeError, ValueError):
-            return value
+            return float(txt)
+        except ValueError:
+            return None
 
     @staticmethod
-    def _sanitize_payload(value: Any) -> Any:
+    def _is_missing(value: Any) -> bool:
         if value is None:
-            return None
-        if isinstance(value, dict):
-            return {str(k): OutputFormatter._sanitize_payload(v) for k, v in value.items()}
-        if isinstance(value, (list, tuple)):
-            return [OutputFormatter._sanitize_payload(v) for v in value]
-        if dataclasses.is_dataclass(value):
-            return OutputFormatter._sanitize_payload(dataclasses.asdict(value))
-        if hasattr(value, "to_dict") and callable(getattr(value, "to_dict")):
-            return OutputFormatter._sanitize_payload(value.to_dict())
-        return OutputFormatter._clean_value(value)
+            return True
+        if value is pd.NA or value is pd.NaT:
+            return True
+        try:
+            return bool(pd.isna(value))
+        except Exception:
+            return False
+
+    @staticmethod
+    def _looks_like_service_payload(value: Any) -> bool:
+        if not isinstance(value, dict):
+            return False
+        labors = value.get("serviceLabors")
+        return "service_id" in value and isinstance(labors, list)

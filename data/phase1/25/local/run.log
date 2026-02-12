@@ -1,0 +1,57 @@
+2026-02-12 19:36:53,597 | INFO | __main__ | run_id=ca5d50b7 | pipeline_start mode_default=LOCAL
+2026-02-12 19:36:53,597 | INFO | __main__ | run_id=ca5d50b7 | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:36:53,598 | INFO | __main__ | run_id=ca5d50b7 | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/request.json
+2026-02-12 19:36:53,613 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=load_request duration_ms=15.22 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/request.json
+2026-02-12 19:36:53,613 | INFO | __main__ | run_id=ca5d50b7 | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:36:53,613 | INFO | __main__ | run_id=ca5d50b7 | step_start step=load_local_input path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/local/input.csv
+2026-02-12 19:36:53,621 | INFO | src.io.input_loader | run_id=ca5d50b7 | local_input_loaded services=6 labors=9
+2026-02-12 19:36:53,621 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=load_local_input duration_ms=8.62 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/local/input.csv
+2026-02-12 19:36:53,622 | INFO | __main__ | run_id=ca5d50b7 | step_start step=parse_input
+2026-02-12 19:36:53,859 | INFO | src.data.parsing.input_parser | run_id=ca5d50b7 | input_parsed rows=9
+2026-02-12 19:36:53,860 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=parse_input duration_ms=237.95
+2026-02-12 19:36:53,861 | INFO | src.io.request_loader | run_id=ca5d50b7 | request_filters_applied rows_in=9 rows_out=9
+2026-02-12 19:36:53,861 | INFO | __main__ | run_id=ca5d50b7 | step_start step=validate_input
+2026-02-12 19:36:53,862 | INFO | src.data.validation.validator | run_id=ca5d50b7 | validation_completed total=9 valid_rows=9 invalid_rows=0
+2026-02-12 19:36:53,862 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=validate_input duration_ms=1.2
+2026-02-12 19:36:53,862 | INFO | __main__ | run_id=ca5d50b7 | step_start step=write_validation_reports
+2026-02-12 19:36:53,863 | INFO | src.io.output_writer | run_id=ca5d50b7 | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:36:53,863 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=write_validation_reports duration_ms=0.89
+2026-02-12 19:36:53,863 | INFO | __main__ | run_id=ca5d50b7 | step_start step=load_local_driver_directory path=./data/model_input/driver_directory.csv
+2026-02-12 19:36:53,865 | INFO | src.data.parsing.driver_directory_parser | run_id=ca5d50b7 | driver_directory_parsed rows=22 skipped=0
+2026-02-12 19:36:53,865 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=load_local_driver_directory duration_ms=1.8 path=./data/model_input/driver_directory.csv
+2026-02-12 19:36:53,866 | INFO | __main__ | run_id=ca5d50b7 | department_filter_applied dataset=driver_directory department=25 rows_in=22 rows_out=11
+2026-02-12 19:36:53,866 | INFO | src.pipeline_helpers | run_id=ca5d50b7 | intermediate_dataframe_exported dataframe=driver_directory rows=11
+2026-02-12 19:36:53,949 | INFO | src.data.loading.master_data_loader | run_id=ca5d50b7 | master_data_loaded directorio duraciones dist_dict
+2026-02-12 19:36:53,949 | INFO | __main__ | run_id=ca5d50b7 | preassigned_reconstruction_skipped reason=algorithm_offline algorithm=OFFLINE
+2026-02-12 19:36:53,950 | INFO | src.pipeline_helpers | run_id=ca5d50b7 | intermediate_dataframe_exported dataframe=input_df rows=9
+2026-02-12 19:36:53,950 | INFO | src.pipeline_helpers | run_id=ca5d50b7 | intermediate_dataframe_exported dataframe=preassigned_df rows=0
+2026-02-12 19:36:53,950 | INFO | __main__ | run_id=ca5d50b7 | step_start step=solve
+2026-02-12 19:36:53,955 | WARNING | src.optimization.solver | run_id=ca5d50b7 | TEMP: schedule_date normalized to first row date for testing
+2026-02-12 19:36:53,956 | INFO | src.optimization.solver | run_id=ca5d50b7 | solver_selected algorithm=OFFLINE
+2026-02-12 19:36:53,969 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=solve duration_ms=18.44
+2026-02-12 19:36:53,973 | INFO | __main__ | run_id=ca5d50b7 | assignment_diagnostics_summary rows_total=9 rows_infeasible=0 rows_warning=0 rows_reassignment_candidate=0 rows_reassignment_failed=0
+2026-02-12 19:36:53,973 | INFO | __main__ | run_id=ca5d50b7 | step_start step=write_assignment_diagnostics_report
+2026-02-12 19:36:53,976 | INFO | src.io.output_writer | run_id=ca5d50b7 | assignment_diagnostics_report_saved artifacts=assignment_diagnostics_csv,assignment_diagnostics_json rows=9
+2026-02-12 19:36:53,976 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=write_assignment_diagnostics_report duration_ms=2.78
+2026-02-12 19:36:53,976 | INFO | __main__ | run_id=ca5d50b7 | step_start step=validate_solution
+2026-02-12 19:36:53,979 | INFO | src.optimization.validation.solution_validator | run_id=ca5d50b7 | solution_validation_driver_overlap drivers=5 overlaps=0
+2026-02-12 19:36:53,983 | INFO | src.optimization.validation.solution_validator | run_id=ca5d50b7 | solution_validation_moves drivers=5 rows=21 inconsistencies=1
+2026-02-12 19:36:53,983 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=validate_solution duration_ms=6.53
+2026-02-12 19:36:53,983 | INFO | __main__ | run_id=ca5d50b7 | step_start step=write_solution_validation_outputs
+2026-02-12 19:36:53,984 | INFO | src.io.output_writer | run_id=ca5d50b7 | solution_validation_outputs_saved generated=issues_csv,validation_report_json
+2026-02-12 19:36:53,984 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=write_solution_validation_outputs duration_ms=0.77
+2026-02-12 19:36:53,984 | WARNING | __main__ | run_id=ca5d50b7 | solution_validation_non_blocking_issues issues=1
+2026-02-12 19:36:53,984 | INFO | __main__ | run_id=ca5d50b7 | step_start step=evaluate_solution
+2026-02-12 19:36:54,010 | INFO | src.optimization.evaluation.solution_evaluator | run_id=ca5d50b7 | solution_evaluation_completed services=6 labors=9 drivers=5 vt_labors=7 labor_distance_km=28.54 driver_move_distance_km=25.84 util_wo_moves=10.77 util_with_moves=12.4
+2026-02-12 19:36:54,010 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=evaluate_solution duration_ms=26.3
+2026-02-12 19:36:54,010 | INFO | __main__ | run_id=ca5d50b7 | step_start step=write_solution_evaluation_output
+2026-02-12 19:36:54,010 | INFO | src.io.output_writer | run_id=ca5d50b7 | solution_evaluation_output_saved artifact=solution_evaluation_report_json
+2026-02-12 19:36:54,010 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=write_solution_evaluation_output duration_ms=0.41
+2026-02-12 19:36:54,010 | INFO | __main__ | run_id=ca5d50b7 | step_start step=format_output
+2026-02-12 19:36:54,013 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=format_output duration_ms=2.97
+2026-02-12 19:36:54,013 | INFO | __main__ | run_id=ca5d50b7 | step_start step=save_model_solution_artifacts
+2026-02-12 19:36:54,014 | INFO | src.io.output_writer | run_id=ca5d50b7 | local_output_saved artifact=output_csv rows=9
+2026-02-12 19:36:54,014 | INFO | src.io.output_writer | run_id=ca5d50b7 | local_output_saved artifact=output_payload_json
+2026-02-12 19:36:54,014 | INFO | __main__ | run_id=ca5d50b7 | step_end   step=save_model_solution_artifacts duration_ms=0.9
+2026-02-12 19:36:54,014 | INFO | __main__ | run_id=ca5d50b7 | output_delivered
+2026-02-12 19:36:54,014 | INFO | __main__ | run_id=ca5d50b7 | pipeline_end status=success

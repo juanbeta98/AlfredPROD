@@ -1,0 +1,25 @@
+2026-02-12 19:37:02,531 | INFO | __main__ | run_id=bde9d453 | pipeline_start mode_default=API
+2026-02-12 19:37:02,531 | INFO | __main__ | run_id=bde9d453 | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:37:02,532 | INFO | __main__ | run_id=bde9d453 | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/8/request.json
+2026-02-12 19:37:02,545 | INFO | __main__ | run_id=bde9d453 | step_end   step=load_request duration_ms=13.76 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/8/request.json
+2026-02-12 19:37:02,545 | INFO | __main__ | run_id=bde9d453 | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:37:02,545 | INFO | __main__ | run_id=bde9d453 | step_start step=fetch_optimization_data
+2026-02-12 19:37:02,905 | INFO | src.integration.client | run_id=bde9d453 | fetch_optimization_data_completed department=8 start_date=2026-02-19T00:00:00-05:00 end_date=2026-02-27T23:59:59-05:00
+2026-02-12 19:37:02,905 | INFO | __main__ | run_id=bde9d453 | step_end   step=fetch_optimization_data duration_ms=359.93
+2026-02-12 19:37:02,906 | INFO | __main__ | run_id=bde9d453 | step_start step=parse_input
+2026-02-12 19:37:03,156 | INFO | src.data.parsing.input_parser | run_id=bde9d453 | input_parsed rows=4
+2026-02-12 19:37:03,156 | INFO | __main__ | run_id=bde9d453 | step_end   step=parse_input duration_ms=250.09
+2026-02-12 19:37:03,157 | INFO | __main__ | run_id=bde9d453 | api_payload_driver_ignored_for_testing cleared_rows=1
+2026-02-12 19:37:03,157 | INFO | __main__ | run_id=bde9d453 | step_start step=validate_input
+2026-02-12 19:37:03,158 | INFO | src.data.validation.validator | run_id=bde9d453 | validation_completed total=4 valid_rows=0 invalid_rows=4
+2026-02-12 19:37:03,158 | INFO | __main__ | run_id=bde9d453 | step_end   step=validate_input duration_ms=1.5
+2026-02-12 19:37:03,158 | INFO | __main__ | run_id=bde9d453 | step_start step=write_validation_reports
+2026-02-12 19:37:03,162 | INFO | src.io.output_writer | run_id=bde9d453 | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:37:03,162 | INFO | __main__ | run_id=bde9d453 | step_end   step=write_validation_reports duration_ms=4.08
+2026-02-12 19:37:03,162 | WARNING | __main__ | run_id=bde9d453 | input_validation_found_issues invalid_rows=4
+2026-02-12 19:37:03,163 | ERROR | __main__ | run_id=bde9d453 | input_validation_failed
+Traceback (most recent call last):
+  File "/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/main.py", line 589, in main
+    raise ValueError("all_rows_failed_validation")
+ValueError: all_rows_failed_validation
+2026-02-12 19:37:03,461 | INFO | src.integration.sender | run_id=bde9d453 | results_sent status_code=200 payload_status=success

@@ -1,0 +1,60 @@
+2026-02-12 19:36:54,444 | INFO | __main__ | run_id=b63a5ae1 | pipeline_start mode_default=API
+2026-02-12 19:36:54,444 | INFO | __main__ | run_id=b63a5ae1 | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:36:54,444 | INFO | __main__ | run_id=b63a5ae1 | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/request.json
+2026-02-12 19:36:54,458 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=load_request duration_ms=13.75 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/25/request.json
+2026-02-12 19:36:54,458 | INFO | __main__ | run_id=b63a5ae1 | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:36:54,458 | INFO | __main__ | run_id=b63a5ae1 | step_start step=fetch_optimization_data
+2026-02-12 19:36:54,990 | INFO | src.integration.client | run_id=b63a5ae1 | fetch_optimization_data_completed department=25 start_date=2026-02-19T00:00:00-05:00 end_date=2026-02-27T23:59:59-05:00
+2026-02-12 19:36:54,990 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=fetch_optimization_data duration_ms=531.77
+2026-02-12 19:36:54,991 | INFO | __main__ | run_id=b63a5ae1 | step_start step=parse_input
+2026-02-12 19:36:55,245 | INFO | src.data.parsing.input_parser | run_id=b63a5ae1 | input_parsed rows=17
+2026-02-12 19:36:55,245 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=parse_input duration_ms=254.2
+2026-02-12 19:36:55,246 | INFO | __main__ | run_id=b63a5ae1 | api_payload_driver_ignored_for_testing cleared_rows=7
+2026-02-12 19:36:55,246 | INFO | __main__ | run_id=b63a5ae1 | step_start step=validate_input
+2026-02-12 19:36:55,247 | INFO | src.data.validation.validator | run_id=b63a5ae1 | validation_completed total=17 valid_rows=17 invalid_rows=0
+2026-02-12 19:36:55,247 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=validate_input duration_ms=1.62
+2026-02-12 19:36:55,247 | INFO | __main__ | run_id=b63a5ae1 | step_start step=write_validation_reports
+2026-02-12 19:36:55,252 | INFO | src.io.output_writer | run_id=b63a5ae1 | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:36:55,252 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=write_validation_reports duration_ms=4.46
+2026-02-12 19:36:55,252 | INFO | __main__ | run_id=b63a5ae1 | step_start step=fetch_driver_directory
+2026-02-12 19:36:55,531 | INFO | src.integration.client | run_id=b63a5ae1 | fetch_driver_directory_completed active=True schedule_date=2026-02-24 department=25 rows=10
+2026-02-12 19:36:55,532 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=fetch_driver_directory duration_ms=279.24
+2026-02-12 19:36:55,534 | INFO | src.data.parsing.driver_directory_parser | run_id=b63a5ae1 | driver_directory_parsed rows=10 skipped=0
+2026-02-12 19:36:55,536 | INFO | src.pipeline_helpers | run_id=b63a5ae1 | intermediate_dataframe_exported dataframe=driver_directory rows=10
+2026-02-12 19:36:55,632 | INFO | src.data.loading.master_data_loader | run_id=b63a5ae1 | master_data_loaded directorio duraciones dist_dict
+2026-02-12 19:36:55,633 | INFO | __main__ | run_id=b63a5ae1 | preassigned_reconstruction_skipped reason=algorithm_offline algorithm=OFFLINE
+2026-02-12 19:36:55,633 | INFO | src.pipeline_helpers | run_id=b63a5ae1 | intermediate_dataframe_exported dataframe=input_df rows=17
+2026-02-12 19:36:55,634 | INFO | src.pipeline_helpers | run_id=b63a5ae1 | intermediate_dataframe_exported dataframe=preassigned_df rows=0
+2026-02-12 19:36:55,634 | INFO | __main__ | run_id=b63a5ae1 | step_start step=solve
+2026-02-12 19:36:55,639 | WARNING | src.optimization.solver | run_id=b63a5ae1 | TEMP: schedule_date normalized to first row date for testing
+2026-02-12 19:36:55,639 | INFO | src.optimization.solver | run_id=b63a5ae1 | solver_selected algorithm=OFFLINE
+2026-02-12 19:36:55,652 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=solve duration_ms=17.95
+2026-02-12 19:36:55,656 | INFO | __main__ | run_id=b63a5ae1 | assignment_diagnostics_summary rows_total=17 rows_infeasible=1 rows_warning=0 rows_reassignment_candidate=0 rows_reassignment_failed=0
+2026-02-12 19:36:55,656 | INFO | __main__ | run_id=b63a5ae1 | step_start step=write_assignment_diagnostics_report
+2026-02-12 19:36:55,657 | INFO | src.io.output_writer | run_id=b63a5ae1 | assignment_diagnostics_report_saved artifacts=assignment_diagnostics_csv,assignment_diagnostics_json rows=17
+2026-02-12 19:36:55,657 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=write_assignment_diagnostics_report duration_ms=1.49
+2026-02-12 19:36:55,657 | INFO | __main__ | run_id=b63a5ae1 | step_start step=validate_solution
+2026-02-12 19:36:55,660 | INFO | src.optimization.validation.solution_validator | run_id=b63a5ae1 | solution_validation_driver_overlap drivers=7 overlaps=0
+2026-02-12 19:36:55,665 | INFO | src.optimization.validation.solution_validator | run_id=b63a5ae1 | solution_validation_moves drivers=7 rows=42 inconsistencies=1
+2026-02-12 19:36:55,665 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=validate_solution duration_ms=7.39
+2026-02-12 19:36:55,665 | INFO | __main__ | run_id=b63a5ae1 | step_start step=write_solution_validation_outputs
+2026-02-12 19:36:55,665 | INFO | src.io.output_writer | run_id=b63a5ae1 | solution_validation_outputs_saved generated=issues_csv,validation_report_json
+2026-02-12 19:36:55,665 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=write_solution_validation_outputs duration_ms=0.32
+2026-02-12 19:36:55,665 | WARNING | __main__ | run_id=b63a5ae1 | solution_validation_non_blocking_issues issues=1
+2026-02-12 19:36:55,665 | INFO | __main__ | run_id=b63a5ae1 | step_start step=evaluate_solution
+2026-02-12 19:36:55,687 | INFO | src.optimization.evaluation.solution_evaluator | run_id=b63a5ae1 | solution_evaluation_completed services=14 labors=17 drivers=7 vt_labors=15 labor_distance_km=43.91 driver_move_distance_km=47.44 util_wo_moves=15.12 util_with_moves=17.23
+2026-02-12 19:36:55,687 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=evaluate_solution duration_ms=21.82
+2026-02-12 19:36:55,687 | INFO | __main__ | run_id=b63a5ae1 | step_start step=write_solution_evaluation_output
+2026-02-12 19:36:55,687 | INFO | src.io.output_writer | run_id=b63a5ae1 | solution_evaluation_output_saved artifact=solution_evaluation_report_json
+2026-02-12 19:36:55,687 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=write_solution_evaluation_output duration_ms=0.33
+2026-02-12 19:36:55,687 | INFO | __main__ | run_id=b63a5ae1 | step_start step=format_output
+2026-02-12 19:36:55,693 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=format_output duration_ms=5.58
+2026-02-12 19:36:55,693 | INFO | __main__ | run_id=b63a5ae1 | step_start step=save_model_solution_artifacts
+2026-02-12 19:36:55,694 | INFO | src.io.output_writer | run_id=b63a5ae1 | local_output_saved artifact=output_csv rows=17
+2026-02-12 19:36:55,694 | INFO | src.io.output_writer | run_id=b63a5ae1 | local_output_saved artifact=output_payload_json
+2026-02-12 19:36:55,694 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=save_model_solution_artifacts duration_ms=1.03
+2026-02-12 19:36:55,694 | INFO | __main__ | run_id=b63a5ae1 | step_start step=send_results
+2026-02-12 19:36:55,976 | INFO | src.integration.sender | run_id=b63a5ae1 | results_sent status_code=200 payload_status=success
+2026-02-12 19:36:55,976 | INFO | __main__ | run_id=b63a5ae1 | step_end   step=send_results duration_ms=281.93
+2026-02-12 19:36:55,976 | INFO | __main__ | run_id=b63a5ae1 | output_delivered
+2026-02-12 19:36:55,976 | INFO | __main__ | run_id=b63a5ae1 | pipeline_end status=success

@@ -1,0 +1,57 @@
+2026-02-12 19:36:59,068 | INFO | __main__ | run_id=e4185706 | pipeline_start mode_default=LOCAL
+2026-02-12 19:36:59,068 | INFO | __main__ | run_id=e4185706 | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:36:59,068 | INFO | __main__ | run_id=e4185706 | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/request.json
+2026-02-12 19:36:59,082 | INFO | __main__ | run_id=e4185706 | step_end   step=load_request duration_ms=13.63 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/request.json
+2026-02-12 19:36:59,082 | INFO | __main__ | run_id=e4185706 | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:36:59,082 | INFO | __main__ | run_id=e4185706 | step_start step=load_local_input path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/local/input.csv
+2026-02-12 19:36:59,087 | INFO | src.io.input_loader | run_id=e4185706 | local_input_loaded services=2 labors=6
+2026-02-12 19:36:59,088 | INFO | __main__ | run_id=e4185706 | step_end   step=load_local_input duration_ms=6.01 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/local/input.csv
+2026-02-12 19:36:59,088 | INFO | __main__ | run_id=e4185706 | step_start step=parse_input
+2026-02-12 19:36:59,316 | INFO | src.data.parsing.input_parser | run_id=e4185706 | input_parsed rows=6
+2026-02-12 19:36:59,316 | INFO | __main__ | run_id=e4185706 | step_end   step=parse_input duration_ms=228.6
+2026-02-12 19:36:59,318 | INFO | src.io.request_loader | run_id=e4185706 | request_filters_applied rows_in=6 rows_out=6
+2026-02-12 19:36:59,318 | INFO | __main__ | run_id=e4185706 | step_start step=validate_input
+2026-02-12 19:36:59,319 | INFO | src.data.validation.validator | run_id=e4185706 | validation_completed total=6 valid_rows=6 invalid_rows=0
+2026-02-12 19:36:59,319 | INFO | __main__ | run_id=e4185706 | step_end   step=validate_input duration_ms=0.98
+2026-02-12 19:36:59,319 | INFO | __main__ | run_id=e4185706 | step_start step=write_validation_reports
+2026-02-12 19:36:59,319 | INFO | src.io.output_writer | run_id=e4185706 | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:36:59,319 | INFO | __main__ | run_id=e4185706 | step_end   step=write_validation_reports duration_ms=0.78
+2026-02-12 19:36:59,320 | INFO | __main__ | run_id=e4185706 | step_start step=load_local_driver_directory path=./data/model_input/driver_directory.csv
+2026-02-12 19:36:59,321 | INFO | src.data.parsing.driver_directory_parser | run_id=e4185706 | driver_directory_parsed rows=22 skipped=0
+2026-02-12 19:36:59,321 | INFO | __main__ | run_id=e4185706 | step_end   step=load_local_driver_directory duration_ms=1.47 path=./data/model_input/driver_directory.csv
+2026-02-12 19:36:59,321 | INFO | __main__ | run_id=e4185706 | department_filter_applied dataset=driver_directory department=76 rows_in=22 rows_out=4
+2026-02-12 19:36:59,322 | INFO | src.pipeline_helpers | run_id=e4185706 | intermediate_dataframe_exported dataframe=driver_directory rows=4
+2026-02-12 19:36:59,396 | INFO | src.data.loading.master_data_loader | run_id=e4185706 | master_data_loaded directorio duraciones dist_dict
+2026-02-12 19:36:59,396 | INFO | __main__ | run_id=e4185706 | preassigned_reconstruction_skipped reason=algorithm_offline algorithm=OFFLINE
+2026-02-12 19:36:59,397 | INFO | src.pipeline_helpers | run_id=e4185706 | intermediate_dataframe_exported dataframe=input_df rows=6
+2026-02-12 19:36:59,397 | INFO | src.pipeline_helpers | run_id=e4185706 | intermediate_dataframe_exported dataframe=preassigned_df rows=0
+2026-02-12 19:36:59,397 | INFO | __main__ | run_id=e4185706 | step_start step=solve
+2026-02-12 19:36:59,400 | WARNING | src.optimization.solver | run_id=e4185706 | TEMP: schedule_date normalized to first row date for testing
+2026-02-12 19:36:59,401 | INFO | src.optimization.solver | run_id=e4185706 | solver_selected algorithm=OFFLINE
+2026-02-12 19:36:59,409 | INFO | __main__ | run_id=e4185706 | step_end   step=solve duration_ms=12.06
+2026-02-12 19:36:59,413 | INFO | __main__ | run_id=e4185706 | assignment_diagnostics_summary rows_total=6 rows_infeasible=0 rows_warning=0 rows_reassignment_candidate=0 rows_reassignment_failed=0
+2026-02-12 19:36:59,413 | INFO | __main__ | run_id=e4185706 | step_start step=write_assignment_diagnostics_report
+2026-02-12 19:36:59,415 | INFO | src.io.output_writer | run_id=e4185706 | assignment_diagnostics_report_saved artifacts=assignment_diagnostics_csv,assignment_diagnostics_json rows=6
+2026-02-12 19:36:59,415 | INFO | __main__ | run_id=e4185706 | step_end   step=write_assignment_diagnostics_report duration_ms=1.55
+2026-02-12 19:36:59,415 | INFO | __main__ | run_id=e4185706 | step_start step=validate_solution
+2026-02-12 19:36:59,417 | INFO | src.optimization.validation.solution_validator | run_id=e4185706 | solution_validation_driver_overlap drivers=2 overlaps=0
+2026-02-12 19:36:59,418 | INFO | src.optimization.validation.solution_validator | run_id=e4185706 | solution_validation_moves drivers=2 rows=12 inconsistencies=2
+2026-02-12 19:36:59,419 | INFO | __main__ | run_id=e4185706 | step_end   step=validate_solution duration_ms=3.73
+2026-02-12 19:36:59,419 | INFO | __main__ | run_id=e4185706 | step_start step=write_solution_validation_outputs
+2026-02-12 19:36:59,419 | INFO | src.io.output_writer | run_id=e4185706 | solution_validation_outputs_saved generated=issues_csv,validation_report_json
+2026-02-12 19:36:59,419 | INFO | __main__ | run_id=e4185706 | step_end   step=write_solution_validation_outputs duration_ms=0.35
+2026-02-12 19:36:59,419 | WARNING | __main__ | run_id=e4185706 | solution_validation_non_blocking_issues issues=2
+2026-02-12 19:36:59,419 | INFO | __main__ | run_id=e4185706 | step_start step=evaluate_solution
+2026-02-12 19:36:59,437 | INFO | src.optimization.evaluation.solution_evaluator | run_id=e4185706 | solution_evaluation_completed services=2 labors=6 drivers=2 vt_labors=4 labor_distance_km=4.32 driver_move_distance_km=14.8 util_wo_moves=13.72 util_with_moves=16.31
+2026-02-12 19:36:59,437 | INFO | __main__ | run_id=e4185706 | step_end   step=evaluate_solution duration_ms=18.3
+2026-02-12 19:36:59,437 | INFO | __main__ | run_id=e4185706 | step_start step=write_solution_evaluation_output
+2026-02-12 19:36:59,437 | INFO | src.io.output_writer | run_id=e4185706 | solution_evaluation_output_saved artifact=solution_evaluation_report_json
+2026-02-12 19:36:59,437 | INFO | __main__ | run_id=e4185706 | step_end   step=write_solution_evaluation_output duration_ms=0.21
+2026-02-12 19:36:59,438 | INFO | __main__ | run_id=e4185706 | step_start step=format_output
+2026-02-12 19:36:59,439 | INFO | __main__ | run_id=e4185706 | step_end   step=format_output duration_ms=1.3
+2026-02-12 19:36:59,439 | INFO | __main__ | run_id=e4185706 | step_start step=save_model_solution_artifacts
+2026-02-12 19:36:59,439 | INFO | src.io.output_writer | run_id=e4185706 | local_output_saved artifact=output_csv rows=6
+2026-02-12 19:36:59,440 | INFO | src.io.output_writer | run_id=e4185706 | local_output_saved artifact=output_payload_json
+2026-02-12 19:36:59,440 | INFO | __main__ | run_id=e4185706 | step_end   step=save_model_solution_artifacts duration_ms=0.7
+2026-02-12 19:36:59,440 | INFO | __main__ | run_id=e4185706 | output_delivered
+2026-02-12 19:36:59,440 | INFO | __main__ | run_id=e4185706 | pipeline_end status=success

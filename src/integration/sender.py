@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -53,9 +53,9 @@ class ResultSender:
 
     def send_results(
         self,
-        results: Dict[str, Any],
+        results: Any,
         request_id: Optional[str] = None,
-    ) -> Dict[str, Any]:
+    ) -> Any:
         """
         Sends optimization results to ALFRED API.
 
@@ -64,10 +64,11 @@ class ResultSender:
             request_id: Optional request identifier for traceability
 
         Returns:
-            API response as dict
+            API response body
         """
         endpoint = self.base_url
         payload = self._build_payload(results=results, request_id=request_id)
+        payload_status = payload.get("status") if isinstance(payload, dict) else None
 
         logger.debug("Endpoint: %s", endpoint)
         logger.debug("Payload size: %s characters", len(str(payload)))
@@ -85,10 +86,11 @@ class ResultSender:
                 response.raise_for_status()
 
             result = self._parse_json_response(response)
+            logged_payload_status = "success" if response.status_code == 200 else payload_status
             logger.info(
-                "results_sent status_code=%s response_keys=%s",
+                "results_sent status_code=%s payload_status=%s",
                 response.status_code,
-                sorted(result.keys()) if isinstance(result, dict) else None,
+                logged_payload_status,
             )
             
             return result
@@ -142,19 +144,44 @@ class ResultSender:
     @staticmethod
     def _build_payload(
         *,
-        results: Dict[str, Any],
+        results: Any,
         request_id: Optional[str],
-    ) -> Dict[str, Any]:
+    ) -> Any:
         """
         Build request payload.
         """
-        return {
-            "request_id": request_id,
-            **results,
-        }
+        if results is None:
+            return {"data": []}
+
+        # Preserve failure reporting payloads.
+        if isinstance(results, dict) and str(results.get("status", "")).lower() == "failed":
+            payload = dict(results)
+            if request_id and not payload.get("request_id"):
+                payload["request_id"] = request_id
+            return payload
+
+        if isinstance(results, dict):
+            if "data" in results:
+                payload = dict(results)
+                data = payload.get("data")
+                if data is None:
+                    payload["data"] = []
+                elif isinstance(data, dict) and ResultSender._looks_like_service_payload(data):
+                    payload["data"] = [data]
+                return payload
+
+            if ResultSender._looks_like_service_payload(results):
+                return {"data": [results]}
+
+            return results
+
+        if isinstance(results, list):
+            return {"data": results}
+
+        return results
 
     @staticmethod
-    def _parse_json_response(response: requests.Response) -> Dict[str, Any]:
+    def _parse_json_response(response: requests.Response) -> Any:
         """
         Safely parse JSON response.
         """
@@ -175,10 +202,15 @@ class ResultSender:
         """
         Log HTTP error details safely.
         """
+        body_preview = (response.text or "")[:500]
         logger.error(
-            "HTTP error from ALFRED API",
-            extra={
-                "status_code": response.status_code,
-                "response_body": response.text[:500],
-            },
+            "HTTP error from ALFRED API status_code=%s response_body=%s",
+            response.status_code,
+            body_preview,
         )
+
+    @staticmethod
+    def _looks_like_service_payload(value: Any) -> bool:
+        if not isinstance(value, dict):
+            return False
+        return "service_id" in value and isinstance(value.get("serviceLabors"), list)

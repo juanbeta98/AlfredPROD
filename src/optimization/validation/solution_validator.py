@@ -5,8 +5,10 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 
+from src.location import row_location_key
 from src.optimization.common.distance_utils import distance
 from src.optimization.settings.model_params import ModelParams
+from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD
 
 logger = logging.getLogger(__name__)
 
@@ -14,9 +16,21 @@ DEFAULT_BLOCKING_CHECKS = frozenset(
     {
         "driver_overlap",
         "time_discontinuity",
-        "free_time_overlap",
     }
 )
+
+
+def _city_dist_slice(dist_dict: Optional[Dict[Any, Any]], city_key: Any) -> Dict[Any, Any]:
+    if not isinstance(dist_dict, dict):
+        return {}
+    if city_key in dist_dict:
+        value = dist_dict.get(city_key, {})
+        return value if isinstance(value, dict) else {}
+    city_key_txt = str(city_key)
+    for key, value in dist_dict.items():
+        if str(key) == city_key_txt:
+            return value if isinstance(value, dict) else {}
+    return {}
 
 
 def validate_solution(
@@ -24,7 +38,7 @@ def validate_solution(
     moves_df: pd.DataFrame,
     *,
     model_params: ModelParams,
-    dist_method: str = "haversine",
+    dist_method: str = DEFAULT_DISTANCE_METHOD,
     dist_dict: Optional[Dict[Any, Any]] = None,
     strict_time_check: bool = False,
     blocking_checks: Optional[Iterable[str]] = None,
@@ -195,7 +209,7 @@ def validate_moves_df(
     moves_df: pd.DataFrame,
     *,
     model_params: ModelParams,
-    dist_method: str = "haversine",
+    dist_method: str = DEFAULT_DISTANCE_METHOD,
     dist_dict: Optional[Dict[Any, Any]] = None,
     strict_time_check: bool = True,
     dist_tol_km: float = 1e-3,
@@ -228,8 +242,8 @@ def validate_moves_df(
         for i in range(len(g)):
             row = g.loc[i]
 
-            city = row.get("city")
-            city_dist_dict = dist_dict.get(city, {}) if isinstance(dist_dict, dict) else {}
+            city_key = row_location_key(row.to_dict())
+            city_dist_dict = _city_dist_slice(dist_dict, city_key)
 
             stats["rows_checked"] += 1
             labor_id = row.get("labor_id")
@@ -240,7 +254,7 @@ def validate_moves_df(
 
             computed_dist = None
             if pd.notna(start_pt) and pd.notna(end_pt):
-                cache_key = (str(city), str(start_pt), str(end_pt), dist_method)
+                cache_key = (str(city_key), str(start_pt), str(end_pt), dist_method)
                 if cache_key in distance_cache:
                     computed_dist = distance_cache[cache_key]
                 else:
@@ -353,9 +367,9 @@ def validate_moves_df(
 
 
 def _drop_all_city(df: pd.DataFrame) -> pd.DataFrame:
-    if "city" not in df.columns:
-        return df
-    return df[df["city"] != "ALL"]
+    if "city_code" in df.columns:
+        return df[df["city_code"] != "ALL"]
+    return df
 
 
 def _combine_issues(*dfs: pd.DataFrame) -> pd.DataFrame:

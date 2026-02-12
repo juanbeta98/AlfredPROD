@@ -3,6 +3,10 @@ from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 
+from src.data.id_normalization import normalize_id_columns
+from src.datetime_utils import normalize_datetime_columns_to_colombia
+from src.location import parse_service_location
+
 logger = logging.getLogger(__name__)
 
 
@@ -70,6 +74,35 @@ class InputParser:
             return pd.DataFrame(), {"raw": json_data}
 
         df = pd.json_normalize(records)
+        normalize_id_columns(
+            df,
+            columns=(
+                "service_id",
+                "labor_id",
+                "start_address_id",
+                "end_address_id",
+                "city_code",
+                "department_code",
+                "labor_type",
+                "assigned_driver",
+                "shop_address_id",
+                "shop_id",
+            ),
+            include_detected=True,
+        )
+        normalize_datetime_columns_to_colombia(
+            df,
+            [
+                "created_at",
+                "schedule_date",
+                "payload_labor_schedule_date",
+                "actual_start",
+                "actual_end",
+                "labor_created_at",
+                "labor_start_date",
+                "labor_end_date",
+            ],
+        )
 
         metadata = {
             "service_count": len(services),
@@ -88,11 +121,19 @@ class InputParser:
         """
         Parse service-level fields common to all labor records.
         """
+        raw_city = service.get("start_address", {}).get("city")
+        location = parse_service_location(raw_city)
+
         base: Dict[str, Any] = {
             "service_id": service.get("service_id"),
             "state": service.get("state"),
             "created_at": service.get("created_at"),
-            'city': service.get('start_address', {}).get('city', ''),  # used in some algorithms
+            "service_schedule_date": service.get("schedule_date") or service.get("scheduleDate"),
+            "city_code": location["city_code"],
+            "city_name": location["city_name"],
+            "department_code": location["department_code"],
+            "department_name": location["department_name"],
+            "location_resolution_status": location["location_resolution_status"],
         }
 
         base.update(
@@ -132,8 +173,9 @@ class InputParser:
                 "labor_name": labor.get("labor_name"),
                 "labor_category": labor.get("labor_category"),
                 "schedule_date": labor.get("schedule_date"),
+                "payload_labor_schedule_date": labor.get("schedule_date"),
                 "labor_sequence": labor.get("labor_sequence", 1),
-                "assigned_driver": labor.get("alfred"),
+                "assigned_driver": InputParser._extract_assigned_driver(labor.get("alfred")),
                 "actual_start": actual_start,
                 "actual_end": actual_end,
             }
@@ -157,6 +199,12 @@ class InputParser:
             )
 
         return record
+
+    @staticmethod
+    def _extract_assigned_driver(value: Any) -> Any:
+        if isinstance(value, dict):
+            return value.get("id")
+        return value
 
     @staticmethod
     def _parse_address(

@@ -1,0 +1,59 @@
+2026-02-12 19:36:57,162 | INFO | __main__ | run_id=5e41e331 | pipeline_start mode_default=API
+2026-02-12 19:36:57,162 | INFO | __main__ | run_id=5e41e331 | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:36:57,162 | INFO | __main__ | run_id=5e41e331 | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/5/request.json
+2026-02-12 19:36:57,176 | INFO | __main__ | run_id=5e41e331 | step_end   step=load_request duration_ms=13.49 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/5/request.json
+2026-02-12 19:36:57,176 | INFO | __main__ | run_id=5e41e331 | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:36:57,176 | INFO | __main__ | run_id=5e41e331 | step_start step=fetch_optimization_data
+2026-02-12 19:36:57,666 | INFO | src.integration.client | run_id=5e41e331 | fetch_optimization_data_completed department=5 start_date=2026-02-19T00:00:00-05:00 end_date=2026-02-27T23:59:59-05:00
+2026-02-12 19:36:57,666 | INFO | __main__ | run_id=5e41e331 | step_end   step=fetch_optimization_data duration_ms=489.95
+2026-02-12 19:36:57,666 | INFO | __main__ | run_id=5e41e331 | step_start step=parse_input
+2026-02-12 19:36:57,919 | INFO | src.data.parsing.input_parser | run_id=5e41e331 | input_parsed rows=14
+2026-02-12 19:36:57,919 | INFO | __main__ | run_id=5e41e331 | step_end   step=parse_input duration_ms=252.33
+2026-02-12 19:36:57,919 | INFO | __main__ | run_id=5e41e331 | api_payload_driver_ignored_for_testing cleared_rows=14
+2026-02-12 19:36:57,920 | INFO | __main__ | run_id=5e41e331 | step_start step=validate_input
+2026-02-12 19:36:57,921 | INFO | src.data.validation.validator | run_id=5e41e331 | validation_completed total=14 valid_rows=14 invalid_rows=0
+2026-02-12 19:36:57,921 | INFO | __main__ | run_id=5e41e331 | step_end   step=validate_input duration_ms=1.47
+2026-02-12 19:36:57,921 | INFO | __main__ | run_id=5e41e331 | step_start step=write_validation_reports
+2026-02-12 19:36:57,925 | INFO | src.io.output_writer | run_id=5e41e331 | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:36:57,925 | INFO | __main__ | run_id=5e41e331 | step_end   step=write_validation_reports duration_ms=3.59
+2026-02-12 19:36:57,925 | INFO | __main__ | run_id=5e41e331 | step_start step=fetch_driver_directory
+2026-02-12 19:36:58,210 | INFO | src.integration.client | run_id=5e41e331 | fetch_driver_directory_completed active=True schedule_date=2026-02-19 department=5 rows=3
+2026-02-12 19:36:58,211 | INFO | __main__ | run_id=5e41e331 | step_end   step=fetch_driver_directory duration_ms=285.41
+2026-02-12 19:36:58,214 | INFO | src.data.parsing.driver_directory_parser | run_id=5e41e331 | driver_directory_parsed rows=3 skipped=0
+2026-02-12 19:36:58,217 | INFO | src.pipeline_helpers | run_id=5e41e331 | intermediate_dataframe_exported dataframe=driver_directory rows=3
+2026-02-12 19:36:58,313 | INFO | src.data.loading.master_data_loader | run_id=5e41e331 | master_data_loaded directorio duraciones dist_dict
+2026-02-12 19:36:58,313 | INFO | __main__ | run_id=5e41e331 | preassigned_reconstruction_skipped reason=algorithm_offline algorithm=OFFLINE
+2026-02-12 19:36:58,314 | INFO | src.pipeline_helpers | run_id=5e41e331 | intermediate_dataframe_exported dataframe=input_df rows=14
+2026-02-12 19:36:58,314 | INFO | src.pipeline_helpers | run_id=5e41e331 | intermediate_dataframe_exported dataframe=preassigned_df rows=0
+2026-02-12 19:36:58,314 | INFO | __main__ | run_id=5e41e331 | step_start step=solve
+2026-02-12 19:36:58,319 | WARNING | src.optimization.solver | run_id=5e41e331 | TEMP: schedule_date normalized to first row date for testing
+2026-02-12 19:36:58,319 | INFO | src.optimization.solver | run_id=5e41e331 | solver_selected algorithm=OFFLINE
+2026-02-12 19:36:58,330 | INFO | __main__ | run_id=5e41e331 | step_end   step=solve duration_ms=15.63
+2026-02-12 19:36:58,334 | INFO | __main__ | run_id=5e41e331 | assignment_diagnostics_summary rows_total=14 rows_infeasible=1 rows_warning=0 rows_reassignment_candidate=0 rows_reassignment_failed=0
+2026-02-12 19:36:58,334 | INFO | __main__ | run_id=5e41e331 | step_start step=write_assignment_diagnostics_report
+2026-02-12 19:36:58,336 | INFO | src.io.output_writer | run_id=5e41e331 | assignment_diagnostics_report_saved artifacts=assignment_diagnostics_csv,assignment_diagnostics_json rows=14
+2026-02-12 19:36:58,336 | INFO | __main__ | run_id=5e41e331 | step_end   step=write_assignment_diagnostics_report duration_ms=1.55
+2026-02-12 19:36:58,336 | INFO | __main__ | run_id=5e41e331 | step_start step=validate_solution
+2026-02-12 19:36:58,338 | INFO | src.optimization.validation.solution_validator | run_id=5e41e331 | solution_validation_driver_overlap drivers=3 overlaps=0
+2026-02-12 19:36:58,342 | INFO | src.optimization.validation.solution_validator | run_id=5e41e331 | solution_validation_moves drivers=3 rows=39 inconsistencies=0
+2026-02-12 19:36:58,342 | INFO | __main__ | run_id=5e41e331 | step_end   step=validate_solution duration_ms=6.66
+2026-02-12 19:36:58,342 | INFO | __main__ | run_id=5e41e331 | step_start step=write_solution_validation_outputs
+2026-02-12 19:36:58,343 | INFO | src.io.output_writer | run_id=5e41e331 | solution_validation_outputs_saved generated=issues_csv,validation_report_json
+2026-02-12 19:36:58,343 | INFO | __main__ | run_id=5e41e331 | step_end   step=write_solution_validation_outputs duration_ms=0.3
+2026-02-12 19:36:58,343 | INFO | __main__ | run_id=5e41e331 | step_start step=evaluate_solution
+2026-02-12 19:36:58,362 | INFO | src.optimization.evaluation.solution_evaluator | run_id=5e41e331 | solution_evaluation_completed services=14 labors=14 drivers=3 vt_labors=14 labor_distance_km=19.59 driver_move_distance_km=19.38 util_wo_moves=32.01 util_with_moves=34.02
+2026-02-12 19:36:58,362 | INFO | __main__ | run_id=5e41e331 | step_end   step=evaluate_solution duration_ms=19.03
+2026-02-12 19:36:58,362 | INFO | __main__ | run_id=5e41e331 | step_start step=write_solution_evaluation_output
+2026-02-12 19:36:58,362 | INFO | src.io.output_writer | run_id=5e41e331 | solution_evaluation_output_saved artifact=solution_evaluation_report_json
+2026-02-12 19:36:58,362 | INFO | __main__ | run_id=5e41e331 | step_end   step=write_solution_evaluation_output duration_ms=0.26
+2026-02-12 19:36:58,362 | INFO | __main__ | run_id=5e41e331 | step_start step=format_output
+2026-02-12 19:36:58,367 | INFO | __main__ | run_id=5e41e331 | step_end   step=format_output duration_ms=5.37
+2026-02-12 19:36:58,367 | INFO | __main__ | run_id=5e41e331 | step_start step=save_model_solution_artifacts
+2026-02-12 19:36:58,368 | INFO | src.io.output_writer | run_id=5e41e331 | local_output_saved artifact=output_csv rows=14
+2026-02-12 19:36:58,368 | INFO | src.io.output_writer | run_id=5e41e331 | local_output_saved artifact=output_payload_json
+2026-02-12 19:36:58,368 | INFO | __main__ | run_id=5e41e331 | step_end   step=save_model_solution_artifacts duration_ms=0.96
+2026-02-12 19:36:58,368 | INFO | __main__ | run_id=5e41e331 | step_start step=send_results
+2026-02-12 19:36:58,653 | INFO | src.integration.sender | run_id=5e41e331 | results_sent status_code=200 payload_status=success
+2026-02-12 19:36:58,653 | INFO | __main__ | run_id=5e41e331 | step_end   step=send_results duration_ms=284.67
+2026-02-12 19:36:58,653 | INFO | __main__ | run_id=5e41e331 | output_delivered
+2026-02-12 19:36:58,653 | INFO | __main__ | run_id=5e41e331 | pipeline_end status=success

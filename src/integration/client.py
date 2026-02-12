@@ -1,10 +1,13 @@
 import logging
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, Optional
 
 import requests
+import pandas as pd
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+from src.datetime_utils import utc_to_colombia_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +114,76 @@ class ALFREDAPIClient:
             )
             raise
 
+    def get_driver_directory(
+        self,
+        *,
+        active: Optional[bool] = True,
+        schedule_date: Optional[date | datetime | str] = None,
+        department: Optional[int | None] = None,
+    ) -> list[Dict[str, Any]]:
+        """
+        Fetch driver directory (alfreds) data from ALFRED API.
+
+        Args:
+            active: Optional active filter
+            schedule_date: Optional schedule date (YYYY-MM-DD)
+            department: Optional department filter
+
+        Returns:
+            List of driver records
+
+        Raises:
+            RuntimeError: On timeout or invalid response
+            requests.HTTPError: On non-success HTTP status
+        """
+        params = self._build_driver_params(
+            active=active,
+            schedule_date=schedule_date,
+            department=department,
+        )
+
+        logger.debug("Endpoint: %s", self.endpoint_url)
+        logger.debug("Query params: %s", params)
+
+        try:
+            response = self.session.get(
+                self.endpoint_url,
+                headers=self.headers,
+                params=params,
+                timeout=self.timeout,
+            )
+
+            if not response.ok:
+                self._log_http_error(response)
+                response.raise_for_status()
+
+            payload = self._parse_json_response(response)
+            if isinstance(payload, dict) and "results" in payload:
+                payload = payload.get("results")
+
+            if not isinstance(payload, list):
+                raise RuntimeError("Driver directory response must be a list")
+
+            logger.info(
+                "fetch_driver_directory_completed active=%s schedule_date=%s department=%s rows=%s",
+                active,
+                self._format_schedule_date(schedule_date),
+                department,
+                len(payload),
+            )
+            return payload
+
+        except requests.exceptions.Timeout as exc:
+            logger.error("Timeout while calling ALFRED driver directory API")
+            raise RuntimeError("ALFRED driver directory API request timed out") from exc
+
+        except requests.exceptions.RequestException as exc:
+            logger.error(
+                "Request error while calling ALFRED driver directory API",
+                exc_info=exc,
+            )
+            raise
+
     # --------------------------------------------------
     # Internal helpers
     # --------------------------------------------------
@@ -164,7 +237,27 @@ class ALFREDAPIClient:
         return params
 
     @staticmethod
-    def _parse_json_response(response: requests.Response) -> Dict[str, Any]:
+    def _build_driver_params(
+        *,
+        active: Optional[bool],
+        schedule_date: Optional[date | datetime | str],
+        department: Optional[int],
+    ) -> Dict[str, str]:
+        params: Dict[str, str] = {}
+
+        if active is not None:
+            params["active"] = "true" if active else "false"
+
+        if schedule_date is not None:
+            params["schedule_date"] = ALFREDAPIClient._format_schedule_date(schedule_date)
+
+        if department is not None:
+            params["department"] = str(department)
+
+        return params
+
+    @staticmethod
+    def _parse_json_response(response: requests.Response) -> Any:
         """
         Safely parse JSON response.
         """
@@ -179,6 +272,27 @@ class ALFREDAPIClient:
                 },
             )
             raise RuntimeError("Invalid JSON response from API") from exc
+
+    @staticmethod
+    def _format_schedule_date(value: Optional[date | datetime | str]) -> Optional[str]:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            ts = utc_to_colombia_timestamp(value, errors="coerce")
+            return value.date().isoformat() if pd.isna(ts) else ts.date().isoformat()
+        if isinstance(value, date):
+            return value.isoformat()
+        if isinstance(value, str):
+            try:
+                if "T" in value:
+                    ts = utc_to_colombia_timestamp(value, errors="coerce")
+                    if not pd.isna(ts):
+                        return ts.date().isoformat()
+                    return datetime.fromisoformat(value.replace("Z", "+00:00")).date().isoformat()
+                return date.fromisoformat(value).isoformat()
+            except ValueError:
+                return value
+        return str(value)
 
     @staticmethod
     def _log_http_error(response: requests.Response) -> None:

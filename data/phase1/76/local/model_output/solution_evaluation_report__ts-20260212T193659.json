@@ -1,0 +1,121 @@
+{
+  "summary": {
+    "services_total": 2,
+    "labors_total": 6,
+    "drivers_used": 2,
+    "services_with_vt_labors": 2,
+    "services_successfully_assigned": 2,
+    "services_unassigned_or_failed": 0,
+    "failed_services_total": 0,
+    "vt_labors_total": 4,
+    "vt_labors_assigned": 4,
+    "vt_labors_unassigned": 0,
+    "failed_labors_total": 0,
+    "unassigned_labors_total": 2,
+    "total_labor_distance_km": 4.32,
+    "total_driver_move_distance_km": 14.8,
+    "service_assignment_rate_pct": 100.0,
+    "vt_assignment_rate_pct": 100.0,
+    "utilization_without_moves_pct": 13.72,
+    "utilization_with_moves_pct": 16.31,
+    "driver_move_utilization_pct": 2.59
+  },
+  "assignment": {
+    "services_total": 2,
+    "labors_total": 6,
+    "drivers_used": 2,
+    "services_with_vt_labors": 2,
+    "services_successfully_assigned": 2,
+    "services_unassigned_or_failed": 0,
+    "failed_services_total": 0,
+    "vt_labors_total": 4,
+    "vt_labors_assigned": 4,
+    "vt_labors_unassigned": 0,
+    "failed_labors_total": 0,
+    "unassigned_labors_total": 2,
+    "service_assignment_rate_pct": 100.0,
+    "vt_assignment_rate_pct": 100.0
+  },
+  "distance": {
+    "total_labor_distance_km": 4.32,
+    "total_driver_move_distance_km": 14.8,
+    "avg_vt_labor_distance_km": 1.08,
+    "avg_driver_move_distance_km_per_labor": 2.47
+  },
+  "time_allocation": {
+    "timeline_total_min": 771.6,
+    "free_time_min": 585.7,
+    "driver_move_min": 29.5,
+    "labor_work_min": 156.4,
+    "free_time_pct": 75.91,
+    "driver_move_pct": 3.82,
+    "labor_work_pct": 20.27
+  },
+  "punctuality": {
+    "grace_minutes": 15,
+    "services_considered": 2,
+    "late_services_count": 0,
+    "late_services_pct": 0.0,
+    "total_lateness_min": 0.0,
+    "avg_lateness_min_late_only": 0.0,
+    "avg_lateness_min_all_considered": 0.0,
+    "normalized_tardiness_pct": 0.0
+  },
+  "utilization": {
+    "system": {
+      "drivers_considered": 2,
+      "driver_day_rows": 2,
+      "total_reference_window_min": 1140.0,
+      "total_labor_work_min": 156.4,
+      "total_driver_move_min": 29.5,
+      "total_active_work_min": 185.9,
+      "utilization_without_moves_pct": 13.72,
+      "utilization_with_moves_pct": 16.31,
+      "driver_move_utilization_pct": 2.59,
+      "driver_move_share_of_active_pct": 15.87
+    },
+    "driver_distribution": {
+      "utilization_without_moves_pct_avg": 13.89,
+      "utilization_without_moves_pct_p50": 13.89,
+      "utilization_without_moves_pct_p90": 16.59,
+      "utilization_with_moves_pct_avg": 16.49,
+      "utilization_with_moves_pct_p50": 16.49,
+      "utilization_with_moves_pct_p90": 19.3
+    },
+    "drivers": [
+      {
+        "driver_id": "20269",
+        "day": "2026-02-20",
+        "shift_window_found": true,
+        "reference_window_min": 600.0,
+        "labor_work_min": 63.2,
+        "driver_move_min": 14.7,
+        "active_work_min": 77.9,
+        "utilization_without_moves_pct": 10.53,
+        "utilization_with_moves_pct": 12.98,
+        "driver_move_utilization_pct": 2.45,
+        "driver_move_share_of_active_pct": 18.87
+      },
+      {
+        "driver_id": "26834",
+        "day": "2026-02-20",
+        "shift_window_found": true,
+        "reference_window_min": 540.0,
+        "labor_work_min": 93.2,
+        "driver_move_min": 14.8,
+        "active_work_min": 108.0,
+        "utilization_without_moves_pct": 17.26,
+        "utilization_with_moves_pct": 20.0,
+        "driver_move_utilization_pct": 2.74,
+        "driver_move_share_of_active_pct": 13.7
+      }
+    ]
+  },
+  "quality_checks": {
+    "moves_rows": 12,
+    "missing_driver_move_distance_rows": 0,
+    "negative_duration_rows": 0,
+    "assigned_vt_labors_without_driver_move_row": 0,
+    "assigned_drivers_missing_from_directory": 0
+  }
+}

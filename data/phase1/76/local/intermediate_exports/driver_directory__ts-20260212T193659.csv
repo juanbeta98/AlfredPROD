@@ -1,0 +1,5 @@
+driver_id,latitud,longitud,start_time,end_time,city_id,city_name,department_code,department_name,location_resolution_status
+20269,3.414003,-76.493671,07:00:00,17:00:00,1004,CALI,76,VALLE DEL CAUCA,resolved
+2306,3.406073,-76.5710842,07:00:00,17:00:00,1004,CALI,76,VALLE DEL CAUCA,resolved
+26834,3.455582,-76.4876642,07:00:00,16:00:00,1004,CALI,76,VALLE DEL CAUCA,resolved
+9526,3.4079059,-76.35007879999999,08:00:00,20:00:00,1015,CANDELARIA,76,VALLE DEL CAUCA,resolved

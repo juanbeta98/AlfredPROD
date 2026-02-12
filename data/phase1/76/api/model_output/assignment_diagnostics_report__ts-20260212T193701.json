@@ -1,0 +1,135 @@
+{
+  "summary": {
+    "rows_total": 9,
+    "rows_infeasible": 0,
+    "rows_warning": 0,
+    "rows_unassigned": 3,
+    "rows_reassignment_candidate": 0,
+    "rows_reassignment_failed": 0,
+    "rows_reassignment_success": 0,
+    "infeasibility_causes": {},
+    "warning_causes": {},
+    "actual_status_counts": {
+      "COMPLETED": 9
+    }
+  },
+  "rows": [
+    {
+      "service_id": "397007",
+      "labor_id": "500567",
+      "labor_sequence": 1,
+      "assigned_driver": "26834",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 11:30:00-05:00",
+      "actual_end": "2026-02-20 12:02:05.614148-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "397007",
+      "labor_id": "500568",
+      "labor_sequence": 2,
+      "assigned_driver": null,
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:02:05.614148-05:00",
+      "actual_end": "2026-02-20 12:32:05.614148-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "397007",
+      "labor_id": "500569",
+      "labor_sequence": 3,
+      "assigned_driver": "26834",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:32:05.614148-05:00",
+      "actual_end": "2026-02-20 13:19:11.228296-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "402549",
+      "labor_id": "506329",
+      "labor_sequence": 1,
+      "assigned_driver": "20269",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 11:30:00-05:00",
+      "actual_end": "2026-02-20 12:01:08.492273-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "402549",
+      "labor_id": "506330",
+      "labor_sequence": 2,
+      "assigned_driver": null,
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:01:08.492273-05:00",
+      "actual_end": "2026-02-20 12:31:08.492273-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "402549",
+      "labor_id": "506331",
+      "labor_sequence": 3,
+      "assigned_driver": "20269",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:31:08.492273-05:00",
+      "actual_end": "2026-02-20 13:17:16.984546-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "405263",
+      "labor_id": "509205",
+      "labor_sequence": 1,
+      "assigned_driver": "9526",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 11:30:00-05:00",
+      "actual_end": "2026-02-20 12:01:47.460273-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "405263",
+      "labor_id": "509206",
+      "labor_sequence": 2,
+      "assigned_driver": null,
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:01:47.460273-05:00",
+      "actual_end": "2026-02-20 12:31:47.460273-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    },
+    {
+      "service_id": "405263",
+      "labor_id": "509207",
+      "labor_sequence": 3,
+      "assigned_driver": "9526",
+      "actual_status": "COMPLETED",
+      "actual_start": "2026-02-20 12:31:47.460273-05:00",
+      "actual_end": "2026-02-20 13:18:34.920546-05:00",
+      "is_infeasible": false,
+      "infeasibility_cause_code": null,
+      "infeasibility_cause_detail": null,
+      "reassignment_candidate": false
+    }
+  ]
+}

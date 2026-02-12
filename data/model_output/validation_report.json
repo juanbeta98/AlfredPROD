@@ -1,8 +1,0 @@
-{
-  "total_records": 136,
-  "valid_records": 129,
-  "invalid_records": 7,
-  "failures_by_rule": {
-    "created_before_schedule": 7
-  }
-}

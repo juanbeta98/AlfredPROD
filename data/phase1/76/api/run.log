@@ -1,0 +1,60 @@
+2026-02-12 19:36:59,830 | INFO | __main__ | run_id=b88812eb | pipeline_start mode_default=API
+2026-02-12 19:36:59,830 | INFO | __main__ | run_id=b88812eb | local_outputs_enabled outputs=validation_reports,intermediate_dataframes,model_solution
+2026-02-12 19:36:59,830 | INFO | __main__ | run_id=b88812eb | step_start step=load_request path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/request.json
+2026-02-12 19:36:59,845 | INFO | __main__ | run_id=b88812eb | step_end   step=load_request duration_ms=14.86 path=/Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/76/request.json
+2026-02-12 19:36:59,845 | INFO | __main__ | run_id=b88812eb | preassignment_mode_resolved keep_payload_assignment=False mode=reassign_infeasible_services
+2026-02-12 19:36:59,845 | INFO | __main__ | run_id=b88812eb | step_start step=fetch_optimization_data
+2026-02-12 19:37:00,493 | INFO | src.integration.client | run_id=b88812eb | fetch_optimization_data_completed department=76 start_date=2026-02-19T00:00:00-05:00 end_date=2026-02-27T23:59:59-05:00
+2026-02-12 19:37:00,493 | INFO | __main__ | run_id=b88812eb | step_end   step=fetch_optimization_data duration_ms=648.04
+2026-02-12 19:37:00,494 | INFO | __main__ | run_id=b88812eb | step_start step=parse_input
+2026-02-12 19:37:00,748 | INFO | src.data.parsing.input_parser | run_id=b88812eb | input_parsed rows=9
+2026-02-12 19:37:00,749 | INFO | __main__ | run_id=b88812eb | step_end   step=parse_input duration_ms=254.74
+2026-02-12 19:37:00,749 | INFO | __main__ | run_id=b88812eb | api_payload_driver_ignored_for_testing cleared_rows=0
+2026-02-12 19:37:00,750 | INFO | __main__ | run_id=b88812eb | step_start step=validate_input
+2026-02-12 19:37:00,751 | INFO | src.data.validation.validator | run_id=b88812eb | validation_completed total=9 valid_rows=9 invalid_rows=0
+2026-02-12 19:37:00,751 | INFO | __main__ | run_id=b88812eb | step_end   step=validate_input duration_ms=1.4
+2026-02-12 19:37:00,751 | INFO | __main__ | run_id=b88812eb | step_start step=write_validation_reports
+2026-02-12 19:37:00,754 | INFO | src.io.output_writer | run_id=b88812eb | validation_outputs_saved generated=data_validation_invalid_rows_csv,data_validation_report_json
+2026-02-12 19:37:00,754 | INFO | __main__ | run_id=b88812eb | step_end   step=write_validation_reports duration_ms=3.55
+2026-02-12 19:37:00,755 | INFO | __main__ | run_id=b88812eb | step_start step=fetch_driver_directory
+2026-02-12 19:37:01,022 | INFO | src.integration.client | run_id=b88812eb | fetch_driver_directory_completed active=True schedule_date=2026-02-20 department=76 rows=4
+2026-02-12 19:37:01,023 | INFO | __main__ | run_id=b88812eb | step_end   step=fetch_driver_directory duration_ms=267.83
+2026-02-12 19:37:01,025 | INFO | src.data.parsing.driver_directory_parser | run_id=b88812eb | driver_directory_parsed rows=4 skipped=0
+2026-02-12 19:37:01,027 | INFO | src.pipeline_helpers | run_id=b88812eb | intermediate_dataframe_exported dataframe=driver_directory rows=4
+2026-02-12 19:37:01,127 | INFO | src.data.loading.master_data_loader | run_id=b88812eb | master_data_loaded directorio duraciones dist_dict
+2026-02-12 19:37:01,127 | INFO | __main__ | run_id=b88812eb | preassigned_reconstruction_skipped reason=algorithm_offline algorithm=OFFLINE
+2026-02-12 19:37:01,127 | INFO | src.pipeline_helpers | run_id=b88812eb | intermediate_dataframe_exported dataframe=input_df rows=9
+2026-02-12 19:37:01,128 | INFO | src.pipeline_helpers | run_id=b88812eb | intermediate_dataframe_exported dataframe=preassigned_df rows=0
+2026-02-12 19:37:01,128 | INFO | __main__ | run_id=b88812eb | step_start step=solve
+2026-02-12 19:37:01,132 | WARNING | src.optimization.solver | run_id=b88812eb | TEMP: schedule_date normalized to first row date for testing
+2026-02-12 19:37:01,133 | INFO | src.optimization.solver | run_id=b88812eb | solver_selected algorithm=OFFLINE
+2026-02-12 19:37:01,144 | INFO | __main__ | run_id=b88812eb | step_end   step=solve duration_ms=16.01
+2026-02-12 19:37:01,149 | INFO | __main__ | run_id=b88812eb | assignment_diagnostics_summary rows_total=9 rows_infeasible=0 rows_warning=0 rows_reassignment_candidate=0 rows_reassignment_failed=0
+2026-02-12 19:37:01,149 | INFO | __main__ | run_id=b88812eb | step_start step=write_assignment_diagnostics_report
+2026-02-12 19:37:01,151 | INFO | src.io.output_writer | run_id=b88812eb | assignment_diagnostics_report_saved artifacts=assignment_diagnostics_csv,assignment_diagnostics_json rows=9
+2026-02-12 19:37:01,151 | INFO | __main__ | run_id=b88812eb | step_end   step=write_assignment_diagnostics_report duration_ms=2.16
+2026-02-12 19:37:01,151 | INFO | __main__ | run_id=b88812eb | step_start step=validate_solution
+2026-02-12 19:37:01,153 | INFO | src.optimization.validation.solution_validator | run_id=b88812eb | solution_validation_driver_overlap drivers=3 overlaps=0
+2026-02-12 19:37:01,156 | INFO | src.optimization.validation.solution_validator | run_id=b88812eb | solution_validation_moves drivers=3 rows=18 inconsistencies=3
+2026-02-12 19:37:01,156 | INFO | __main__ | run_id=b88812eb | step_end   step=validate_solution duration_ms=5.18
+2026-02-12 19:37:01,156 | INFO | __main__ | run_id=b88812eb | step_start step=write_solution_validation_outputs
+2026-02-12 19:37:01,156 | INFO | src.io.output_writer | run_id=b88812eb | solution_validation_outputs_saved generated=issues_csv,validation_report_json
+2026-02-12 19:37:01,157 | INFO | __main__ | run_id=b88812eb | step_end   step=write_solution_validation_outputs duration_ms=0.43
+2026-02-12 19:37:01,157 | WARNING | __main__ | run_id=b88812eb | solution_validation_non_blocking_issues issues=3
+2026-02-12 19:37:01,157 | INFO | __main__ | run_id=b88812eb | step_start step=evaluate_solution
+2026-02-12 19:37:01,179 | INFO | src.optimization.evaluation.solution_evaluator | run_id=b88812eb | solution_evaluation_completed services=3 labors=9 drivers=3 vt_labors=6 labor_distance_km=6.7 driver_move_distance_km=11.02 util_wo_moves=12.63 util_with_moves=13.82
+2026-02-12 19:37:01,179 | INFO | __main__ | run_id=b88812eb | step_end   step=evaluate_solution duration_ms=22.79
+2026-02-12 19:37:01,179 | INFO | __main__ | run_id=b88812eb | step_start step=write_solution_evaluation_output
+2026-02-12 19:37:01,180 | INFO | src.io.output_writer | run_id=b88812eb | solution_evaluation_output_saved artifact=solution_evaluation_report_json
+2026-02-12 19:37:01,180 | INFO | __main__ | run_id=b88812eb | step_end   step=write_solution_evaluation_output duration_ms=0.35
+2026-02-12 19:37:01,180 | INFO | __main__ | run_id=b88812eb | step_start step=format_output
+2026-02-12 19:37:01,182 | INFO | __main__ | run_id=b88812eb | step_end   step=format_output duration_ms=1.86
+2026-02-12 19:37:01,182 | INFO | __main__ | run_id=b88812eb | step_start step=save_model_solution_artifacts
+2026-02-12 19:37:01,182 | INFO | src.io.output_writer | run_id=b88812eb | local_output_saved artifact=output_csv rows=9
+2026-02-12 19:37:01,182 | INFO | src.io.output_writer | run_id=b88812eb | local_output_saved artifact=output_payload_json
+2026-02-12 19:37:01,182 | INFO | __main__ | run_id=b88812eb | step_end   step=save_model_solution_artifacts duration_ms=0.87
+2026-02-12 19:37:01,183 | INFO | __main__ | run_id=b88812eb | step_start step=send_results
+2026-02-12 19:37:01,465 | INFO | src.integration.sender | run_id=b88812eb | results_sent status_code=200 payload_status=success
+2026-02-12 19:37:01,465 | INFO | __main__ | run_id=b88812eb | step_end   step=send_results duration_ms=282.82
+2026-02-12 19:37:01,466 | INFO | __main__ | run_id=b88812eb | output_delivered
+2026-02-12 19:37:01,466 | INFO | __main__ | run_id=b88812eb | pipeline_end status=success

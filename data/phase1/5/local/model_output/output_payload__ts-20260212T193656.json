@@ -1,0 +1,172 @@
+{
+  "data": [
+    {
+      "service_id": 399332,
+      "schedule_date": "2026-02-19T14:30:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 503021,
+          "schedule_date": "2026-02-19T14:00:00+00:00",
+          "addData": {
+            "distance_km": 1.61,
+            "labor_distance_km": 1.61,
+            "driver_move_distance_km": 1.82,
+            "duration_min": 47.41,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 4555
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 399335,
+      "schedule_date": "2026-02-19T18:30:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 503024,
+          "schedule_date": "2026-02-19T18:00:00+00:00",
+          "addData": {
+            "distance_km": 1.61,
+            "labor_distance_km": 1.61,
+            "driver_move_distance_km": 0.22,
+            "duration_min": 47.41,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 20111
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 399668,
+      "schedule_date": "2026-02-24T21:00:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 503383,
+          "schedule_date": "2026-02-19T20:30:00+00:00",
+          "addData": {
+            "distance_km": 3.11,
+            "labor_distance_km": 3.11,
+            "driver_move_distance_km": 0.81,
+            "duration_min": 49.66,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 4554
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 399777,
+      "schedule_date": "2026-02-19T12:00:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 503494,
+          "schedule_date": "2026-02-19T12:04:51.491682+00:00",
+          "addData": {
+            "distance_km": 1.06,
+            "labor_distance_km": 1.06,
+            "driver_move_distance_km": 2.43,
+            "duration_min": 46.59,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 20111
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 400326,
+      "schedule_date": "2026-02-19T16:00:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 504072,
+          "schedule_date": "2026-02-19T15:30:00+00:00",
+          "addData": {
+            "distance_km": 1.12,
+            "labor_distance_km": 1.12,
+            "driver_move_distance_km": 0.91,
+            "duration_min": 46.68,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 20111
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 400357,
+      "schedule_date": "2026-02-19T21:00:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 504105,
+          "schedule_date": "2026-02-19T20:30:00+00:00",
+          "addData": {
+            "distance_km": 1.12,
+            "labor_distance_km": 1.12,
+            "driver_move_distance_km": 0.38,
+            "duration_min": 46.68,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 4555
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 402879,
+      "schedule_date": "2026-02-26T12:00:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 506687,
+          "schedule_date": "2026-02-19T12:10:20.471782+00:00",
+          "addData": {
+            "distance_km": 0.38,
+            "labor_distance_km": 0.38,
+            "driver_move_distance_km": 5.17,
+            "duration_min": 45.57,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 4555
+          }
+        }
+      ]
+    },
+    {
+      "service_id": 402881,
+      "schedule_date": "2026-02-26T17:30:00+00:00",
+      "serviceLabors": [
+        {
+          "id": 506689,
+          "schedule_date": "2026-02-19T17:00:00+00:00",
+          "addData": {
+            "distance_km": 0.38,
+            "labor_distance_km": 0.38,
+            "driver_move_distance_km": 0.22,
+            "duration_min": 45.57,
+            "is_infeasible": false,
+            "reassignment_candidate": false
+          },
+          "alfred": {
+            "id": 4555
+          }
+        }
+      ]
+    }
+  ]
+}

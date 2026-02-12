@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ENV_NAME="${ALFRED_MAMBA_ENV:-AlfredEnv}"
+ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/share/mamba}"
+
+if ! command -v micromamba >/dev/null 2>&1; then
+  echo "micromamba not found in PATH" >&2
+  exit 127
+fi
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: scripts/mrun <command> [args...]" >&2
+  echo "Example: scripts/mrun python main.py" >&2
+  exit 2
+fi
+
+if [[ "${ENV_NAME}" == "base" ]]; then
+  ENV_PREFIX="${ROOT_PREFIX}"
+else
+  ENV_PREFIX="${ROOT_PREFIX}/envs/${ENV_NAME}"
+fi
+
+CMD="$1"
+shift || true
+
+# Fast path: execute command directly from env prefix (avoids mamba lock contention).
+if [[ -x "${ENV_PREFIX}/bin/${CMD}" ]]; then
+  exec "${ENV_PREFIX}/bin/${CMD}" "$@"
+fi
+
+# Fallback: expose env binaries on PATH for shell commands.
+if [[ -d "${ENV_PREFIX}/bin" ]]; then
+  export PATH="${ENV_PREFIX}/bin:${PATH}"
+  if command -v "${CMD}" >/dev/null 2>&1; then
+    exec "${CMD}" "$@"
+  fi
+fi
+
+# Final fallback to micromamba's own resolver.
+exec micromamba run -n "${ENV_NAME}" "${CMD}" "$@"

@@ -11,6 +11,7 @@ from src.algorithms.INSERT_algorithm import insert_single_labor, get_drivers, fi
 from src.utils.utils import prep_online_algorithm_inputs, compute_workday_end
 from src.config.experimentation_config import *
 from src.config.config import *
+from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD
 
 from src.utils.filtering import flexible_filter
 
@@ -182,7 +183,7 @@ def run_INSERT(
 if __name__ == "__main__":
     instance='instAD2b'
     optimization_obj='hybrid'
-    distance_method='haversine'
+    distance_method=DEFAULT_DISTANCE_METHOD
 
     import argparse
 

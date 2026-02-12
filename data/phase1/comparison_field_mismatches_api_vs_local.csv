@@ -1,0 +1,16 @@
+field,shared_rows,mismatch_rows,mismatch_pct
+schedule_date,26,9,34.62
+address_id,26,5,19.23
+address_point,26,5,19.23
+city_code,26,0,0.00
+created_at,26,0,0.00
+department_code,26,0,0.00
+end_address_id,26,0,0.00
+end_address_point,26,0,0.00
+labor_category,26,0,0.00
+labor_name,26,0,0.00
+labor_sequence,26,0,0.00
+labor_type,26,0,0.00
+service_id,26,0,0.00
+start_address_id,26,0,0.00
+start_address_point,26,0,0.00

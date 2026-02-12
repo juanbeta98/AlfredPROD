@@ -1,0 +1,4 @@
+check,assigned_driver,labor_id,date,diff_min,reported,expected
+duration_mismatch,20269,506329,2026-02-20,15.0,31.1,46.1
+duration_mismatch,26834,500567,2026-02-20,15.0,32.1,47.1
+duration_mismatch,9526,509205,2026-02-20,14.999999999999996,31.8,46.8
