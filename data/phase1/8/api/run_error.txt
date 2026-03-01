@@ -1,2 +1,0 @@
-api run failed.
-RuntimeError: api run failed with code 4. See /Users/jbeta/Documents/AlfredEnvs/AlfredPROD/data/phase1/8/api/run.log

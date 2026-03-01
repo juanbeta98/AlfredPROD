@@ -5,7 +5,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
 
-from src.location import row_location_key
+from src.geo.location import row_location_key
 from src.optimization.common.distance_utils import distance
 from src.optimization.settings.model_params import ModelParams
 from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD

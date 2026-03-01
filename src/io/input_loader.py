@@ -7,6 +7,7 @@ import pandas as pd
 
 from src.config import Config
 from src.data.id_normalization import normalize_id_value
+from src.io.artifact_naming import build_run_subdir
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ def load_local_input(
     *,
     write_debug_json: bool = False,
     debug_output_path: Optional[str | Path] = None,
+    run_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Load local input data from a CSV file (transformed) or a JSON payload
@@ -40,7 +42,7 @@ def load_local_input(
         payload = _load_local_csv_as_payload(input_path)
 
     if write_debug_json:
-        _write_debug_payload(payload, debug_output_path)
+        _write_debug_payload(payload, debug_output_path, run_id=run_id)
 
     return payload
 
@@ -413,6 +415,8 @@ def _parse_point(point_value: Any) -> Dict[str, float] | None:
 def _write_debug_payload(
     payload: Dict[str, Any],
     output_path: Optional[str | Path],
+    *,
+    run_id: Optional[str] = None,
 ) -> None:
     """
     Persist the generated payload for debugging purposes.
@@ -420,7 +424,7 @@ def _write_debug_payload(
     path = (
         Path(output_path)
         if output_path
-        else Path(Config.LOCAL_OUTPUT_DIR) / "processed_input.json"
+        else Path(Config.RUNS_DIR) / build_run_subdir(run_id) / "input" / "processed_input.json"
     )
     path.parent.mkdir(parents=True, exist_ok=True)
 

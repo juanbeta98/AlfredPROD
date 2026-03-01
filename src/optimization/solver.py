@@ -8,7 +8,7 @@ import pandas as pd
 
 from src.data.id_normalization import normalize_id_columns
 from src.optimization.algorithms.buffer_react import algorithm
-from src.datetime_utils import normalize_datetime_columns_to_colombia, now_colombia
+from src.utils.datetime_utils import normalize_datetime_columns_to_colombia, now_colombia
 
 from .algorithms.registry import get_algorithm
 from src.data.loading.master_data_loader import MasterData, load_master_data
@@ -70,6 +70,7 @@ class OptimizationSolver:
             algo_params = self.settings.for_algorithm(algo_name)
             algo_params["master_data"] = self.master_data
             algo_params["run_id"] = self.run_id
+            algo_params["preassigned"] = self.context.get("preassigned", {})
 
             logger.info(
                 f"solver_selected algorithm={algo_name}",
@@ -80,24 +81,18 @@ class OptimizationSolver:
                     "planning_day": self.input_df["planning_day"].iloc[0]
                     if "planning_day" in self.input_df.columns and not self.input_df.empty
                     else None,
-                    "algo_params": {k: v for k, v in algo_params.items() if k != "master_data"},
+                    "algo_params": {k: v for k, v in algo_params.items() if k not in ("master_data", "preassigned")},
                 },
             )
 
             algorithm = get_algorithm(algo_name, algo_params)
 
             solve_result = algorithm.solve(self.input_df)
-            if not isinstance(solve_result, tuple):
-                raise SolverExecutionError("Algorithm did not return a tuple")
-            if len(solve_result) == 2:
-                results_df, algo_metrics = solve_result
-                algo_artifacts = {}
-            elif len(solve_result) == 3:
-                results_df, algo_metrics, algo_artifacts = solve_result
-                if not isinstance(algo_artifacts, dict):
-                    raise SolverExecutionError("Algorithm artifacts must be a dict")
-            else:
-                raise SolverExecutionError("Algorithm returned an unexpected tuple shape")
+            if not isinstance(solve_result, tuple) or len(solve_result) != 3:
+                raise SolverExecutionError("Algorithm must return a 3-tuple (results_df, metrics, artifacts)")
+            results_df, algo_metrics, algo_artifacts = solve_result
+            if not isinstance(algo_artifacts, dict):
+                raise SolverExecutionError("Algorithm artifacts must be a dict")
 
             self._algo_metrics = algo_metrics or {}
             self._algo_artifacts = algo_artifacts or {}
@@ -181,21 +176,6 @@ class OptimizationSolver:
             # but we guard anyway to avoid silent failures.
             raise SolverValidationError("schedule_date contains invalid datetime values")
 
-        # TEMP: force all schedule_date values to first row's date for testing
-        first_date = df["schedule_date"].dt.date.iloc[0]
-        df["schedule_date"] = df["schedule_date"].apply(
-            lambda ts: ts.replace(
-                year=first_date.year,
-                month=first_date.month,
-                day=first_date.day,
-            )
-            if pd.notna(ts)
-            else ts
-        )
-        logger.warning("TEMP: schedule_date normalized to first row date for testing")
-
-        # Enforce single planning day (optional strictness)
-        # If "single date" is truly guaranteed, enforce it here.
         planning_days = df["schedule_date"].dt.date.unique()
         if len(planning_days) != 1:
             raise SolverValidationError(
@@ -262,6 +242,11 @@ class OptimizationSolver:
         )
 
         def _row_stop_point(row: pd.Series) -> str | None:
+            # VT labors travel between stops and have no shop of their own.
+            # Returning None lets the surrounding logic pick the correct
+            # prev_stop / next_stop as the leg endpoints.
+            if str(row.get("labor_category") or "").strip().upper() == "VEHICLE_TRANSPORTATION":
+                return None
             for col in ("address_point", "shop_address_point", "end_address_point", "start_address_point"):
                 if col not in row.index:
                     continue
@@ -292,15 +277,16 @@ class OptimizationSolver:
                 next_stop = stop_points[pos + 1] if pos < (group_size - 1) else None
                 start_addr = cls._clean_point(row.get("start_address_point"))
                 end_addr = cls._clean_point(row.get("end_address_point"))
+                prior_stop = cls._clean_point(row.get("prior_stop_point"))
 
                 category = str(row.get("labor_category") or "").strip().upper()
 
                 if group_size == 1:
-                    computed_start = start_addr or current_stop or end_addr
+                    computed_start = prior_stop or start_addr or current_stop or end_addr
                     computed_end = end_addr or current_stop or computed_start
                 elif category == "VEHICLE_TRANSPORTATION":
                     if pos == 0:
-                        computed_start = start_addr or prev_stop or current_stop or end_addr
+                        computed_start = prior_stop or start_addr or prev_stop or current_stop or end_addr
                         computed_end = next_stop or current_stop or end_addr or computed_start
                     else:
                         computed_start = prev_stop or start_addr or current_stop or end_addr
@@ -339,17 +325,11 @@ class OptimizationSolver:
 
         # algorithms still receive DataFrame
         solve_result = algorithm.solve(self.input_df)
-        if not isinstance(solve_result, tuple):
-            raise SolverExecutionError("Algorithm did not return a tuple")
-        if len(solve_result) == 2:
-            results_df, algo_metrics = solve_result
-            algo_artifacts = {}
-        elif len(solve_result) == 3:
-            results_df, algo_metrics, algo_artifacts = solve_result
-            if not isinstance(algo_artifacts, dict):
-                raise SolverExecutionError("Algorithm artifacts must be a dict")
-        else:
-            raise SolverExecutionError("Algorithm returned an unexpected tuple shape")
+        if not isinstance(solve_result, tuple) or len(solve_result) != 3:
+            raise SolverExecutionError("Algorithm must return a 3-tuple (results_df, metrics, artifacts)")
+        results_df, algo_metrics, algo_artifacts = solve_result
+        if not isinstance(algo_artifacts, dict):
+            raise SolverExecutionError("Algorithm artifacts must be a dict")
 
         self._algo_metrics = algo_metrics or {}
         self._algo_artifacts = algo_artifacts or {}

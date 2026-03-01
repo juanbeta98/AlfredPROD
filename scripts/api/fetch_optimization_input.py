@@ -95,6 +95,67 @@ def _write_json(
     return path
 
 
+def _build_services_summary(payload: object) -> dict:
+    services = payload.get("data", []) if isinstance(payload, dict) else []
+
+    total_labors = 0
+    uni_labor_services = 0
+    multi_labor_services = 0
+    services_by_state: dict[str, int] = {}
+    labors_by_type: dict[str, int] = {}
+    labors_by_category: dict[str, int] = {}
+    services_assignable = 0
+    services_with_alfred = 0
+    schedule_dates: list[str] = []
+
+    for svc in services:
+        state = svc.get("state", "UNKNOWN")
+        services_by_state[state] = services_by_state.get(state, 0) + 1
+
+        if svc.get("is_assignable"):
+            services_assignable += 1
+
+        labors = svc.get("serviceLabors", [])
+        total_labors += len(labors)
+        if len(labors) == 1:
+            uni_labor_services += 1
+        elif len(labors) > 1:
+            multi_labor_services += 1
+
+        has_alfred = False
+        for labor in labors:
+            lt = labor.get("labor_type", "UNKNOWN")
+            labors_by_type[lt] = labors_by_type.get(lt, 0) + 1
+            lc = labor.get("labor_category", "UNKNOWN")
+            labors_by_category[lc] = labors_by_category.get(lc, 0) + 1
+            if labor.get("alfred") is not None:
+                has_alfred = True
+
+        if has_alfred:
+            services_with_alfred += 1
+
+        sd = svc.get("schedule_date")
+        if sd:
+            schedule_dates.append(sd)
+
+    schedule_dates_sorted = sorted(schedule_dates)
+    return {
+        "total_services": len(services),
+        "total_labors": total_labors,
+        "uni_labor_services": uni_labor_services,
+        "multi_labor_services": multi_labor_services,
+        "services_by_state": dict(sorted(services_by_state.items())),
+        "labors_by_type": dict(sorted(labors_by_type.items(), key=lambda x: -x[1])),
+        "labors_by_category": dict(sorted(labors_by_category.items(), key=lambda x: -x[1])),
+        "services_assignable": services_assignable,
+        "services_with_alfred_assigned": services_with_alfred,
+        "schedule_date_range": {
+            "earliest": schedule_dates_sorted[0] if schedule_dates_sorted else None,
+            "latest": schedule_dates_sorted[-1] if schedule_dates_sorted else None,
+        },
+    }
+
+
 def _resolve_path(path: Path) -> Path:
     if path.is_absolute():
         return path
@@ -115,6 +176,11 @@ def main() -> int:
         "--ignore-request-filters",
         action="store_true",
         help="Ignore request.json filters and only use constants in this script.",
+    )
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        help="Reuse an existing run ID (e.g. when invoked from fetch_snapshots.py).",
     )
     parser.add_argument(
         "--dry-run",
@@ -153,10 +219,10 @@ def main() -> int:
 
     from src.config import Config  # noqa: E402
     from src.integration.client import ALFREDAPIClient  # noqa: E402
-    from src.logging_utils import set_run_id, setup_logging_context  # noqa: E402
+    from src.utils.logging_utils import set_run_id, setup_logging_context  # noqa: E402
 
     setup_logging_context()
-    run_id = str(uuid.uuid4())[:8]
+    run_id = args.run_id or str(uuid.uuid4())[:8]
     set_run_id(run_id)
     Config.configure_logging()
 
@@ -169,6 +235,12 @@ def main() -> int:
         timeout=Config.REQUEST_TIMEOUT,
         max_retries=Config.API_MAX_RETRIES,
     )
+
+    from src.io.artifact_naming import build_run_subdir, finalize_run_manifest, write_run_manifest  # noqa: E402
+
+    run_dir = OUTPUT_DIR / build_run_subdir(run_id)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    write_run_manifest(run_dir, run_id)
 
     logger.info(
         "fetching_optimization_input department=%s start_date=%s end_date=%s request_path=%s request_filters_enabled=%s",
@@ -193,6 +265,16 @@ def main() -> int:
         request_id=payload_request_id,
     )
     logger.info("snapshot_written path=%s bytes=%s", path.as_posix(), path.stat().st_size)
+
+    summary = _build_services_summary(payload)
+    summary_path = _write_json(
+        summary,
+        prefix="optimization_input_summary",
+        run_id=run_id,
+        request_id=payload_request_id,
+    )
+    logger.info("summary_written path=%s", summary_path.as_posix())
+    finalize_run_manifest(run_dir, status="completed")
     return 0
 
 

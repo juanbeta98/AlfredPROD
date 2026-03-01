@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 from pathlib import Path
@@ -161,9 +162,44 @@ def _normalize_city_code_candidate(value: Any) -> str | None:
         return str(int(numeric))
     return None
 
+def load_driver_directory_json(path: str | Path) -> List[dict]:
+    """
+    Load a local driver directory JSON (API snapshot format) and return
+    the list of driver items ready for DriverDirectoryParser.parse().
+
+    Accepts either a bare list or a dict with a ``results`` key (API envelope).
+    """
+    driver_path = Path(path)
+    if not driver_path.exists():
+        raise FileNotFoundError(f"Driver directory file not found: {driver_path}")
+
+    logger.debug("Loading driver directory file from JSON", extra={"path": str(driver_path)})
+
+    with driver_path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        items = data.get("results") or data.get("data") or []
+        if isinstance(items, list):
+            return items
+
+    raise ValueError(
+        f"Unexpected driver directory JSON structure in {driver_path}. "
+        "Expected a list or a dict with a 'results' or 'data' key."
+    )
+
+
 def load_driver_directory_df(path: str | Path) -> pd.DataFrame:
     """
-    Load and parse a local CSV driver directory into a DataFrame.
+    Load and parse a local driver directory into a DataFrame.
+
+    Accepts CSV (legacy) or JSON (API snapshot format).
     """
-    raw = load_driver_directory_csv(path)
+    p = Path(path)
+    if p.suffix.lower() == ".json":
+        raw = load_driver_directory_json(p)
+    else:
+        raw = load_driver_directory_csv(p)
     return DriverDirectoryParser.parse(raw)

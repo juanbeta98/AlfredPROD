@@ -7,8 +7,8 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 
-from src.datetime_utils import utc_to_colombia_series, utc_to_colombia_timestamp
-from src.location import series_location_key
+from src.utils.datetime_utils import utc_to_colombia_series, utc_to_colombia_timestamp
+from src.geo.location import series_location_key
 from src.optimization.settings.solver_settings import OptimizationSettings
 
 logger = logging.getLogger(__name__)
@@ -80,13 +80,23 @@ def load_request(path: str | Path) -> RequestPayload:
 def build_settings_from_request(payload: RequestPayload) -> OptimizationSettings:
     """
     Convert request algorithm config to OptimizationSettings.
+
+    Supports an optional ``distance_method`` key inside ``algorithm.params``
+    (e.g. ``"haversine"`` for test runs that should not hit OSRM).  The key is
+    consumed here and not forwarded to the algorithm-level overrides dict.
     """
     algo_name = payload.algorithm.name.strip().upper()
-    algo_params = payload.algorithm.params or {}
-    return OptimizationSettings(
-        algorithm=algo_name,
-        overrides={algo_name: algo_params},
-    )
+    algo_params = dict(payload.algorithm.params or {})
+    distance_method = algo_params.pop("distance_method", None)
+
+    kwargs: Dict[str, Any] = {
+        "algorithm": algo_name,
+        "overrides": {algo_name: algo_params},
+    }
+    if distance_method is not None:
+        kwargs["distance_method"] = distance_method
+
+    return OptimizationSettings(**kwargs)
 
 
 def apply_request_filters(
@@ -228,3 +238,48 @@ def _parse_str(value: Any) -> Optional[str]:
     if isinstance(value, str) and value.strip() == "":
         return None
     return str(value)
+
+
+DEFAULT_KEEP_PAYLOAD_ASSIGNMENT: bool = False
+
+
+def _parse_bool_flag(value: Any, *, default: bool) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    text = str(value).strip().lower()
+    if text in {"true", "1", "yes", "y", "on"}:
+        return True
+    if text in {"false", "0", "no", "n", "off"}:
+        return False
+    return default
+
+
+def resolve_keep_payload_assignment(request_payload: Any) -> bool:
+    if request_payload is None:
+        return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
+
+    raw = getattr(request_payload, "raw", {}) or {}
+    if not isinstance(raw, dict):
+        return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
+
+    algo = raw.get("algorithm") if isinstance(raw.get("algorithm"), dict) else {}
+    algo_params = algo.get("params") if isinstance(algo.get("params"), dict) else {}
+    preassignment = raw.get("preassignment") if isinstance(raw.get("preassignment"), dict) else {}
+
+    for candidate in (
+        raw.get("keep_payload_assignment"),
+        raw.get("keep_payload_assingment"),
+        preassignment.get("keep_payload_assignment"),
+        preassignment.get("keep_payload_assingment"),
+        algo_params.get("keep_payload_assignment"),
+        algo_params.get("keep_payload_assingment"),
+    ):
+        if candidate is None:
+            continue
+        return _parse_bool_flag(candidate, default=DEFAULT_KEEP_PAYLOAD_ASSIGNMENT)
+
+    return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT

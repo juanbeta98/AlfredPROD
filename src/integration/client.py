@@ -7,7 +7,7 @@ import pandas as pd
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from src.datetime_utils import utc_to_colombia_timestamp
+from src.utils.datetime_utils import utc_to_colombia_timestamp
 
 logger = logging.getLogger(__name__)
 

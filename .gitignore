@@ -2,7 +2,11 @@ data/model_output
 data/intermediate_exports
 data/api_snapshots
 data/data_exploration
+data/runs
+tests
+experiments/
 
 # Ignore Python bytecode
 __pycache__/
 *.py[cod]
+*$py.class   

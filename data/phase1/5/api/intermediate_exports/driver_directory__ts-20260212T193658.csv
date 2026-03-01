@@ -1,4 +1,0 @@
-driver_id,latitud,longitud,start_time,end_time,city_id,city_name,department_code,department_name,location_resolution_status
-20111,6.190818699999999,-75.594906,07:00:00,17:00:00,59,ITAGUI,5,ANTIOQUIA,resolved
-4555,6.171584399999999,-75.61418499999999,07:00:00,17:00:00,59,ITAGUI,5,ANTIOQUIA,resolved
-4554,6.218995299999999,-75.5979697,08:00:00,20:00:00,1,MEDELLIN Y ALREDEDORES,5,ANTIOQUIA,resolved

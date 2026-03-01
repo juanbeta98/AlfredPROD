@@ -37,6 +37,7 @@ class OutputFormatter:
         "computed_travel_min",
         "minutes_late_payload",
         "minutes_after_window",
+        "overtime_minutes",
     )
 
     @staticmethod

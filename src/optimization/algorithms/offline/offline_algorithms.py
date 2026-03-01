@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 import random
@@ -7,8 +8,16 @@ import math
 from datetime import datetime, timedelta, time
 from typing import Any, Dict, List, Optional, Tuple
 
+logger = logging.getLogger(__name__)
+
 from ...common.distance_utils import parse_point, distance
 from ...common.utils import compute_workday_end
+from ...common.movements import (
+    build_driver_movements,
+    _location_fields,
+    _filter_drivers_by_city,
+    _extract_driver_key,
+)
 from ...settings.model_params import ModelParams
 from ...settings.solver_settings import DEFAULT_DISTANCE_METHOD
 from ....data.id_normalization import normalize_id_value
@@ -18,57 +27,6 @@ from ....data.loading.master_data_loader import MasterData
 DistDict = Dict[str, Any] | None
 DriverState = Dict[str, Any]
 Candidate = Dict[str, Any]
-
-
-def _location_fields(row: pd.Series) -> Dict[str, Any]:
-    return {
-        "city_code": row.get("city_code"),
-        "department_code": row.get("department_code"),
-        "city_name": row.get("city_name"),
-        "department_name": row.get("department_name"),
-    }
-
-
-def _filter_drivers_by_city(directorio_df: pd.DataFrame, city: Any) -> pd.DataFrame:
-    if directorio_df is None or directorio_df.empty:
-        return pd.DataFrame()
-
-    # Backward-compatible name: matching is department-based by design.
-    department_key = str(city).strip()
-    if not department_key:
-        return directorio_df.iloc[0:0].copy()
-
-    candidate_masks: List[pd.Series] = []
-    if "department_code" in directorio_df.columns:
-        candidate_masks.append(
-            directorio_df["department_code"].astype(str).str.strip() == department_key
-        )
-    if "department_name" in directorio_df.columns:
-        candidate_masks.append(
-            directorio_df["department_name"].astype(str).str.strip() == department_key
-        )
-    if "city" in directorio_df.columns:
-        candidate_masks.append(
-            directorio_df["city"].astype(str).str.strip() == department_key
-        )
-
-    for mask in candidate_masks:
-        df_city = directorio_df.loc[mask].copy()
-        if not df_city.empty:
-            return df_city
-
-    return directorio_df.iloc[0:0].copy()
-
-
-def _extract_driver_key(driver_row: pd.Series) -> Optional[str]:
-    for col in ("driver_id", "ALFRED'S"):
-        if col in driver_row.index:
-            value = driver_row.get(col)
-            if pd.notna(value):
-                key = str(value).strip()
-                if key:
-                    return key
-    return None
 
 
 '''
@@ -130,6 +88,7 @@ def run_assignment_algorithm(
     starts = [pd.NaT] * len(labors_df)
     ends = [pd.NaT] * len(labors_df)
     distances = [0] * len(labors_df)
+    overtime_minutes_list: List[Optional[float]] = [None] * len(labors_df)
     service_end_times: Dict[Any, Optional[pd.Timestamp]] = {}
 
     drivers = init_drivers(df_sorted, directorio_df=directorio_df, city=city_key, **kwargs)
@@ -202,8 +161,18 @@ def run_assignment_algorithm(
             )
 
             if not pick:
-                service_end_times[service_id] = pd.NaT
-                continue
+                overtime_pick = _get_overtime_fallback(
+                    drivers, row, tiempo_gracia, alfred_speed, dist_method, dist_dict, **kwargs
+                )
+                if not overtime_pick:
+                    service_end_times[service_id] = pd.NaT
+                    continue
+                logger.debug(
+                    "labor_assigned_with_overtime labor_id=%s service_id=%s driver=%s overtime_min=%.1f",
+                    row.get('labor_id'), service_id, overtime_pick['drv'], overtime_pick['overtime_minutes'],
+                )
+                pick = overtime_pick
+                overtime_minutes_list[original_idx] = overtime_pick['overtime_minutes']
 
             drv = pick['drv']
             is_last = not labors_df[
@@ -233,25 +202,29 @@ def run_assignment_algorithm(
             service_end_times[service_id] = aend
 
         else:
-            # --- Labores no transporte: usar p75 de duraciones_df ---
+            # --- Labores no transporte: usar estimated_time o p75 de duraciones_df ---
             astart = prev_end or row['schedule_date']
 
-            # Buscar primero por ciudad + labor_type
-            dur_row = duraciones_df[
-                (duraciones_df["city"] == city_key) &
-                (duraciones_df["labor_type"] == row["labor_type"])
-            ]
-
-            if not dur_row.empty:
-                duration_min = float(dur_row["p75_min"].iloc[0])
+            est_time = row.get("estimated_time")
+            if est_time is not None and pd.notna(est_time):
+                duration_min = float(est_time)
             else:
-                # Si no existe en esa ciudad, sacar promedio global para ese labor_type
-                labor_rows = duraciones_df[duraciones_df["labor_type"] == row["labor_type"]]
-                if not labor_rows.empty:
-                    duration_min = float(labor_rows["p75_min"].mean())
+                # Buscar primero por ciudad + labor_type
+                dur_row = duraciones_df[
+                    (duraciones_df["city"] == city_key) &
+                    (duraciones_df["labor_type"] == row["labor_type"])
+                ]
+
+                if not dur_row.empty:
+                    duration_min = float(dur_row["p75_min"].iloc[0])
                 else:
-                    # Fallback final
-                    duration_min = tiempo_other
+                    # Si no existe en esa ciudad, sacar promedio global para ese labor_type
+                    labor_rows = duraciones_df[duraciones_df["labor_type"] == row["labor_type"]]
+                    if not labor_rows.empty:
+                        duration_min = float(labor_rows["p75_min"].mean())
+                    else:
+                        # Fallback final
+                        duration_min = tiempo_other
 
             aend = astart + timedelta(minutes=duration_min)
             starts[original_idx], ends[original_idx] = astart, aend
@@ -262,8 +235,8 @@ def run_assignment_algorithm(
     df_result['assigned_driver'] = assigned
     df_result['actual_start'] = pd.to_datetime(starts)
     df_result['actual_end'] = pd.to_datetime(ends)
-    
     df_result['dist_km'] = distances
+    df_result['overtime_minutes'] = overtime_minutes_list
 
     failed_services = {
         service_id
@@ -290,7 +263,7 @@ def run_assignment_algorithm(
         city_key=city_key,
         **kwargs)
 
-    return df_result, df_moves, postponed_labors
+    return df_result, df_moves, postponed_labors, dist_dict
 
 
 '''
@@ -359,6 +332,57 @@ def get_candidate_drivers(
             cands.append({'drv': name, 'arrival': arr, 'dist_km': dkm})
 
     return cands, dist_dict_local
+
+
+def _get_overtime_fallback(
+    drivers: Dict[str, DriverState],
+    row: pd.Series,
+    tiempo_gracia: int,
+    alfred_speed: float,
+    dist_method: str,
+    dist_dict: Optional[DistDict] = None,
+    **kwargs: Any,
+) -> Optional[Dict[str, Any]]:
+    """
+    When no driver can arrive within the normal time window, select the one
+    requiring the least overtime (earliest start relative to their shift start).
+
+    The selected driver is assumed to depart before their shift to arrive exactly
+    at the grace deadline (`late`). Returns arrival=late so assign_task_to_driver
+    places astart=late.
+
+    Returns None only if there are no drivers at all.
+    """
+    if not drivers:
+        return None
+
+    kwargs["return_dist_dict"] = True
+    dist_dict_local: DistDict = dist_dict or {}
+
+    late = row['schedule_date'] + timedelta(minutes=tiempo_gracia)
+
+    best: Optional[Dict[str, Any]] = None
+    best_overtime: float = float('inf')
+
+    for name, drv in drivers.items():
+        # Use available as-is (= shift start from init); no shift floor applied here
+        av = drv['available']
+        dkm, dist_dict_local = distance(
+            drv["position"],
+            row["map_start_point"],
+            method=dist_method,
+            dist_dict=dist_dict_local,
+            **kwargs,
+        )
+        travel_min = 0.0 if math.isnan(dkm) else dkm / alfred_speed * 60
+        arrival = av + timedelta(minutes=travel_min)
+        overtime = (arrival - late).total_seconds() / 60  # always > 0 in fallback path
+
+        if overtime < best_overtime:
+            best_overtime = overtime
+            best = {'drv': name, 'arrival': late, 'dist_km': dkm, 'overtime_minutes': overtime}
+
+    return best
 
 
 def select_from_candidates(
@@ -507,7 +531,23 @@ def prepare_iteration_data(df_cleaned: pd.DataFrame) -> pd.DataFrame:
     # The incoming DataFrame index may be sparse/non-contiguous after filtering.
     df = df_cleaned.copy().reset_index(drop=True)
     df["original_idx"] = range(len(df))
-    df = df.sort_values(["schedule_date", "service_id", "labor_sequence"], kind="stable").reset_index(drop=True)
+
+    # Reassignment candidates (formerly preassigned, infeasible services that were
+    # broken and fed back) must be processed before regular unassigned labors so they
+    # retain their implicit customer-commitment priority.  The flag is set in main.py
+    # via _prepare_service_rows_for_reassignment(); regular rows default to 0.
+    if "reassignment_priority" in df.columns:
+        df["reassignment_priority"] = pd.to_numeric(
+            df["reassignment_priority"], errors="coerce"
+        ).fillna(0)
+    else:
+        df["reassignment_priority"] = 0
+
+    df = df.sort_values(
+        ["reassignment_priority", "schedule_date", "service_id", "labor_sequence"],
+        ascending=[False, True, True, True],
+        kind="stable",
+    ).reset_index(drop=True)
 
     return df
 
@@ -674,244 +714,6 @@ def _evaluate_postponement(
 
 
 
-'''
-AUXILIARY FUNCTIONS
-'''
-def build_driver_movements(
-    labors_df: pd.DataFrame,
-    directory_df: pd.DataFrame,
-    day_str: str,
-    dist_method: str,
-    dist_dict: Optional[DistDict],
-    ALFRED_SPEED: float,
-    city_key: str,
-    **kwargs: Any,
-) -> pd.DataFrame:
-    """
-    Build a fully standardized movement timeline for each driver.
-
-    Every labor is expanded into exactly three rows:
-        1. <labor_id>_free  → Waiting time before moving to next labor
-        2. <labor_id>_move  → Travel from previous endpoint to labor start
-        3. <labor_id>       → Actual labor itself
-
-    If the driver starts moving immediately (no wait), the `_free` record
-    will have zero duration (actual_start == actual_end).
-    If the next labor is at the same location, `_move` will have zero distance
-    and possibly zero duration.
-
-    This ensures *absolute structural consistency* across all drivers and days.
-
-    Parameters
-    ----------
-    labors_df : pd.DataFrame
-        DataFrame of labors containing:
-        - 'assigned_driver'
-        - 'actual_start', 'actual_end'
-        - 'map_start_point', 'map_end_point'
-        - 'labor_id', 'labor_name', 'labor_category', 'schedule_date'
-    directory_df : pd.DataFrame
-        Directory containing driver start positions and hours.
-        Must include:
-        - ['driver_id', 'latitud', 'longitud', 'city_id', 'start_time']
-    day_str : str
-        Simulation date (YYYY-MM-DD)
-    DISTANCE_METHOD : str
-        Distance computation mode ('haversine', 'osrm', etc.)
-    ALFRED_SPEED : float
-        Average travel speed in km/h
-    city : str
-        City for which movements are built
-    driver_init_mode : {'historic_directory', 'driver_directory'}, default='historic_directory'
-        Defines how driver start positions are obtained.
-    dist_dict : dict, optional
-        Precomputed distance dictionary.
-    **kwargs :
-        Additional parameters passed to the `distance()` function.
-
-    Returns
-    -------
-    pd.DataFrame
-        A fully standardized DataFrame with every driver's timeline expanded into triplets:
-        ['labor_id_free', 'labor_id_move', 'labor_id'].
-        Columns:
-        - ['labor_id', 'labor_name', 'labor_category', driver_col,
-           'schedule_date', 'actual_start', 'actual_end',
-           'start_point', 'end_point', 'distance_km', 'duration_min']
-
-    Notes
-    -----
-    - All labors have exactly 3 corresponding rows (even if some are zero-duration).
-    - The first labor per driver always includes `_free` and `_move` blocks.
-    - Zero-time intervals are explicit (actual_start == actual_end).
-    """
-
-    # --------------------------------------------------------------------------
-    # 1. Determine driver/time column names (single mode)
-    # --------------------------------------------------------------------------
-    driver_col, start_col, end_col = "assigned_driver", "actual_start", "actual_end"
-
-    # --------------------------------------------------------------------------
-    # 2. Determine timezone and reference day
-    # --------------------------------------------------------------------------
-    tz = labors_df['schedule_date'].dt.tz
-    if tz is None and not labors_df[start_col].dropna().empty:
-        tz = labors_df[start_col].dropna().iloc[0].tz
-
-    day_dt = pd.to_datetime(day_str).date()
-
-    # --------------------------------------------------------------------------
-    # 3. Initialize driver positions and starting times
-    # --------------------------------------------------------------------------
-    driver_pos, driver_end, driver_has_departed = {}, {}, {}
-    df_city = _filter_drivers_by_city(directory_df, city_key)
-    for _, d in df_city.iterrows():
-        if pd.isna(d['latitud']):
-            continue
-
-        drv = _extract_driver_key(d)
-        if drv is None:
-            continue
-
-        driver_pos[drv] = f"POINT ({d['longitud']} {d['latitud']})"
-        start_t = datetime.strptime(d['start_time'], '%H:%M:%S').time()
-        st = datetime.combine(day_dt, start_t)
-        driver_end[drv] = pd.Timestamp(st, tz=tz)
-        driver_has_departed[drv] = False
-
-    # --------------------------------------------------------------------------
-    # 4. Build standardized movement records
-    # --------------------------------------------------------------------------
-    records: List[Dict[str, Any]] = []
-
-    for _, row in labors_df.dropna(subset=[start_col]).sort_values(start_col).iterrows():
-        driver_value = row[driver_col]
-        if pd.isna(driver_value):
-            continue
-        drv = str(driver_value).strip()
-        if not drv:
-            continue
-        labor_id = normalize_id_value(row.get("labor_id"))
-        if labor_id is None:
-            continue
-
-        prev_end = driver_end.get(drv)
-        prev_pos = driver_pos.get(drv)
-
-        # Skip if no reference for driver
-        if prev_end is None or prev_pos is None:
-            continue
-
-        # Compute distance and travel time to this labor
-        move_dkm, _ = distance(prev_pos, row['map_start_point'],
-                          method=dist_method, dist_dict=dist_dict, **kwargs)
-        move_dkm = 0.0 if (pd.isna(move_dkm) or math.isnan(move_dkm)) else move_dkm
-        travel_time = timedelta(minutes=(move_dkm / ALFRED_SPEED * 60)) if move_dkm > 0 else timedelta(0)
-
-        # Departure = end of last labor OR shift start (whichever is later)
-        depart = max(prev_end, row[start_col] - travel_time)
-
-
-        labor_start = row[start_col]
-        move_end = row[start_col]
-        move_start = row[start_col] - travel_time
-        free_end = move_start
-        if not driver_has_departed[drv]:
-            # The driver starts moving before the shift starts
-            if move_start <= prev_end:
-                free_start = free_end
-            else:
-                free_start = prev_end
-            driver_has_departed[drv] = True
-        else:
-            free_start = prev_end
-
-        # ------------------------------------------------------------------
-        # (1) FREE_TIME — always created
-        # ------------------------------------------------------------------
-        # free_start = prev_end
-        # free_end = depart
-        records.append({
-            'service_id': row.get('service_id', np.nan),
-            'labor_id': labor_id,
-            'labor_context_id': f"{labor_id}_free",
-            'labor_name': 'FREE_TIME',
-            'labor_category': 'FREE_TIME',
-            driver_col: drv,
-            'schedule_date': row['schedule_date'],
-            start_col: free_start,
-            end_col: free_end,
-            'start_point': prev_pos,
-            'end_point': prev_pos,
-            'distance_km': 0.0,
-            **_location_fields(row),
-        })
-
-        # ------------------------------------------------------------------
-        # (2) DRIVER_MOVE — always created
-        # ------------------------------------------------------------------
-        # move_start = free_end
-        # move_end = row[start_col]
-        records.append({
-            'service_id': row.get('service_id', np.nan),
-            'labor_id': labor_id,
-            'labor_context_id': f"{labor_id}_move",
-            'labor_name': 'DRIVER_MOVE',
-            'labor_category': 'DRIVER_MOVE',
-            driver_col: drv,
-            'schedule_date': row['schedule_date'],
-            start_col: move_start,
-            end_col: move_end,
-            'start_point': prev_pos,
-            'end_point': row['map_start_point'],
-            'distance_km': move_dkm,
-            **_location_fields(row),
-        })
-
-        # ------------------------------------------------------------------
-        # (3) Actual labor
-        # ------------------------------------------------------------------
-        records.append({
-            'service_id': row.get('service_id', np.nan),
-            'labor_id': labor_id,
-            "labor_context_id": f"{labor_id}_labor",
-            'labor_name': row['labor_name'],
-            'labor_category': row['labor_category'],
-            driver_col: drv,
-            'schedule_date': row['schedule_date'],
-            start_col: labor_start,
-            end_col: row[end_col],
-            'start_point': row['map_start_point'],
-            'end_point': row['map_end_point'],
-            'distance_km': row['dist_km'],
-            **_location_fields(row),
-        })
-
-        # Update reference state
-        driver_end[drv] = row[end_col]
-        driver_pos[drv] = row['map_end_point']
-
-    # --------------------------------------------------------------------------
-    # 5. Final assembly and duration computation
-    # --------------------------------------------------------------------------
-    df_moves = pd.DataFrame(records)
-    if df_moves.empty:
-        return df_moves
-
-    df_moves[start_col] = pd.to_datetime(df_moves[start_col])
-    df_moves[end_col] = pd.to_datetime(df_moves[end_col])
-
-    df_moves['duration_min'] = (
-        (df_moves[end_col] - df_moves[start_col]).dt.total_seconds() / 60
-    ).round(1).fillna(0)
-
-    df_moves['date'] = df_moves['schedule_date'].dt.date
-
-    df_moves = df_moves.sort_values(
-        ['schedule_date', driver_col, start_col, end_col]
-    ).reset_index(drop=True)
-
-    return df_moves
 
 
 def compute_avg_times(df: pd.DataFrame) -> dict:

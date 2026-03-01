@@ -2,17 +2,25 @@ import os
 import sys
 import uuid
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pandas as pd
 
 from src.config import Config
-from src.datetime_utils import utc_to_colombia_series
+from src.utils.datetime_utils import utc_to_colombia_series
+from src.utils.logging_utils import set_run_id, setup_logging_context, add_file_log_handler
 from src.integration.client import ALFREDAPIClient
 from src.integration.sender import ResultSender
 from src.io.input_loader import load_local_input
-from src.io.request_loader import apply_request_filters, build_settings_from_request, load_request
+from src.io.request_loader import (
+    apply_request_filters,
+    build_settings_from_request,
+    load_request,
+    DEFAULT_KEEP_PAYLOAD_ASSIGNMENT,
+    resolve_keep_payload_assignment,
+)
 from src.io.output_writer import (
     save_local_assignment_diagnostics_report,
     save_local_output,
@@ -21,6 +29,7 @@ from src.io.output_writer import (
     save_local_validation_outputs,
     save_local_solution_evaluation_report,
     save_local_solution_validation_outputs,
+    save_local_warnings_report,
 )
 from src.data.loading.driver_directory_loader import load_driver_directory_df
 from src.data.loading.master_data_loader import MasterData, load_master_data
@@ -38,8 +47,8 @@ from src.optimization.solver import OptimizationSolver
 from src.optimization.settings.solver_settings import OptimizationSettings
 from src.optimization.evaluation.solution_evaluator import evaluate_solution
 from src.optimization.validation.solution_validator import validate_solution
-from src.logging_utils import set_run_id, setup_logging_context
-from src.pipeline_helpers import (
+from src.optimization.common.preassigned import _prepare_service_rows_for_reassignment
+from src.pipeline.helpers import (
     _build_intermediate_export_dir,
     _configure_fallback_logging,
     _export_intermediate_dataframe,
@@ -49,286 +58,31 @@ from src.pipeline_helpers import (
     report_failure_if_possible,
     set_pipeline_logger,
 )
+from src.pipeline.filters import (
+    _filter_df_by_department_code,
+    _filter_labors_to_planning_window,
+)
+from src.pipeline.diagnostics import (
+    _finalize_assignment_diagnostics,
+    _build_assignment_diagnostics_metrics,
+    _stabilize_results_order,
+)
 
 logger = logging.getLogger(__name__)
 set_pipeline_logger(logger)
-
-DEFAULT_KEEP_PAYLOAD_ASSIGNMENT = False
-
-
-def _filter_df_by_department_code(
-    df: pd.DataFrame,
-    *,
-    department: int | str | None,
-    dataset_name: str,
-) -> pd.DataFrame:
-    if df is None or df.empty:
-        return df
-
-    if department is None:
-        return df
-
-    department_code = str(department).strip()
-    if not department_code:
-        return df
-
-    if "department_code" not in df.columns:
-        log_info(
-            "department_filter_skipped_missing_column",
-            dataset=dataset_name,
-            expected_column="department_code",
-        )
-        return df
-
-    before_rows = len(df)
-    department_series = df["department_code"].astype("string").str.strip()
-    filtered_df = df.loc[department_series.eq(department_code).fillna(False)].copy()
-
-    log_info(
-        "department_filter_applied",
-        dataset=dataset_name,
-        department=department_code,
-        rows_in=before_rows,
-        rows_out=len(filtered_df),
-    )
-    return filtered_df
-
-
-def _parse_bool_flag(value: Any, *, default: bool) -> bool:
-    if value is None:
-        return default
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    text = str(value).strip().lower()
-    if text in {"true", "1", "yes", "y", "on"}:
-        return True
-    if text in {"false", "0", "no", "n", "off"}:
-        return False
-    return default
-
-
-def _resolve_keep_payload_assignment(request_payload: Any) -> bool:
-    if request_payload is None:
-        return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
-
-    raw = getattr(request_payload, "raw", {}) or {}
-    if not isinstance(raw, dict):
-        return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
-
-    algo = raw.get("algorithm") if isinstance(raw.get("algorithm"), dict) else {}
-    algo_params = algo.get("params") if isinstance(algo.get("params"), dict) else {}
-    preassignment = raw.get("preassignment") if isinstance(raw.get("preassignment"), dict) else {}
-
-    for candidate in (
-        raw.get("keep_payload_assignment"),
-        raw.get("keep_payload_assingment"),
-        preassignment.get("keep_payload_assignment"),
-        preassignment.get("keep_payload_assingment"),
-        algo_params.get("keep_payload_assignment"),
-        algo_params.get("keep_payload_assingment"),
-    ):
-        if candidate is None:
-            continue
-        return _parse_bool_flag(candidate, default=DEFAULT_KEEP_PAYLOAD_ASSIGNMENT)
-
-    return DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
-
-
-def _prepare_service_rows_for_reassignment(df: pd.DataFrame) -> pd.DataFrame:
-    if df is None or df.empty:
-        return pd.DataFrame()
-
-    rows = df.copy()
-    if "original_assigned_driver" not in rows.columns:
-        rows["original_assigned_driver"] = rows.get("assigned_driver")
-    else:
-        missing_original = rows["original_assigned_driver"].isna()
-        rows.loc[missing_original, "original_assigned_driver"] = rows.loc[missing_original, "assigned_driver"]
-
-    rows["preassignment_infeasible_detected"] = rows.get("is_infeasible", False).fillna(False)
-    rows["preassignment_infeasibility_cause_code"] = rows.get("infeasibility_cause_code")
-    rows["preassignment_infeasibility_cause_detail"] = rows.get("infeasibility_cause_detail")
-    rows["preassignment_warning_detected"] = rows.get("is_warning", False).fillna(False)
-    rows["preassignment_warning_code"] = rows.get("warning_code")
-    rows["preassignment_warning_detail"] = rows.get("warning_detail")
-
-    rows["reassignment_candidate"] = True
-    rows["reassignment_priority"] = 1
-    rows["assigned_driver"] = pd.NA
-    rows["actual_start"] = pd.NaT
-    rows["actual_end"] = pd.NaT
-    rows["actual_status"] = pd.NA
-    rows["is_infeasible"] = False
-    rows["infeasibility_cause_code"] = None
-    rows["infeasibility_cause_detail"] = None
-    rows["is_warning"] = False
-    rows["warning_code"] = None
-    rows["warning_detail"] = None
-    return rows
-
-
-def _finalize_assignment_diagnostics(results_df: pd.DataFrame) -> pd.DataFrame:
-    if results_df is None or results_df.empty:
-        return results_df
-
-    df = results_df.copy()
-    default_columns = {
-        "is_infeasible": False,
-        "infeasibility_cause_code": None,
-        "infeasibility_cause_detail": None,
-        "reassignment_candidate": False,
-    }
-    for col, default_value in default_columns.items():
-        if col not in df.columns:
-            df[col] = default_value
-
-    failed_mask = df.get("actual_status", pd.Series(index=df.index, dtype="object")).astype("string").str.upper().eq("FAILED")
-    reassignment_candidate_mask = df["reassignment_candidate"].fillna(False).astype(bool)
-    reassignment_failed_mask = failed_mask & reassignment_candidate_mask
-    generic_failed_mask = failed_mask & ~reassignment_candidate_mask
-
-    df.loc[failed_mask, "is_infeasible"] = True
-
-    reassignment_code_missing = reassignment_failed_mask & (
-        df["infeasibility_cause_code"].isna()
-        | df["infeasibility_cause_code"].astype("string").str.strip().eq("")
-    )
-    df.loc[reassignment_code_missing, "infeasibility_cause_code"] = "reassignment_failed_unassigned"
-    df.loc[reassignment_code_missing, "infeasibility_cause_detail"] = (
-        "Service was moved to reassignment queue but no fully feasible assignment was found."
-    )
-
-    generic_code_missing = generic_failed_mask & (
-        df["infeasibility_cause_code"].isna()
-        | df["infeasibility_cause_code"].astype("string").str.strip().eq("")
-    )
-    df.loc[generic_code_missing, "infeasibility_cause_code"] = "assignment_failed_unassigned"
-    df.loc[generic_code_missing, "infeasibility_cause_detail"] = (
-        "No feasible driver assignment was found for this labor/service."
-    )
-
-    reassigned_success_mask = reassignment_candidate_mask & ~failed_mask
-    df.loc[reassigned_success_mask, "is_infeasible"] = False
-    solver_failure_code_mask = reassigned_success_mask & df["infeasibility_cause_code"].astype("string").isin(
-        ["assignment_failed_unassigned", "reassignment_failed_unassigned"]
-    )
-    df.loc[solver_failure_code_mask, "infeasibility_cause_code"] = None
-    df.loc[solver_failure_code_mask, "infeasibility_cause_detail"] = None
-
-    return df
-
-
-def _build_assignment_diagnostics_metrics(results_df: pd.DataFrame) -> Dict[str, Any]:
-    if results_df is None or results_df.empty:
-        return {
-            "rows_total": 0,
-            "rows_infeasible": 0,
-            "rows_warning": 0,
-            "rows_unassigned": 0,
-            "rows_reassignment_candidate": 0,
-            "rows_reassignment_failed": 0,
-            "rows_reassignment_success": 0,
-            "infeasibility_causes": {},
-            "warning_causes": {},
-            "actual_status_counts": {},
-        }
-
-    df = results_df.copy()
-    status_series = (
-        df.get("actual_status", pd.Series(index=df.index, dtype="object"))
-        .astype("string")
-        .str.upper()
-    )
-    is_failed = status_series.eq("FAILED")
-    reassignment_candidate = (
-        df.get("reassignment_candidate", pd.Series(False, index=df.index))
-        .fillna(False)
-        .astype(bool)
-    )
-    is_infeasible = (
-        df.get("is_infeasible", pd.Series(False, index=df.index))
-        .fillna(False)
-        .astype(bool)
-    )
-    is_warning = (
-        df.get("is_warning", pd.Series(False, index=df.index))
-        .fillna(False)
-        .astype(bool)
-    )
-    assigned_driver = df.get("assigned_driver", pd.Series(index=df.index, dtype="object"))
-    rows_unassigned = int((assigned_driver.isna() | assigned_driver.astype("string").str.strip().isin(["", "nan", "None"])).sum())
-
-    def _counts_to_dict(series: pd.Series) -> Dict[str, int]:
-        if series is None or series.empty:
-            return {}
-        cleaned = series.dropna().astype("string").str.strip()
-        cleaned = cleaned[cleaned.ne("") & cleaned.ne("<NA>") & cleaned.ne("nan")]
-        if cleaned.empty:
-            return {}
-        return {str(k): int(v) for k, v in cleaned.value_counts().to_dict().items()}
-
-    return {
-        "rows_total": int(len(df)),
-        "rows_infeasible": int(is_infeasible.sum()),
-        "rows_warning": int(is_warning.sum()),
-        "rows_unassigned": rows_unassigned,
-        "rows_reassignment_candidate": int(reassignment_candidate.sum()),
-        "rows_reassignment_failed": int((is_failed & reassignment_candidate).sum()),
-        "rows_reassignment_success": int((~is_failed & reassignment_candidate).sum()),
-        "infeasibility_causes": _counts_to_dict(df.get("infeasibility_cause_code", pd.Series(dtype="object"))),
-        "warning_causes": _counts_to_dict(df.get("warning_code", pd.Series(dtype="object"))),
-        "actual_status_counts": _counts_to_dict(status_series),
-    }
-
-
-def _stabilize_results_order(results_df: pd.DataFrame) -> pd.DataFrame:
-    if results_df is None or results_df.empty:
-        return results_df
-
-    df = results_df.copy()
-    df["__service_id_num"] = pd.to_numeric(df.get("service_id"), errors="coerce")
-    df["__labor_sequence_num"] = pd.to_numeric(df.get("labor_sequence"), errors="coerce")
-    df["__labor_id_num"] = pd.to_numeric(df.get("labor_id"), errors="coerce")
-    df["__schedule_ts"] = pd.to_datetime(df.get("schedule_date"), errors="coerce", utc=True)
-    df["__actual_start_ts"] = pd.to_datetime(df.get("actual_start"), errors="coerce", utc=True)
-    df["__created_ts"] = pd.to_datetime(df.get("created_at"), errors="coerce", utc=True)
-    df["__orig_idx"] = range(len(df))
-    df = df.sort_values(
-        [
-            "__service_id_num",
-            "__labor_sequence_num",
-            "__labor_id_num",
-            "__schedule_ts",
-            "__actual_start_ts",
-            "__created_ts",
-            "__orig_idx",
-        ],
-        kind="stable",
-    ).reset_index(drop=True)
-    return df.drop(
-        columns=[
-            "__service_id_num",
-            "__labor_sequence_num",
-            "__labor_id_num",
-            "__schedule_ts",
-            "__actual_start_ts",
-            "__created_ts",
-            "__orig_idx",
-        ],
-        errors="ignore",
-    )
 
 
 # ======================================================
 # Entry point
 # ======================================================
 def main() -> int:
+    from src.io.artifact_naming import build_run_subdir, write_run_manifest, finalize_run_manifest
+
     # Generate a run correlation id for this process execution
     setup_logging_context()
     run_id = str(uuid.uuid4())[:8]
     set_run_id(run_id)
+    started_at = datetime.now(timezone.utc)
 
     # --------------------------------------------------
     # 1. Bootstrap & validation
@@ -364,8 +118,14 @@ def main() -> int:
     request_settings: Optional[OptimizationSettings] = None
     keep_payload_assignment = DEFAULT_KEEP_PAYLOAD_ASSIGNMENT
     intermediate_export_dir: Optional[Path] = None
-    output_dir = Config.LOCAL_OUTPUT_DIR
+    output_dir = Config.RUNS_DIR
     department: int | str | None = Config.DEPARTMENT
+
+    # Create run directory early, write initial manifest, and attach file log
+    run_dir = Path(output_dir) / build_run_subdir(artifact_run_id)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    write_run_manifest(run_dir, artifact_run_id, created_at=started_at)
+    add_file_log_handler(run_dir / "run.log")
 
     # --------------------------------------------------
     # 2. Load request payload (optional)
@@ -377,13 +137,16 @@ def main() -> int:
 
         request_id = request_payload.request_id or request_id
         request_filters = request_payload.filters
-        keep_payload_assignment = _resolve_keep_payload_assignment(request_payload)
+        keep_payload_assignment = resolve_keep_payload_assignment(request_payload)
         request_settings = build_settings_from_request(request_payload)
         if request_filters and request_filters.department is not None:
             department = request_filters.department
 
         if request_payload.output.path:
             output_dir = request_payload.output.path
+            run_dir = Path(output_dir) / build_run_subdir(artifact_run_id)
+            run_dir.mkdir(parents=True, exist_ok=True)
+            write_run_manifest(run_dir, artifact_run_id, created_at=started_at)
 
     except FileNotFoundError:
         log_info("request_missing_using_defaults", path=request_path)
@@ -399,7 +162,6 @@ def main() -> int:
         mode=preassignment_mode,
     )
 
-    # set request_id into logging context ASAP
     raw_input: dict[str, Any] = {}
     input_df = None
     metadata: Dict[str, Any] = {}
@@ -411,8 +173,6 @@ def main() -> int:
     # --------------------------------------------------
     try:
         if use_api:
-            # log_info("execution_mode", mode="API")
-
             alfred_client = ALFREDAPIClient(
                 endpoint_url=Config.SERVICES_ENDPOINT,
                 api_token=Config.API_TOKEN,
@@ -438,18 +198,30 @@ def main() -> int:
 
             # If API returns request_id, prefer it
             request_id = raw_input.get("request_id") or request_id
+
         else:
-            # log_info("execution_mode", mode="LOCAL")
             local_path = Config.LOCAL_INPUT_PATH
             local_input_is_json_payload = Path(local_path).suffix.lower() == ".json"
 
             with log_step("load_local_input", path=local_path):
-                raw_input = load_local_input(local_path, write_debug_json=True)
+                raw_input = load_local_input(local_path, write_debug_json=True, run_id=artifact_run_id)
+
+        # -----------------------------------------------------------
+        # SERVICE MASK (testing only) — remove this block and unset
+        # SERVICE_MASK_PATH in .env to disable without any side effects.
+        # -----------------------------------------------------------
+        _mask_path = os.getenv("SERVICE_MASK_PATH")
+        if _mask_path:
+            from src.io.service_mask import apply_service_mask, load_labor_ids_from_snapshot
+            _mask_labor_ids = load_labor_ids_from_snapshot(_mask_path)
+            raw_input = apply_service_mask(raw_input, _mask_labor_ids)
+        # -----------------------------------------------------------
 
         if Config.WRITE_INTERMEDIATE_DATAFRAMES:
             intermediate_export_dir = _build_intermediate_export_dir(
                 run_id=artifact_run_id,
                 request_id=request_id,
+                run_base_dir=run_dir,
             )
 
     except Exception as exc:
@@ -528,6 +300,9 @@ def main() -> int:
                     department=department_filter,
                 )
 
+    if request_filters:
+        input_df = _filter_labors_to_planning_window(input_df, request_filters)
+
     if not use_api and request_filters:
         input_df = apply_request_filters(input_df, request_filters)
 
@@ -573,7 +348,6 @@ def main() -> int:
                     invalid_df,
                     validation_report,
                     output_dir=output_dir,
-                    request_id=request_id,
                     run_id=artifact_run_id,
                 )
 
@@ -630,11 +404,7 @@ def main() -> int:
             )
 
             try:
-                with log_step(
-                    "fetch_driver_directory",
-                    # schedule_date=str(schedule_date),
-                    # department=department,
-                ):
+                with log_step("fetch_driver_directory"):
                     raw_drivers = driver_client.get_driver_directory(
                         active=True,
                         schedule_date=schedule_date,
@@ -843,7 +613,6 @@ def main() -> int:
                             preassigned_report_df,
                             preassigned_metrics,
                             output_dir=output_dir,
-                            request_id=request_id,
                             run_id=artifact_run_id,
                         )
                 except Exception:
@@ -904,10 +673,24 @@ def main() -> int:
 
             if not preassigned_df.empty:
                 results = pd.concat([preassigned_df, results], axis=0, ignore_index=True)
+
         results = _finalize_assignment_diagnostics(results)
         results = _stabilize_results_order(results)
         assignment_diagnostics = _build_assignment_diagnostics_metrics(results)
         metadata["assignment_diagnostics"] = assignment_diagnostics
+
+        # Service-level summary for run.json
+        if not results.empty and "service_id" in results.columns:
+            _services_total = int(results["service_id"].nunique())
+            if "is_infeasible" in results.columns:
+                _svc_all_failed = results.groupby("service_id")["is_infeasible"].all()
+                _services_failed = int(_svc_all_failed.sum())
+            else:
+                _services_failed = 0
+            _services_planned = _services_total - _services_failed
+        else:
+            _services_total = _services_planned = _services_failed = 0
+
         if isinstance(metrics, dict):
             metrics["assignment_diagnostics"] = assignment_diagnostics
         log_info(
@@ -925,15 +708,11 @@ def main() -> int:
                         results,
                         assignment_diagnostics,
                         output_dir=output_dir,
-                        request_id=request_id,
                         run_id=artifact_run_id,
                     )
             except Exception:
                 logger.exception("assignment_diagnostics_report_write_failed")
 
-        # out_len = len(results) if hasattr(results, "__len__") else None
-        # log_info("optimization_completed", rows_out=out_len, metrics=metrics)
-    
     except Exception as exc:
         logger.exception("optimization_failed")
         report_failure_if_possible(
@@ -977,7 +756,6 @@ def main() -> int:
                     solution_validation_issues,
                     solution_validation_report,
                     output_dir=output_dir,
-                    request_id=request_id,
                     run_id=artifact_run_id,
                 )
 
@@ -1029,7 +807,6 @@ def main() -> int:
                 save_local_solution_evaluation_report(
                     evaluation_report,
                     output_dir=output_dir,
-                    request_id=request_id,
                     run_id=artifact_run_id,
                 )
     except Exception as exc:
@@ -1079,15 +856,49 @@ def main() -> int:
                 save_local_output(
                     results,
                     output_path=output_dir,
-                    request_id=request_id,
                     run_id=artifact_run_id,
                 )
                 save_local_output_payload(
                     output_payload,
                     output_dir=output_dir,
-                    request_id=request_id,
                     run_id=artifact_run_id,
                 )
+
+        with log_step("save_warnings_report"):
+            _overtime_series = results.get("overtime_minutes", pd.Series(dtype=float)).fillna(0) if results is not None and not results.empty else pd.Series(dtype=float)
+            _preassigned_infeasible = int(preassigned_df["is_infeasible"].fillna(False).sum()) if not preassigned_df.empty and "is_infeasible" in preassigned_df.columns else 0
+            _nontransport_mask = (
+                (input_df["labor_category"] != "VEHICLE_TRANSPORTATION")
+                & input_df["shop_id"].notna()
+            ) if not input_df.empty and "labor_category" in input_df.columns and "shop_id" in input_df.columns else pd.Series(False, index=input_df.index if not input_df.empty else [])
+            _et_fallback_mask = (
+                _nontransport_mask & input_df["estimated_time"].isna()
+            ) if "estimated_time" in input_df.columns else _nontransport_mask
+            _et_fallback_count = int(_et_fallback_mask.sum())
+            _et_fallback_ids = input_df.loc[_et_fallback_mask, "labor_id"].astype(str).tolist() if _et_fallback_count > 0 else []
+            warnings_report = {
+                "drivers": {
+                    "defaulted_schedule_count": int(driver_directory_df.get("schedule_defaulted", pd.Series(dtype=bool)).fillna(False).sum()) if not driver_directory_df.empty else 0,
+                    "defaulted_schedule_driver_ids": driver_directory_df.loc[driver_directory_df["schedule_defaulted"].fillna(False).astype(bool), "driver_id"].astype(str).tolist() if not driver_directory_df.empty and "schedule_defaulted" in driver_directory_df.columns else [],
+                },
+                "data_validation": {
+                    "invalid_records_removed": int(len(invalid_df)) if invalid_df is not None else 0,
+                    "failures_by_rule": validation_report.get("failures_by_rule", {}) if validation_report else {},
+                },
+                "assignment": {
+                    "failed_services_count": _services_failed,
+                    "overtime_labors_count": int((_overtime_series > 0).sum()),
+                    "overtime_total_minutes": round(float(_overtime_series.sum()), 2),
+                },
+                "preassigned": {
+                    "infeasible_count": _preassigned_infeasible,
+                },
+                "service_durations": {
+                    "estimated_time_fallback_count": _et_fallback_count,
+                    "estimated_time_fallback_labor_ids": _et_fallback_ids,
+                },
+            }
+            save_local_warnings_report(warnings_report, output_dir=output_dir, run_id=artifact_run_id)
 
         if use_api:
             sender = ResultSender(
@@ -1113,6 +924,19 @@ def main() -> int:
         return 7
 
     log_info("pipeline_end", status="success")
+    elapsed = (datetime.now(timezone.utc) - started_at).total_seconds()
+    try:
+        finalize_run_manifest(
+            run_dir,
+            status="success",
+            duration_seconds=elapsed,
+            solver=str(settings.algorithm or "default").upper(),
+            services_total=_services_total,
+            services_planned=_services_planned,
+            services_failed=_services_failed,
+        )
+    except Exception:
+        logger.exception("run_manifest_finalization_failed")
     return 0
 
 if __name__ == "__main__":

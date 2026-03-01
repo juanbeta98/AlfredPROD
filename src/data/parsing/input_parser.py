@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Tuple
 import pandas as pd
 
 from src.data.id_normalization import normalize_id_columns
-from src.datetime_utils import normalize_datetime_columns_to_colombia
-from src.location import parse_service_location
+from src.utils.datetime_utils import normalize_datetime_columns_to_colombia
+from src.geo.location import parse_service_location
 
 logger = logging.getLogger(__name__)
 
@@ -172,6 +172,7 @@ class InputParser:
                 "labor_type": labor.get("labor_id"),
                 "labor_name": labor.get("labor_name"),
                 "labor_category": labor.get("labor_category"),
+                "estimated_time": labor.get("estimated_time"),
                 "schedule_date": labor.get("schedule_date"),
                 "payload_labor_schedule_date": labor.get("schedule_date"),
                 "labor_sequence": labor.get("labor_sequence", 1),

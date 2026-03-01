@@ -107,6 +107,37 @@ def _write_json(
     return path
 
 
+def _build_drivers_summary(payload: object) -> dict:
+    drivers = payload if isinstance(payload, list) else (payload.get("data", []) if isinstance(payload, dict) else [])
+
+    by_gender: dict[str, int] = {}
+    available_on_weekends = 0
+    on_idle = 0
+    schedules: dict[str, int] = {}
+
+    for driver in drivers:
+        gender = driver.get("gender", "UNKNOWN")
+        by_gender[gender] = by_gender.get(gender, 0) + 1
+
+        if driver.get("isAvailableOnWeekends"):
+            available_on_weekends += 1
+
+        if driver.get("idleStartDate") is not None:
+            on_idle += 1
+
+        schedule = driver.get("schedule") or {}
+        key = f"{schedule.get('startHour', '?')}-{schedule.get('endHour', '?')}"
+        schedules[key] = schedules.get(key, 0) + 1
+
+    return {
+        "total_drivers": len(drivers),
+        "by_gender": by_gender,
+        "available_on_weekends": available_on_weekends,
+        "on_idle": on_idle,
+        "schedules": dict(sorted(schedules.items(), key=lambda x: -x[1])),
+    }
+
+
 def _resolve_path(path: Path) -> Path:
     if path.is_absolute():
         return path
@@ -127,6 +158,11 @@ def main() -> int:
         "--ignore-request-filters",
         action="store_true",
         help="Ignore request.json filters and only use constants in this script.",
+    )
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        help="Reuse an existing run ID (e.g. when invoked from fetch_snapshots.py).",
     )
     parser.add_argument(
         "--dry-run",
@@ -172,10 +208,10 @@ def main() -> int:
 
     from src.config import Config  # noqa: E402
     from src.integration.client import ALFREDAPIClient  # noqa: E402
-    from src.logging_utils import set_run_id, setup_logging_context  # noqa: E402
+    from src.utils.logging_utils import set_run_id, setup_logging_context  # noqa: E402
 
     setup_logging_context()
-    run_id = str(uuid.uuid4())[:8]
+    run_id = args.run_id or str(uuid.uuid4())[:8]
     set_run_id(run_id)
     Config.configure_logging()
 
@@ -188,6 +224,12 @@ def main() -> int:
         timeout=Config.REQUEST_TIMEOUT,
         max_retries=Config.API_MAX_RETRIES,
     )
+
+    from src.io.artifact_naming import build_run_subdir, finalize_run_manifest, write_run_manifest  # noqa: E402
+
+    run_dir = OUTPUT_DIR / build_run_subdir(run_id)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    write_run_manifest(run_dir, run_id)
 
     logger.info(
         "fetching_driver_directory active=%s schedule_date=%s department=%s request_path=%s request_filters_enabled=%s",
@@ -212,6 +254,16 @@ def main() -> int:
         request_id=payload_request_id,
     )
     logger.info("snapshot_written path=%s bytes=%s", path.as_posix(), path.stat().st_size)
+
+    summary = _build_drivers_summary(payload)
+    summary_path = _write_json(
+        summary,
+        prefix="driver_directory_summary",
+        run_id=run_id,
+        request_id=payload_request_id,
+    )
+    logger.info("summary_written path=%s", summary_path.as_posix())
+    finalize_run_manifest(run_dir, status="completed")
     return 0
 
 

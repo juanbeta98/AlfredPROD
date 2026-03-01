@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from dotenv import load_dotenv
 
-from src.datetime_utils import utc_to_colombia_timestamp
+from src.utils.datetime_utils import utc_to_colombia_timestamp
 
 # Load .env file early
 load_dotenv()
@@ -86,10 +86,7 @@ class Config:
     WRITE_MODEL_SOLUTION: bool = (
         os.getenv("WRITE_MODEL_SOLUTION", "false").lower() == "true"
     )
-    INTERMEDIATE_EXPORT_BASE_DIR: str = os.getenv(
-        "INTERMEDIATE_EXPORT_BASE_DIR",
-        "./data/intermediate_exports",
-    )
+    RUNS_DIR: str = os.getenv("RUNS_DIR", "./data/runs")
     ARTIFACT_TIMEZONE: str = os.getenv("ARTIFACT_TIMEZONE", "America/Bogota")
 
     # --------------------------------------------------
@@ -147,10 +144,8 @@ class Config:
         if cls.REQUEST_TIMEOUT <= 0:
             raise RuntimeError("REQUEST_TIMEOUT must be a positive integer")
 
-        if cls.WRITE_INTERMEDIATE_DATAFRAMES and not cls.INTERMEDIATE_EXPORT_BASE_DIR.strip():
-            raise RuntimeError(
-                "WRITE_INTERMEDIATE_DATAFRAMES=true but INTERMEDIATE_EXPORT_BASE_DIR is empty"
-            )
+        if not cls.RUNS_DIR.strip():
+            raise RuntimeError("RUNS_DIR must not be empty")
 
         try:
             ZoneInfo(cls.ARTIFACT_TIMEZONE)
@@ -191,7 +186,7 @@ class Config:
         """
         Configure application-wide logging.
         """
-        from src.logging_utils import ContextFilter, setup_logging_context
+        from src.utils.logging_utils import ContextFilter, setup_logging_context
 
         setup_logging_context()
         logging.basicConfig(

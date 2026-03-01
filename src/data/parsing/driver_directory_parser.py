@@ -7,8 +7,8 @@ from typing import Any, Dict, Optional
 import pandas as pd
 
 from src.data.id_normalization import normalize_id_value
-from src.datetime_utils import utc_to_colombia_timestamp
-from src.location import parse_service_location
+from src.utils.datetime_utils import utc_to_colombia_timestamp
+from src.geo.location import parse_service_location
 
 logger = logging.getLogger(__name__)
 
@@ -85,9 +85,15 @@ class DriverDirectoryParser:
         start_hour = _normalize_time(start_hour_raw)
         end_hour = _normalize_time(end_hour_raw)
 
+        schedule_defaulted = False
         if start_hour is None:
-            logger.debug("driver_missing_start_hour driver_id=%s", driver_id)
-            return None
+            logger.warning(
+                "driver_missing_start_hour_defaulted driver_id=%s using default 09:00:00–18:00:00",
+                driver_id,
+            )
+            start_hour = "09:00:00"
+            end_hour = "18:00:00"
+            schedule_defaulted = True
 
         has_location = any(
             [
@@ -107,6 +113,7 @@ class DriverDirectoryParser:
             "longitud": lon_val,
             "start_time": start_hour,
             "end_time": end_hour,
+            "schedule_defaulted": schedule_defaulted,
             "city_id": normalize_id_value(location["city_code"]),
             "city_name": location["city_name"],
             "department_code": normalize_id_value(location["department_code"]),

@@ -41,13 +41,14 @@ class BufferReactAlgorithm(OptimizationAlgorithm):
             n_processes=params.get("n_processes"),
         )
 
-    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
         """
         Execute BUFFER_REACT algorithm.
 
         Returns:
-            results_df: DataFrame (same base as df, plus added columns)
-            metrics: algorithm metrics
+            results_df : DataFrame (same base as df, plus added columns).
+            metrics    : algorithm KPIs and timing info.
+            artifacts  : auxiliary outputs (e.g. moves_df, distance_method).
         """
         t0 = perf_counter()
 

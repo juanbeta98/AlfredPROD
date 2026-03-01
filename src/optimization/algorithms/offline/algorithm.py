@@ -1,16 +1,69 @@
 import logging
 import multiprocessing as mp
+import os
 import pandas as pd
 from dataclasses import dataclass
 from time import perf_counter
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.location import series_location_key
+from src.geo.location import series_location_key
 from src.optimization.algorithms.base import OptimizationAlgorithm
 from src.optimization.algorithms.offline.offline_algorithms import run_assignment_algorithm
+from src.optimization.common.distance_utils import batch_distance_matrix
 from src.optimization.settings.solver_settings import DEFAULT_DISTANCE_METHOD
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Worker-process shared state
+# ---------------------------------------------------------------------------
+# Large DataFrames (labors_df, directorio_df, etc.) are identical across all
+# iterations of a city run. Passing them through pool.imap/map would pickle
+# them once per task. Instead we push them into each worker once via the pool
+# initializer and only send the tiny per-iteration args over IPC.
+
+_WORKER_SHARED: Dict[str, Any] = {}
+
+
+def _init_worker(shared_args: Dict[str, Any]) -> None:
+    global _WORKER_SHARED
+    _WORKER_SHARED = shared_args
+
+
+def _run_single_iteration_shared(slim_args: Dict[str, Any]) -> Dict[str, Any]:
+    return _run_single_iteration({**_WORKER_SHARED, **slim_args})
+
+
+# Keys that are constant for every iteration within one city call.
+_SHARED_KEYS = frozenset({
+    "labors_df", "dist_dict", "directorio_df", "duraciones_df",
+    "distance_method", "alpha", "model_params", "master_data",
+})
+
+
+def _resolve_n_processes(value: Any) -> Optional[int]:
+    """
+    Normalise the n_processes param from request.json.
+
+    Accepts:
+      None / null / "None" / 0  → None  (sequential)
+      -1 / "-1"                 → os.cpu_count()  (all cores)
+      positive int or str       → int(value)
+    """
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        if value.lower() in ("none", "null", ""):
+            return None
+        try:
+            value = int(value)
+        except ValueError:
+            return None
+    value = int(value)
+    if value <= 0:
+        return os.cpu_count() if value == -1 else None
+    return value
 
 
 def _city_dist_slice(dist_dict_all: Any, city_key: Any) -> Dict[Any, Any]:
@@ -34,7 +87,10 @@ class OfflineAlgoConfig:
     """
     distance_method: str = DEFAULT_DISTANCE_METHOD
     n_processes: Optional[int] = None
+    n_warmup: int = 5
+    precompute_distances: bool = True  # use OSRM Table API to batch-compute all distances before iterations
     max_iterations_by_city: Optional[Dict[Any, int]] = None  # city_key -> max_iter
+    log_progress: bool = False  # show tqdm bar per city; set via request.json algorithm.params.log_progress
 
 
 class OfflineAlgorithm(OptimizationAlgorithm):
@@ -55,8 +111,11 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         max_iterations = params.get("max_iterations_by_city", params.get("max_iterations"))
         self.config = OfflineAlgoConfig(
             distance_method=params.get("distance_method") or DEFAULT_DISTANCE_METHOD,
-            n_processes=params.get("n_processes"),
+            n_processes=_resolve_n_processes(params.get("n_processes")),
+            n_warmup=int(params.get("n_warmup", 5)),
+            precompute_distances=bool(params.get("precompute_distances", True)),
             max_iterations_by_city=max_iterations,
+            log_progress=bool(params.get("log_progress", False)),
         )
 
     def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
@@ -93,8 +152,40 @@ class OfflineAlgorithm(OptimizationAlgorithm):
                 continue
 
             dist_dict = _city_dist_slice(dist_dict_all, city_key)
-        
+
+            # --- OSRM batch pre-computation ---
+            # Compute the full driver→labor distance matrix in one Table API call so
+            # all iterations start with a warm dist_dict and make zero OSRM HTTP calls.
+            if self.config.distance_method == "osrm" and self.config.precompute_distances:
+                _osrm_url = os.environ.get("OSRM_URL", "")
+                if _osrm_url:
+                    _driver_positions = [
+                        f"POINT ({row.longitud} {row.latitud})"
+                        for _, row in directorio_df.iterrows()
+                    ]
+                    _labor_starts = df_city["map_start_point"].dropna().unique().tolist()
+                    _labor_ends   = df_city["map_end_point"].dropna().unique().tolist()
+                    _origins      = list(dict.fromkeys(_driver_positions + _labor_starts))
+                    _destinations = list(dict.fromkeys(_labor_starts + _labor_ends))
+                    _precomp = batch_distance_matrix(_origins, _destinations, _osrm_url)
+                    if _precomp:
+                        dist_dict = {**_precomp, **dist_dict}   # existing entries take priority
+                        logger.info(
+                            "osrm_precompute city=%s origins=%d destinations=%d pairs=%d",
+                            city_key, len(_origins), len(_destinations), len(_precomp),
+                        )
+                    else:
+                        logger.warning(
+                            "osrm_precompute_failed city=%s — iterations will use per-call fallback",
+                            city_key,
+                        )
+
             max_iter = self._get_max_iter(city_key)
+            _mode = "parallel" if (self.config.n_processes or 1) > 1 else "sequential"
+            logger.info(
+                "city_iteration_start city=%s n_iter=%d mode=%s",
+                city_key, max_iter, _mode,
+            )
             iter_args = [
                 {
                     "city_key": city_key,
@@ -116,6 +207,22 @@ class OfflineAlgorithm(OptimizationAlgorithm):
             df_results = pd.DataFrame(results)
             best_idx = self._select_best_iteration(df_results)
             inc_state = df_results.iloc[best_idx]
+
+            _best_results = inc_state.get("results")
+            if isinstance(_best_results, pd.DataFrame) and not _best_results.empty:
+                _ot_series = pd.to_numeric(
+                    _best_results.get("overtime_minutes", pd.Series(dtype=float)),
+                    errors="coerce",
+                ).fillna(0)
+                _ot_count = int((_ot_series > 0).sum())
+                if _ot_count > 0:
+                    logger.warning(
+                        "best_iteration_has_overtime city=%s iter=%s overtime_labors=%s total_overtime_min=%.1f",
+                        city_key,
+                        inc_state.get("iter"),
+                        _ot_count,
+                        float(_ot_series.sum()),
+                    )
 
             postponed_labors.extend(inc_state.get("postponed_labors", []))
             run_results.append((inc_state["results"], inc_state["moves"]))
@@ -194,15 +301,90 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         Production note:
         - multiprocessing + pandas can be expensive.
         - keep this optional via config.
+        - set log_progress=True (via request.json algorithm.params) to show a tqdm bar.
+        - n_warmup sequential iterations run before the pool only when distance_method='osrm'.
         """
         if not iter_args:
             return []
 
-        if self.config.n_processes and self.config.n_processes > 1:
-            with mp.Pool(processes=self.config.n_processes) as pool:
-                return pool.map(_run_single_iteration, iter_args)
+        city_key = iter_args[0].get("city_key", "?")
 
-        return [_run_single_iteration(args) for args in iter_args]
+        if self.config.n_processes and self.config.n_processes > 1:
+            warmup_results: List[Dict[str, Any]] = []
+            warm_dist_dict: Dict[str, Any] = {}
+
+            if self.config.distance_method == "osrm":
+                # --- Warmup: run n_warmup iterations sequentially to build the distance cache ---
+                # Only needed for OSRM; haversine/manhattan compute distances in-process
+                # and never populate dist_dict, so warmup would add overhead with no benefit.
+                warmup_list = iter_args[:self.config.n_warmup]
+                remaining   = iter_args[self.config.n_warmup:]
+
+                warmup_iterable = warmup_list
+                if self.config.log_progress:
+                    from tqdm import tqdm
+                    warmup_iterable = tqdm(
+                        warmup_list,
+                        desc=f"city={city_key} [warmup]",
+                        unit="iter",
+                    )
+                for w_args in warmup_iterable:
+                    result = _run_single_iteration({**w_args, "dist_dict": warm_dist_dict})
+                    warm_dist_dict = result.get("dist_dict") or warm_dist_dict
+                    warmup_results.append(result)
+
+                if not remaining:
+                    return warmup_results
+            else:
+                remaining = iter_args
+
+            # --- Parallel: all workers start with the (possibly pre-populated) cache ---
+            shared = {k: v for k, v in iter_args[0].items() if k in _SHARED_KEYS}
+            shared["dist_dict"] = warm_dist_dict
+            slim = [
+                {k: v for k, v in args.items() if k not in _SHARED_KEYS}
+                for args in remaining
+            ]
+            chunksize = max(1, len(slim) // (self.config.n_processes * 4))
+            with mp.Pool(
+                processes=self.config.n_processes,
+                initializer=_init_worker,
+                initargs=(shared,),
+            ) as pool:
+                if self.config.log_progress:
+                    from tqdm import tqdm
+                    # chunksize=1 so tqdm ticks per completed iteration, not per chunk.
+                    # IPC overhead is negligible: slim args are tiny (iter_idx + city_key);
+                    # large shared DataFrames live in each worker's _WORKER_SHARED global.
+                    pool_results = list(tqdm(
+                        pool.imap_unordered(
+                            _run_single_iteration_shared, slim, chunksize=1,
+                        ),
+                        total=len(slim),
+                        desc=f"city={city_key}",
+                        unit="iter",
+                    ))
+                else:
+                    pool_results = pool.map(_run_single_iteration_shared, slim, chunksize=chunksize)
+
+            return warmup_results + pool_results
+
+        # --- Sequential: thread the cache forward across all iterations ---
+        accumulated_dist_dict: Dict[str, Any] = {}
+        results: List[Dict[str, Any]] = []
+
+        if self.config.log_progress:
+            from tqdm import tqdm
+            iterable = tqdm(iter_args, desc=f"city={city_key}", unit="iter")
+        else:
+            iterable = iter_args
+
+        for args in iterable:
+            result = _run_single_iteration({**args, "dist_dict": accumulated_dist_dict})
+            accumulated_dist_dict = result.get("dist_dict") or accumulated_dist_dict
+            results.append(result)
+
+        return results
 
     def _select_best_iteration(self, df_results: pd.DataFrame) -> int:
         if df_results is None or df_results.empty:
@@ -289,11 +471,12 @@ def _run_single_iteration(args: Dict[str, Any]) -> Dict[str, Any]:
     day_str = args.get("day_str") or _infer_day_str(labors_df)
     city_key = args.get("city_key")
 
-    results_df, moves_df, postponed_labors = run_assignment_algorithm(
+    results_df, moves_df, postponed_labors, dist_dict_out = run_assignment_algorithm(
         labors_df=labors_df,
         day_str=day_str,
         city_key=city_key,
         dist_method=args.get("distance_method"),
+        dist_dict=args.get("dist_dict"),
         alpha=args.get("alpha", 1),
         iter_idx=args.get("iter_idx", 0),
         model_params=args.get("model_params"),
@@ -306,5 +489,6 @@ def _run_single_iteration(args: Dict[str, Any]) -> Dict[str, Any]:
         "results": results_df,
         "moves": moves_df,
         "postponed_labors": postponed_labors,
+        "dist_dict": dist_dict_out,
         "success": True,
     }

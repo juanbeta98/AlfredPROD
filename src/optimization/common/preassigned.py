@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 
-from src.datetime_utils import normalize_datetime_columns_to_colombia
-from src.location import series_location_key
+from src.utils.datetime_utils import normalize_datetime_columns_to_colombia
+from src.geo.location import series_location_key
 
 logger = logging.getLogger(__name__)
 
@@ -316,12 +316,24 @@ def _apply_payload_schedule_fallback(
                 end_ts = start_ts + timedelta(minutes=duration_min)
                 assigned_df.at[idx, "dist_km"] = 0.0 if pd.isna(dist_km) else float(dist_km)
             else:
-                duration_min = _nontransport_duration(
-                    duraciones_df=duraciones_df,
-                    city=city_key,
-                    labor_type=row.get("labor_type"),
-                    fallback_min=tiempo_other,
-                )
+                est_time = row.get("estimated_time")
+                if est_time is not None and pd.notna(est_time):
+                    duration_min = float(est_time)
+                else:
+                    duration_min = _nontransport_duration(
+                        duraciones_df=duraciones_df,
+                        city=city_key,
+                        labor_type=row.get("labor_type"),
+                        fallback_min=tiempo_other,
+                    )
+                    _mark_warning(
+                        assigned_df, idx,
+                        warning_code="estimated_time_fallback",
+                        detail=(
+                            f"estimated_time missing for labor_type={row.get('labor_type')!r}; "
+                            f"used duraciones fallback ({duration_min:.1f} min)."
+                        ),
+                    )
                 end_ts = start_ts + timedelta(minutes=duration_min)
                 if pd.isna(assigned_df.at[idx, "dist_km"]):
                     assigned_df.at[idx, "dist_km"] = 0.0
@@ -375,7 +387,7 @@ def build_preassigned_state(
     if "schedule_date" not in assigned_df.columns:
         return _finalize_preassigned_df(assigned_df), unassigned_df, pd.DataFrame()
 
-    from src.optimization.algorithms.offline.offline_algorithms import build_driver_movements
+    from src.optimization.common.movements import build_driver_movements
 
     moves_parts = []
     assigned_for_group = assigned_df.dropna(subset=["schedule_date"]).copy()
@@ -484,7 +496,7 @@ def reconstruct_preassigned_state(
     assigned_df = _initialize_preassigned_diagnostics(assigned_df)
 
     from src.optimization.algorithms.offline.offline_algorithms import assign_task_to_driver, init_drivers
-    from src.optimization.algorithms.offline.offline_algorithms import build_driver_movements
+    from src.optimization.common.movements import build_driver_movements
     from src.optimization.common.distance_utils import distance
     from src.optimization.common.utils import compute_workday_end
 
@@ -696,12 +708,24 @@ def reconstruct_preassigned_state(
                 else:
                     astart = sched
 
-                duration_min = _nontransport_duration(
-                    duraciones_df=duraciones_df,
-                    city=city_key,
-                    labor_type=row.get("labor_type"),
-                    fallback_min=tiempo_other,
-                )
+                est_time = row.get("estimated_time")
+                if est_time is not None and pd.notna(est_time):
+                    duration_min = float(est_time)
+                else:
+                    duration_min = _nontransport_duration(
+                        duraciones_df=duraciones_df,
+                        city=city_key,
+                        labor_type=row.get("labor_type"),
+                        fallback_min=tiempo_other,
+                    )
+                    _mark_warning(
+                        assigned_df, idx,
+                        warning_code="estimated_time_fallback",
+                        detail=(
+                            f"estimated_time missing for labor_type={row.get('labor_type')!r}; "
+                            f"used duraciones fallback ({duration_min:.1f} min)."
+                        ),
+                    )
 
                 aend = astart + timedelta(minutes=duration_min)
                 assigned_df.loc[idx, "actual_start"] = astart
@@ -763,6 +787,39 @@ def reconstruct_preassigned_state(
 
     _log_preassigned_reconstruction_summary(metrics)
     return _finalize_preassigned_df(assigned_df), unassigned_df, moves_df, metrics
+
+
+def _prepare_service_rows_for_reassignment(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None or df.empty:
+        return pd.DataFrame()
+
+    rows = df.copy()
+    if "original_assigned_driver" not in rows.columns:
+        rows["original_assigned_driver"] = rows.get("assigned_driver")
+    else:
+        missing_original = rows["original_assigned_driver"].isna()
+        rows.loc[missing_original, "original_assigned_driver"] = rows.loc[missing_original, "assigned_driver"]
+
+    rows["preassignment_infeasible_detected"] = rows.get("is_infeasible", False).fillna(False)
+    rows["preassignment_infeasibility_cause_code"] = rows.get("infeasibility_cause_code")
+    rows["preassignment_infeasibility_cause_detail"] = rows.get("infeasibility_cause_detail")
+    rows["preassignment_warning_detected"] = rows.get("is_warning", False).fillna(False)
+    rows["preassignment_warning_code"] = rows.get("warning_code")
+    rows["preassignment_warning_detail"] = rows.get("warning_detail")
+
+    rows["reassignment_candidate"] = True
+    rows["reassignment_priority"] = 1
+    rows["assigned_driver"] = pd.NA
+    rows["actual_start"] = pd.NaT
+    rows["actual_end"] = pd.NaT
+    rows["actual_status"] = pd.NA
+    rows["is_infeasible"] = False
+    rows["infeasibility_cause_code"] = None
+    rows["infeasibility_cause_detail"] = None
+    rows["is_warning"] = False
+    rows["warning_code"] = None
+    rows["warning_detail"] = None
+    return rows
 
 
 def _nontransport_duration(

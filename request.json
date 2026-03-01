@@ -2,10 +2,14 @@
   "request_id": "sim-0001",
   "filters": {
     "department": "25",
-    "start_date": "2026-02-19T00:00:00-05:00",
-    "end_date": "2026-02-27T23:59:59-05:00"
+    "start_date": "2026-02-18T00:00:00-00:00",
+    "end_date": "2026-02-18T23:59:59-00:00"
   },
   "algorithm": {
-    "name": "OFFLINE"
+    "name": "OFFLINE",
+    "params": {
+      "n_processes": -1,
+      "log_progress": true
+    }
   }
 }

@@ -17,18 +17,22 @@ class OptimizationSettings:
     # max_iterations: int = 1000
     max_iterations: dict[str, int] = field(
         default_factory=lambda: {
-            "149": 1000,
-            "1": 600,
-            "1004": 600,
-            "126": 150,
-            "150": 150,
-            "844": 150,
-            "830": 150,
+            "25": 5000,  # Cundinamarca (Bogotá)
+            "5":  2000,   # Antioquia (Medellín)
+            "76": 2000,   # Valle del Cauca (Cali)
+            "8":  500,    # Atlántico (Barranquilla)
+            "13": 500,    # Bolívar (Cartagena)
+            "68": 500,    # Santander (Bucaramanga)
+            "66": 500,    # Risaralda (Pereira)
         }
     )
 
     # execution controls
     n_processes: Optional[int] = None
+    # warmup iterations run sequentially before the parallel pool to pre-populate dist_dict
+    n_warmup: int = 1
+    # pre-compute the full driver→labor distance matrix via OSRM Table API before iterations
+    precompute_distances: bool = True
 
     # shared model parameters (timings, speeds, etc.)
     model_params: ModelParams = field(default_factory=ModelParams)
@@ -47,6 +51,8 @@ class OptimizationSettings:
             "distance_method": self.distance_method,
             "max_iterations": self.max_iterations,
             "n_processes": self.n_processes,
+            "n_warmup": self.n_warmup,
+            "precompute_distances": self.precompute_distances,
             "model_params": self.model_params,
             "master_data": self.master_data,
         }

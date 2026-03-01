@@ -22,5 +22,13 @@ class OptimizationAlgorithm(ABC):
         self.params: Dict[str, Any] = params or {}
 
     @abstractmethod
-    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def solve(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any], Dict[str, Any]]:
+        """
+        Execute the algorithm.
+
+        Returns:
+            results_df : DataFrame of processed labors.
+            metrics    : algorithm KPIs and timing info.
+            artifacts  : auxiliary outputs (e.g. moves_df, distance_method).
+        """
         raise NotImplementedError
