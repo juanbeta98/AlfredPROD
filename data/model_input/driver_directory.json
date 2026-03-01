@@ -41,7 +41,7 @@
       "startHour": "07:00:00",
       "endHour": "16:00:00"
     },
-    "isAvailableOnWeekends": false,
+    "isAvailableOnWeekends": true,
     "idleStartDate": null,
     "idleEndDate": null
   },
@@ -133,7 +133,7 @@
       "startHour": "08:00:00",
       "endHour": "20:00:00"
     },
-    "isAvailableOnWeekends": true,
+    "isAvailableOnWeekends": false,
     "idleStartDate": null,
     "idleEndDate": null
   },
@@ -179,7 +179,7 @@
       "startHour": "08:00:00",
       "endHour": "20:00:00"
     },
-    "isAvailableOnWeekends": false,
+    "isAvailableOnWeekends": true,
     "idleStartDate": "2025-12-29",
     "idleEndDate": "2026-01-17"
   },
@@ -271,7 +271,7 @@
       "startHour": "08:00:00",
       "endHour": "20:00:00"
     },
-    "isAvailableOnWeekends": true,
+    "isAvailableOnWeekends": false,
     "idleStartDate": "2025-12-22",
     "idleEndDate": "2026-01-03"
   },
@@ -317,239 +317,9 @@
       "startHour": "08:00:00",
       "endHour": "20:00:00"
     },
-    "isAvailableOnWeekends": false,
+    "isAvailableOnWeekends": true,
     "idleStartDate": "2026-03-12",
     "idleEndDate": "2026-03-18"
-  },
-  {
-    "id": 3214,
-    "uuid": "c89d76f9-a2ae-416a-acef-0f792e8119e2",
-    "idNumber": "91102386",
-    "idType": "CC",
-    "firstName": "Julio Cesar",
-    "lastName": "Parra*",
-    "email": "jucepa27@hotmail.com",
-    "phoneNumber": "3008124962",
-    "username": "jucepa27@hotmail.com",
-    "gender": "MALE",
-    "address": {
-      "id": 6489,
-      "uuid": "365362e2-79d3-4c0f-9df3-b68df0b0f548",
-      "name": "Casa",
-      "address": "Carrera 46 # 152 - 29",
-      "addressDetail": "Bloque 9 Apto 236",
-      "point": {
-        "longitude": -74.0502413,
-        "latitude": 4.7362323
-      },
-      "city": {
-        "id": 149,
-        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
-        "name": "CUNDINAMARCA-BOGOTA D.C.",
-        "data": {
-          "city_code": 1,
-          "city_name": "BOGOTA Y ALREDEDORES",
-          "department_code": 25,
-          "department_name": "CUNDINAMARCA"
-        },
-        "point": {
-          "longitude": -74.071914974205,
-          "latitude": 4.708620187207246
-        },
-        "hasAlfred": null
-      }
-    },
-    "schedule": {
-      "startHour": "07:00:00",
-      "endHour": "17:00:00"
-    },
-    "isAvailableOnWeekends": false,
-    "idleStartDate": "2025-12-06",
-    "idleEndDate": "2025-12-09"
-  },
-  {
-    "id": 2331,
-    "uuid": "8044ebfe-6705-4b4c-8837-c1dc623dd047",
-    "idNumber": "79214621",
-    "idType": "CC",
-    "firstName": "Wilson",
-    "lastName": "Socha Cantor *",
-    "email": "wilsonsocha2021@gmail.com",
-    "phoneNumber": "3245785428",
-    "username": "wilsonsocha2021@gmail.com",
-    "gender": "MALE",
-    "address": {
-      "id": 56572,
-      "uuid": "8606aa54-935b-4477-b51c-d07428c6bed2",
-      "name": "Casa",
-      "address": "Carrera 18m # 10 - 51",
-      "addressDetail": "SOACHA",
-      "point": {
-        "longitude": -74.2240796,
-        "latitude": 4.5898388
-      },
-      "city": {
-        "id": 149,
-        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
-        "name": "CUNDINAMARCA-BOGOTA D.C.",
-        "data": {
-          "city_code": 1,
-          "city_name": "BOGOTA Y ALREDEDORES",
-          "department_code": 25,
-          "department_name": "CUNDINAMARCA"
-        },
-        "point": {
-          "longitude": -74.071914974205,
-          "latitude": 4.708620187207246
-        },
-        "hasAlfred": null
-      }
-    },
-    "schedule": {
-      "startHour": "07:00:00",
-      "endHour": "17:00:00"
-    },
-    "isAvailableOnWeekends": false,
-    "idleStartDate": null,
-    "idleEndDate": null
-  },
-  {
-    "id": 2036,
-    "uuid": "3627232a-8120-467e-95e1-698791513451",
-    "idNumber": "79654842",
-    "idType": "CC",
-    "firstName": "Pedro",
-    "lastName": "Callejas Rincon*",
-    "email": "pcallejasrincon@gmail.com",
-    "phoneNumber": null,
-    "username": "pcallejasrincon@gmail.com",
-    "gender": "MALE",
-    "address": {
-      "id": 165848,
-      "uuid": "acfc0db0-3f97-4ad4-beb4-a7cf8a8f684f",
-      "name": "Casa",
-      "address": "carrera 81a #58c Sur-46 Interior 1 apartamento 502",
-      "addressDetail": null,
-      "point": {
-        "longitude": -74.18195709999999,
-        "latitude": 4.6139142
-      },
-      "city": {
-        "id": 149,
-        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
-        "name": "CUNDINAMARCA-BOGOTA D.C.",
-        "data": {
-          "city_code": 1,
-          "city_name": "BOGOTA Y ALREDEDORES",
-          "department_code": 25,
-          "department_name": "CUNDINAMARCA"
-        },
-        "point": {
-          "longitude": -74.071914974205,
-          "latitude": 4.708620187207246
-        },
-        "hasAlfred": null
-      }
-    },
-    "schedule": {
-      "startHour": "08:00:00",
-      "endHour": "20:00:00"
-    },
-    "isAvailableOnWeekends": false,
-    "idleStartDate": "2026-02-10",
-    "idleEndDate": "2026-02-12"
-  },
-  {
-    "id": 719,
-    "uuid": "e515b2bb-4b74-4e4a-aaad-44fc2c0e27bf",
-    "idNumber": "79709452",
-    "idType": "CC",
-    "firstName": "Jorge",
-    "lastName": "Cortes Rojas",
-    "email": "yoryi101010@hotmail.com",
-    "phoneNumber": "3118485646",
-    "username": "yoryi101010@hotmail.com",
-    "gender": "MALE",
-    "address": {
-      "id": 9575,
-      "uuid": "862b3d71-645b-47ea-bce4-7b19f5018e5d",
-      "name": "Apartamento",
-      "address": "Calle 39 sur # 72m - 26 Bloque 4 Apto 403",
-      "addressDetail": null,
-      "point": {
-        "longitude": -74.1474839,
-        "latitude": 4.6118768
-      },
-      "city": {
-        "id": 149,
-        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
-        "name": "CUNDINAMARCA-BOGOTA D.C.",
-        "data": {
-          "city_code": 1,
-          "city_name": "BOGOTA Y ALREDEDORES",
-          "department_code": 25,
-          "department_name": "CUNDINAMARCA"
-        },
-        "point": {
-          "longitude": -74.071914974205,
-          "latitude": 4.708620187207246
-        },
-        "hasAlfred": null
-      }
-    },
-    "schedule": {
-      "startHour": "07:00:00",
-      "endHour": "17:00:00"
-    },
-    "isAvailableOnWeekends": true,
-    "idleStartDate": "2026-01-05",
-    "idleEndDate": "2026-01-17"
-  },
-  {
-    "id": 211,
-    "uuid": "a2a04468-68d5-473e-a8a5-8acaa6fc5f8d",
-    "idNumber": "79623259",
-    "idType": "CC",
-    "firstName": "Ancisar",
-    "lastName": "Echavarria",
-    "email": "ancisar2873@hotmail.com",
-    "phoneNumber": "3103265671",
-    "username": "ancisar2873@hotmail.com",
-    "gender": "MALE",
-    "address": {
-      "id": 56465,
-      "uuid": "1a68cc9f-8cf5-40df-bb92-d04c91e95953",
-      "name": "Casa",
-      "address": "Calle 130c # 90 - 10",
-      "addressDetail": null,
-      "point": {
-        "longitude": -74.0877144,
-        "latitude": 4.7271318
-      },
-      "city": {
-        "id": 149,
-        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
-        "name": "CUNDINAMARCA-BOGOTA D.C.",
-        "data": {
-          "city_code": 1,
-          "city_name": "BOGOTA Y ALREDEDORES",
-          "department_code": 25,
-          "department_name": "CUNDINAMARCA"
-        },
-        "point": {
-          "longitude": -74.071914974205,
-          "latitude": 4.708620187207246
-        },
-        "hasAlfred": null
-      }
-    },
-    "schedule": {
-      "startHour": "07:00:00",
-      "endHour": "17:00:00"
-    },
-    "isAvailableOnWeekends": true,
-    "idleStartDate": "2026-02-16",
-    "idleEndDate": "2026-02-16"
   },
   {
     "id": 10451,
@@ -596,5 +366,235 @@
     "isAvailableOnWeekends": false,
     "idleStartDate": "2026-02-14",
     "idleEndDate": "2026-02-14"
+  },
+  {
+    "id": 3214,
+    "uuid": "c89d76f9-a2ae-416a-acef-0f792e8119e2",
+    "idNumber": "91102386",
+    "idType": "CC",
+    "firstName": "Julio Cesar",
+    "lastName": "Parra*",
+    "email": "jucepa27@hotmail.com",
+    "phoneNumber": "3008124962",
+    "username": "jucepa27@hotmail.com",
+    "gender": "MALE",
+    "address": {
+      "id": 6489,
+      "uuid": "365362e2-79d3-4c0f-9df3-b68df0b0f548",
+      "name": "Casa",
+      "address": "Carrera 46 # 152 - 29",
+      "addressDetail": "Bloque 9 Apto 236",
+      "point": {
+        "longitude": -74.0502413,
+        "latitude": 4.7362323
+      },
+      "city": {
+        "id": 149,
+        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
+        "name": "CUNDINAMARCA-BOGOTA D.C.",
+        "data": {
+          "city_code": 1,
+          "city_name": "BOGOTA Y ALREDEDORES",
+          "department_code": 25,
+          "department_name": "CUNDINAMARCA"
+        },
+        "point": {
+          "longitude": -74.071914974205,
+          "latitude": 4.708620187207246
+        },
+        "hasAlfred": null
+      }
+    },
+    "schedule": {
+      "startHour": "07:00:00",
+      "endHour": "17:00:00"
+    },
+    "isAvailableOnWeekends": true,
+    "idleStartDate": "2025-12-06",
+    "idleEndDate": "2025-12-09"
+  },
+  {
+    "id": 2331,
+    "uuid": "8044ebfe-6705-4b4c-8837-c1dc623dd047",
+    "idNumber": "79214621",
+    "idType": "CC",
+    "firstName": "Wilson",
+    "lastName": "Socha Cantor *",
+    "email": "wilsonsocha2021@gmail.com",
+    "phoneNumber": "3245785428",
+    "username": "wilsonsocha2021@gmail.com",
+    "gender": "MALE",
+    "address": {
+      "id": 56572,
+      "uuid": "8606aa54-935b-4477-b51c-d07428c6bed2",
+      "name": "Casa",
+      "address": "Carrera 18m # 10 - 51",
+      "addressDetail": "SOACHA",
+      "point": {
+        "longitude": -74.2240796,
+        "latitude": 4.5898388
+      },
+      "city": {
+        "id": 149,
+        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
+        "name": "CUNDINAMARCA-BOGOTA D.C.",
+        "data": {
+          "city_code": 1,
+          "city_name": "BOGOTA Y ALREDEDORES",
+          "department_code": 25,
+          "department_name": "CUNDINAMARCA"
+        },
+        "point": {
+          "longitude": -74.071914974205,
+          "latitude": 4.708620187207246
+        },
+        "hasAlfred": null
+      }
+    },
+    "schedule": {
+      "startHour": "07:00:00",
+      "endHour": "17:00:00"
+    },
+    "isAvailableOnWeekends": true,
+    "idleStartDate": null,
+    "idleEndDate": null
+  },
+  {
+    "id": 2036,
+    "uuid": "3627232a-8120-467e-95e1-698791513451",
+    "idNumber": "79654842",
+    "idType": "CC",
+    "firstName": "Pedro",
+    "lastName": "Callejas Rincon*",
+    "email": "pcallejasrincon@gmail.com",
+    "phoneNumber": null,
+    "username": "pcallejasrincon@gmail.com",
+    "gender": "MALE",
+    "address": {
+      "id": 165848,
+      "uuid": "acfc0db0-3f97-4ad4-beb4-a7cf8a8f684f",
+      "name": "Casa",
+      "address": "carrera 81a #58c Sur-46 Interior 1 apartamento 502",
+      "addressDetail": null,
+      "point": {
+        "longitude": -74.18195709999999,
+        "latitude": 4.6139142
+      },
+      "city": {
+        "id": 149,
+        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
+        "name": "CUNDINAMARCA-BOGOTA D.C.",
+        "data": {
+          "city_code": 1,
+          "city_name": "BOGOTA Y ALREDEDORES",
+          "department_code": 25,
+          "department_name": "CUNDINAMARCA"
+        },
+        "point": {
+          "longitude": -74.071914974205,
+          "latitude": 4.708620187207246
+        },
+        "hasAlfred": null
+      }
+    },
+    "schedule": {
+      "startHour": "08:00:00",
+      "endHour": "20:00:00"
+    },
+    "isAvailableOnWeekends": true,
+    "idleStartDate": "2026-02-10",
+    "idleEndDate": "2026-02-12"
+  },
+  {
+    "id": 719,
+    "uuid": "e515b2bb-4b74-4e4a-aaad-44fc2c0e27bf",
+    "idNumber": "79709452",
+    "idType": "CC",
+    "firstName": "Jorge",
+    "lastName": "Cortes Rojas",
+    "email": "yoryi101010@hotmail.com",
+    "phoneNumber": "3118485646",
+    "username": "yoryi101010@hotmail.com",
+    "gender": "MALE",
+    "address": {
+      "id": 9575,
+      "uuid": "862b3d71-645b-47ea-bce4-7b19f5018e5d",
+      "name": "Apartamento",
+      "address": "Calle 39 sur # 72m - 26 Bloque 4 Apto 403",
+      "addressDetail": null,
+      "point": {
+        "longitude": -74.1474839,
+        "latitude": 4.6118768
+      },
+      "city": {
+        "id": 149,
+        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
+        "name": "CUNDINAMARCA-BOGOTA D.C.",
+        "data": {
+          "city_code": 1,
+          "city_name": "BOGOTA Y ALREDEDORES",
+          "department_code": 25,
+          "department_name": "CUNDINAMARCA"
+        },
+        "point": {
+          "longitude": -74.071914974205,
+          "latitude": 4.708620187207246
+        },
+        "hasAlfred": null
+      }
+    },
+    "schedule": {
+      "startHour": "07:00:00",
+      "endHour": "17:00:00"
+    },
+    "isAvailableOnWeekends": false,
+    "idleStartDate": "2026-01-05",
+    "idleEndDate": "2026-01-17"
+  },
+  {
+    "id": 211,
+    "uuid": "a2a04468-68d5-473e-a8a5-8acaa6fc5f8d",
+    "idNumber": "79623259",
+    "idType": "CC",
+    "firstName": "Ancisar",
+    "lastName": "Echavarria",
+    "email": "ancisar2873@hotmail.com",
+    "phoneNumber": "3103265671",
+    "username": "ancisar2873@hotmail.com",
+    "gender": "MALE",
+    "address": {
+      "id": 56465,
+      "uuid": "1a68cc9f-8cf5-40df-bb92-d04c91e95953",
+      "name": "Casa",
+      "address": "Calle 130c # 90 - 10",
+      "addressDetail": null,
+      "point": {
+        "longitude": -74.0877144,
+        "latitude": 4.7271318
+      },
+      "city": {
+        "id": 149,
+        "uuid": "79d88e57-bcc5-4d31-99eb-d8902e500149",
+        "name": "CUNDINAMARCA-BOGOTA D.C.",
+        "data": {
+          "city_code": 1,
+          "city_name": "BOGOTA Y ALREDEDORES",
+          "department_code": 25,
+          "department_name": "CUNDINAMARCA"
+        },
+        "point": {
+          "longitude": -74.071914974205,
+          "latitude": 4.708620187207246
+        },
+        "hasAlfred": null
+      }
+    },
+    "schedule": {
+      "startHour": "07:00:00",
+      "endHour": "17:00:00"
+    },
+    "isAvailableOnWeekends": false,
+    "idleStartDate": "2026-02-16",
+    "idleEndDate": "2026-02-16"
   }
 ]

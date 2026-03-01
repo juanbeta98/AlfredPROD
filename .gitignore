@@ -1,9 +1,8 @@
-data/model_output
 data/api_snapshots
-data/data_exploration
 data/runs
-tests
+tests/
 experiments/
+.DS_Store
 
 # Ignore Python bytecode
 __pycache__/

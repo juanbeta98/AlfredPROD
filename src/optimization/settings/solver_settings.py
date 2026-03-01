@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from .model_params import ModelParams
 from .master_data import MasterDataParams
 
-DEFAULT_DISTANCE_METHOD = "haversine"
+DEFAULT_DISTANCE_METHOD = "osrm"
 
 
 @dataclass(frozen=True)

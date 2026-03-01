@@ -28,7 +28,6 @@ scripts/mrun python -m pip install -r requirements.txt
 ```bash
 export USE_API=false
 export LOCAL_INPUT_FILE=./data/model_input/input.csv
-export LOCAL_OUTPUT_DIR=./data/model_output
 export WRITE_MODEL_SOLUTION=true
 python main.py
 ```
@@ -240,12 +239,11 @@ export WRITE_VALIDATION_REPORTS=true
 Optional intermediate debug exports:
 ```bash
 export WRITE_INTERMEDIATE_DATAFRAMES=true
-export INTERMEDIATE_EXPORT_BASE_DIR=./data/intermediate_exports
 ```
-When enabled, each run writes:
-- `<base_dir>/run-<run_id>/input_df__ts-<timestamp>[__req-<request_id>].csv`
-- `<base_dir>/run-<run_id>/preassigned_df__ts-<timestamp>[__req-<request_id>].csv`
-- `<base_dir>/run-<run_id>/driver_directory__ts-<timestamp>[__req-<request_id>].csv`
+When enabled, each run writes under `data/runs/run-<run_id>/intermediate/`:
+- `input_df__ts-<timestamp>[__req-<request_id>].csv`
+- `preassigned_df__ts-<timestamp>[__req-<request_id>].csv`
+- `driver_directory__ts-<timestamp>[__req-<request_id>].csv`
 
 `input_df` export reflects the dataframe right before solver creation (after validation and after preassigned split).
 
@@ -313,11 +311,8 @@ Filters:
 - `END_DATE` (ISO datetime)
 
 Local mode:
-- `LOCAL_INPUT_DIR`
 - `LOCAL_INPUT_FILE`
 - `LOCAL_DRIVER_DIRECTORY_FILE`
-- `LOCAL_OUTPUT_DIR`
-- `LOCAL_OUTPUT_FILE`
 
 Execution:
 - `REQUEST_TIMEOUT`
@@ -325,7 +320,6 @@ Execution:
 - `LOG_LEVEL`
 - `WRITE_VALIDATION_REPORTS`
 - `WRITE_INTERMEDIATE_DATAFRAMES` (true/false)
-- `INTERMEDIATE_EXPORT_BASE_DIR` (default `./data/intermediate_exports`)
 - `WRITE_MODEL_SOLUTION` (true/false; writes solver CSV + formatted payload JSON)
 
 Backward compatibility:

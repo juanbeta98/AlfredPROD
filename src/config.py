@@ -92,27 +92,11 @@ class Config:
     # --------------------------------------------------
     # Local Development
     # --------------------------------------------------
-    LOCAL_INPUT_DIR: str = os.getenv("LOCAL_INPUT_DIR", "./data/model_input")
-    LOCAL_INPUT_FILE: str = os.getenv("LOCAL_INPUT_FILE", "input.csv")
+    LOCAL_INPUT_FILE: str = os.getenv("LOCAL_INPUT_FILE", "./data/model_input/input.csv")
+    LOCAL_INPUT_PATH: str = LOCAL_INPUT_FILE
     LOCAL_DRIVER_DIRECTORY_FILE: str = os.getenv(
         "LOCAL_DRIVER_DIRECTORY_FILE",
         "./data/model_input/driver_directory.csv",
-    )
-    LOCAL_OUTPUT_DIR: str = os.getenv("LOCAL_OUTPUT_DIR", "./data/model_output")
-    LOCAL_OUTPUT_FILE: str = os.getenv("LOCAL_OUTPUT_FILE", "output.csv")
-    _LOCAL_DATA_PATH_LEGACY: str | None = os.getenv("LOCAL_DATA_PATH")
-    _LOCAL_OUTPUT_PATH_LEGACY: str | None = os.getenv("LOCAL_OUTPUT_PATH")
-    _LOCAL_INPUT_FILE_HAS_DIR: bool = bool(os.path.dirname(LOCAL_INPUT_FILE))
-    _LOCAL_OUTPUT_FILE_HAS_DIR: bool = bool(os.path.dirname(LOCAL_OUTPUT_FILE))
-    LOCAL_INPUT_PATH: str = _LOCAL_DATA_PATH_LEGACY or (
-        LOCAL_INPUT_FILE
-        if os.path.isabs(LOCAL_INPUT_FILE) or _LOCAL_INPUT_FILE_HAS_DIR
-        else os.path.join(LOCAL_INPUT_DIR, LOCAL_INPUT_FILE)
-    )
-    LOCAL_OUTPUT_PATH: str = _LOCAL_OUTPUT_PATH_LEGACY or (
-        LOCAL_OUTPUT_FILE
-        if os.path.isabs(LOCAL_OUTPUT_FILE) or _LOCAL_OUTPUT_FILE_HAS_DIR
-        else os.path.join(LOCAL_OUTPUT_DIR, LOCAL_OUTPUT_FILE)
     )
     DRIVER_DIRECTORY_FALLBACK_PATH: str = os.getenv(
         "DRIVER_DIRECTORY_FALLBACK_PATH",
