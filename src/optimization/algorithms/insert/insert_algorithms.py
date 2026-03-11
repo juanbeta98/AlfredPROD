@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from ...common.distance_utils import distance
+from ...common.distance_utils import distance, parse_point, travel_time_minutes
 from ...common.movements import (
     _extract_driver_key,
     _filter_drivers_by_city,
@@ -42,6 +42,26 @@ from ...common.movements import (
 logger = logging.getLogger(__name__)
 
 DistDict = Dict[str, Any] | None
+
+
+# ===========================================================================
+# HELPERS
+# ===========================================================================
+
+def _append_labor_row(labors_df: pd.DataFrame, new_row: pd.Series) -> pd.DataFrame:
+    """Append a new labor row to labors_df without triggering FutureWarning.
+
+    Builds a 1-row DataFrame aligned to labors_df columns and casts each
+    column to the parent dtype so pd.concat never sees all-NA columns with
+    mismatched dtypes.
+    """
+    row_df = pd.DataFrame([new_row]).reindex(columns=labors_df.columns)
+    for col, dtype in labors_df.dtypes.items():
+        try:
+            row_df[col] = row_df[col].astype(dtype)
+        except (TypeError, ValueError):
+            pass
+    return pd.concat([labors_df, row_df], ignore_index=True)
 
 
 # ===========================================================================
@@ -114,17 +134,25 @@ def _compute_service_end_time(
     vehicle_speed: float,
     prep_time: float,
     finish_time: float,
+    time_method: str = "speed_based",
+    time_dict: Optional[Dict[Any, Any]] = None,
     **kwargs,
 ) -> Tuple:
     """Return (finish_time, end_pos, total_duration_min, labor_distance_km)."""
-    labor_dist, _ = distance(
+    labor_dist, t_min, _, _ = travel_time_minutes(
         start_pos, end_pos,
-        method=distance_method, dist_dict=dist_dict, **kwargs,
+        speed_kmh=vehicle_speed,
+        time_method=time_method,
+        dist_method=distance_method,
+        dist_dict=dist_dict or {},
+        time_dict=time_dict or {},
+        **kwargs,
     )
     if labor_dist is None or (isinstance(labor_dist, float) and math.isnan(labor_dist)):
         labor_dist = 0.0
-    travel_min = labor_dist / vehicle_speed * 60
-    total_duration = prep_time + travel_min + finish_time
+    if t_min is None or (isinstance(t_min, float) and math.isnan(t_min)):
+        t_min = 0.0
+    total_duration = prep_time + t_min + finish_time
     return arrival_time + timedelta(minutes=total_duration), end_pos, total_duration, labor_dist
 
 
@@ -480,7 +508,12 @@ def _is_creation_before_first_labor(
     if home_pos is None:
         return False
     first_start = str(moves_driver_df.iloc[0]["start_point"]).strip()
-    return first_start == home_pos.strip()
+    # Compare as coordinates to avoid WKT format fragility (e.g. "POINT(x y)" vs "POINT (x y)")
+    h_lon, h_lat = parse_point(home_pos)
+    f_lon, f_lat = parse_point(first_start)
+    if math.isnan(h_lon) or math.isnan(f_lon):
+        return False
+    return abs(h_lon - f_lon) < 1e-6 and abs(h_lat - f_lat) < 1e-6
 
 
 def _evaluate_and_execute_insertion_before_first_labor(
@@ -566,8 +599,8 @@ def _evaluate_and_execute_insertion_before_first_labor(
         moves_driver_df=moves_driver_df,
         driver=driver,
         start_idx=2,
-        start_time=next_real_arrival,
-        start_pos=next_labor["start_point"],
+        start_time=next_finish,       # state AFTER first downstream labor completes
+        start_pos=next_end_pos,       # position AFTER first downstream labor completes
         previous_start_time=next_labor["actual_end"],
         distance_method=distance_method,
         dist_dict=dist_dict,
@@ -1042,9 +1075,7 @@ def commit_new_labor_insertion(
 
     # Remove any pre-existing row then append (Fixed: no double-filter bug)
     labors_df_updated = labors_df_updated[labors_df_updated["labor_id"] != new_labor_id]
-    labors_df_updated = pd.concat(
-        [labors_df_updated, pd.DataFrame([new_labor_row])], ignore_index=True
-    )
+    labors_df_updated = _append_labor_row(labors_df_updated, new_labor_row)
 
     end_time = new_labor_move_row["actual_end"]
     end_pos = new_labor_move_row["end_point"]
@@ -1123,6 +1154,8 @@ def commit_labor_insertion(
     early_buffer: float,
     forced_start_time=None,
     selection_mode: str = "min_total_distance",
+    time_method: str = "speed_based",
+    time_dict: Optional[Dict[Any, Any]] = None,
     **kwargs,
 ) -> Tuple[bool, pd.DataFrame, pd.DataFrame, Optional[Any], Optional[str]]:
     """
@@ -1154,6 +1187,8 @@ def commit_labor_insertion(
             TIEMPO_GRACIA=tiempo_gracia,
             EARLY_BUFFER=early_buffer,
             forced_start_time=forced_start_time,
+            time_method=time_method,
+            time_dict=time_dict,
             **kwargs,
         )
 
@@ -1334,9 +1369,7 @@ def commit_nontransport_labor_insertion(
     new_labor_row["date"] = fecha
 
     labors_updated = labors_df[labors_df["labor_id"] != new_labor_id].copy()
-    labors_updated = pd.concat(
-        [labors_updated, pd.DataFrame([new_labor_row])], ignore_index=True
-    )
+    labors_updated = _append_labor_row(labors_updated, new_labor_row)
     return labors_updated, moves_df.copy(), new_end_time
 
 
@@ -1363,6 +1396,8 @@ def run_insertion_worker(
     early_buffer: float,
     workday_end_dt,
     duraciones_df: Optional[pd.DataFrame] = None,
+    time_method: str = "speed_based",
+    time_dict: Optional[Dict[Any, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Attempt to insert all new labors into the base schedule using a randomised
@@ -1370,8 +1405,14 @@ def run_insertion_worker(
 
     Returns a result dict with keys: valid, seed, num_inserted, dist, results, moves.
     """
-    working_labors = base_labors_df.copy()
-    working_moves = base_moves_df.copy()
+    # Guard: when base schedule has no column schema (no preassigned labors exist
+    # yet), seed the schema from new_labors_df so downstream column accesses work.
+    if "department_code" not in base_labors_df.columns:
+        working_labors = new_labors_df.iloc[:0].copy()
+        working_moves = pd.DataFrame()
+    else:
+        working_labors = base_labors_df.copy()
+        working_moves = base_moves_df.copy()
 
     # Shuffle service order by seed
     service_ids = (
@@ -1421,6 +1462,8 @@ def run_insertion_worker(
                         early_buffer=early_buffer,
                         forced_start_time=curr_end_time,
                         selection_mode="random",
+                        time_method=time_method,
+                        time_dict=time_dict,
                     )
                 )
 
@@ -1430,6 +1473,10 @@ def run_insertion_worker(
 
             else:
                 # Non-transport: schedule relative to current position
+                if curr_end_time is not None and curr_end_time > workday_end_dt:
+                    svc_ok = False
+                    break
+
                 est_time = labor.get("estimated_time")
                 if est_time is not None and pd.notna(est_time):
                     duration = float(est_time)
