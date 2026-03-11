@@ -107,6 +107,9 @@ def finalize_run_manifest(
     services_total: int = 0,
     services_planned: int = 0,
     services_failed: int = 0,
+    labors_summary: Optional[dict] = None,
+    instance_config: Optional[dict] = None,
+    algorithm_config: Optional[dict] = None,
     timezone_name: Optional[str] = None,
 ) -> Path:
     """
@@ -143,6 +146,15 @@ def finalize_run_manifest(
             "planned": services_planned,
             "failed": services_failed,
         }
+
+    if labors_summary:
+        manifest["labors"] = labors_summary
+
+    if instance_config:
+        manifest["instance"] = instance_config
+
+    if algorithm_config:
+        manifest["algorithm"] = algorithm_config
 
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     return manifest_path

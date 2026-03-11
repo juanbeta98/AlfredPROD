@@ -129,6 +129,7 @@ class InputParser:
             "state": service.get("state"),
             "created_at": service.get("created_at"),
             "service_schedule_date": service.get("schedule_date") or service.get("scheduleDate"),
+            "is_assignable": service.get("is_assignable"),
             "city_code": location["city_code"],
             "city_name": location["city_name"],
             "department_code": location["department_code"],

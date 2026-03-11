@@ -117,11 +117,8 @@ def _build_evaluation_report(
         "vt_labors_assigned": assignment["vt_labors_assigned"],
         "vt_labors_unassigned": assignment["vt_labors_unassigned"],
         "failed_labors_total": assignment["failed_labors_total"],
-        "unassigned_labors_total": assignment["unassigned_labors_total"],
         "total_labor_distance_km": distance["total_labor_distance_km"],
         "total_driver_move_distance_km": distance["total_driver_move_distance_km"],
-        "service_assignment_rate_pct": assignment["service_assignment_rate_pct"],
-        "vt_assignment_rate_pct": assignment["vt_assignment_rate_pct"],
         "utilization_without_moves_pct": utilization["system"]["utilization_without_moves_pct"],
         "utilization_with_moves_pct": utilization["system"]["utilization_with_moves_pct"],
         "driver_move_utilization_pct": utilization["system"]["driver_move_utilization_pct"],
@@ -129,7 +126,6 @@ def _build_evaluation_report(
 
     return {
         "summary": summary,
-        "assignment": assignment,
         "distance": distance,
         "time_allocation": time_allocation,
         "punctuality": punctuality,
@@ -152,16 +148,12 @@ def _empty_report() -> Dict[str, Any]:
             "vt_labors_assigned": 0,
             "vt_labors_unassigned": 0,
             "failed_labors_total": 0,
-            "unassigned_labors_total": 0,
             "total_labor_distance_km": 0.0,
             "total_driver_move_distance_km": 0.0,
-            "service_assignment_rate_pct": 0.0,
-            "vt_assignment_rate_pct": 0.0,
             "utilization_without_moves_pct": 0.0,
             "utilization_with_moves_pct": 0.0,
             "driver_move_utilization_pct": 0.0,
         },
-        "assignment": {},
         "distance": {},
         "time_allocation": {},
         "punctuality": {},
@@ -202,7 +194,6 @@ def _assignment_metrics(df: pd.DataFrame) -> Dict[str, Any]:
     services_total = int(service_key.nunique(dropna=True))
     services_unassigned_or_failed = max(services_with_vt - services_success, 0)
     failed_labors_total = int(status_series.eq("FAILED").sum())
-    unassigned_labors_total = int((~is_assigned).sum())
 
     return {
         "services_total": services_total,
@@ -216,9 +207,6 @@ def _assignment_metrics(df: pd.DataFrame) -> Dict[str, Any]:
         "vt_labors_assigned": vt_assigned,
         "vt_labors_unassigned": max(vt_total - vt_assigned, 0),
         "failed_labors_total": failed_labors_total,
-        "unassigned_labors_total": unassigned_labors_total,
-        "service_assignment_rate_pct": _pct(services_success, services_with_vt),
-        "vt_assignment_rate_pct": _pct(vt_assigned, vt_total),
     }
 
 
@@ -366,14 +354,6 @@ def _utilization_metrics(
                 "driver_move_utilization_pct": 0.0,
                 "driver_move_share_of_active_pct": 0.0,
             },
-            "driver_distribution": {
-                "utilization_without_moves_pct_avg": 0.0,
-                "utilization_without_moves_pct_p50": 0.0,
-                "utilization_without_moves_pct_p90": 0.0,
-                "utilization_with_moves_pct_avg": 0.0,
-                "utilization_with_moves_pct_p50": 0.0,
-                "utilization_with_moves_pct_p90": 0.0,
-            },
             "drivers": [],
         }
 
@@ -441,14 +421,6 @@ def _utilization_metrics(
                 "driver_move_utilization_pct": 0.0,
                 "driver_move_share_of_active_pct": 0.0,
             },
-            "driver_distribution": {
-                "utilization_without_moves_pct_avg": 0.0,
-                "utilization_without_moves_pct_p50": 0.0,
-                "utilization_without_moves_pct_p90": 0.0,
-                "utilization_with_moves_pct_avg": 0.0,
-                "utilization_with_moves_pct_p50": 0.0,
-                "utilization_with_moves_pct_p90": 0.0,
-            },
             "drivers": [],
         }
 
@@ -471,18 +443,8 @@ def _utilization_metrics(
         "driver_move_share_of_active_pct": _pct_float(move_total, active_total),
     }
 
-    distribution = {
-        "utilization_without_moves_pct_avg": _round_kpi(util_df["utilization_without_moves_pct"].mean()),
-        "utilization_without_moves_pct_p50": _round_kpi(util_df["utilization_without_moves_pct"].quantile(0.50)),
-        "utilization_without_moves_pct_p90": _round_kpi(util_df["utilization_without_moves_pct"].quantile(0.90)),
-        "utilization_with_moves_pct_avg": _round_kpi(util_df["utilization_with_moves_pct"].mean()),
-        "utilization_with_moves_pct_p50": _round_kpi(util_df["utilization_with_moves_pct"].quantile(0.50)),
-        "utilization_with_moves_pct_p90": _round_kpi(util_df["utilization_with_moves_pct"].quantile(0.90)),
-    }
-
     return {
         "system": system,
-        "driver_distribution": distribution,
         "drivers": per_driver_day,
     }
 

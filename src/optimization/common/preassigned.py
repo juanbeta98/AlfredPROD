@@ -166,41 +166,21 @@ def _split_service_level_preassigned(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd
     """
     Split labors by service-level preassignment.
 
-    A service is considered preassigned when its first labor
-    (`labor_sequence == 1`) has a non-null `assigned_driver`.
+    A service is considered preassigned when any of its labors has a
+    non-null `assigned_driver`.
     """
     if df is None or df.empty:
         return pd.DataFrame(), pd.DataFrame()
 
     if "service_id" not in df.columns:
         raise ValueError("Missing required column: service_id")
-    if "labor_sequence" not in df.columns:
-        raise ValueError("Missing required column: labor_sequence")
 
-    first_labor_df = df[df["labor_sequence"] == 1].copy()
-    if first_labor_df.empty:
-        logger.warning("preassigned_missing_first_labor_sequence rows=%s", int(len(df)))
-        return pd.DataFrame(columns=df.columns), df.copy()
-
-    services_total = int(df.loc[df["service_id"].notna(), "service_id"].nunique())
-    services_with_first = int(
-        first_labor_df.loc[first_labor_df["service_id"].notna(), "service_id"].nunique()
-    )
-    if services_with_first < services_total:
-        logger.warning(
-            "preassigned_services_missing_sequence_1 services=%s",
-            services_total - services_with_first,
-        )
-
-    # If data quality issues exist and service has repeated seq=1 rows,
-    # keep the first appearance deterministically.
-    first_labor_df = first_labor_df.drop_duplicates(subset=["service_id"], keep="first")
-
-    assigned_driver = first_labor_df.get("assigned_driver")
-    if assigned_driver is None:
+    # A service is preassigned if ANY of its labors has a non-null assigned_driver.
+    assigned_driver_col = df.get("assigned_driver")
+    if assigned_driver_col is None:
         assigned_service_ids = pd.Index([])
     else:
-        assigned_service_ids = first_labor_df.loc[assigned_driver.notna(), "service_id"]
+        assigned_service_ids = df.loc[assigned_driver_col.notna(), "service_id"].unique()
 
     assigned_mask = df["service_id"].isin(assigned_service_ids)
     assigned_df = df.loc[assigned_mask].copy()
@@ -666,7 +646,11 @@ def reconstruct_preassigned_state(
                 if pd.isna(early):
                     early = arrival
 
-                is_last = group_sorted[
+                # assign_task_to_driver uses inverted semantics: is_last_in_service=True
+                # means "has subsequent labors" (i.e. NOT last), consistent with how
+                # OFFLINE computes it via `not [...].empty`.  Pass True when there ARE
+                # subsequent labors so tiempo_finalizacion is added only to the last VT.
+                is_last = not group_sorted[
                     (group_sorted["service_id"] == service_id)
                     & (group_sorted["labor_sequence"] > row["labor_sequence"])
                 ].empty

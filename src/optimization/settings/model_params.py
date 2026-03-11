@@ -19,11 +19,13 @@ class ModelParams:
     seed: int = 10
 
     # Speeds
-    alfred_speed_kmh: float = 30.0            # driver to first point
-    vehicle_transport_speed_kmh: float = 40.0 # vehicle transport speed
+    # alfred_speed_kmh: float = 30.0            # driver to first point
+    alfred_speed_kmh: float = 20.0            # driver to first point
+    vehicle_transport_speed_kmh: float = 32 # vehicle transporsvt speed
 
     # Times (minutes)
-    tiempo_previo_min: int = 30        # minutes before schedule_date
+    tiempo_previo_min: int = 0        # minutes before schedule_date
+    # tiempo_previo_min: int = 30        # minutes before schedule_date
     tiempo_gracia_min: int = 15
     tiempo_alistar_min: int = 30
     tiempo_other_min: int = 30

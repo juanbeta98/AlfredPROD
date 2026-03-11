@@ -38,6 +38,8 @@ class OutputFormatter:
         "minutes_late_payload",
         "minutes_after_window",
         "overtime_minutes",
+        "map_start_point",
+        "map_end_point",
     )
 
     @staticmethod
@@ -129,6 +131,10 @@ class OutputFormatter:
                     "id": labor_id,
                     "schedule_date": labor_schedule_date,
                 }
+
+                labor_type_val = row.get("labor_type")
+                if not OutputFormatter._is_missing(labor_type_val):
+                    labor["labor_type"] = str(labor_type_val)
 
                 add_data = OutputFormatter._build_add_data(row)
                 if add_data is not None:

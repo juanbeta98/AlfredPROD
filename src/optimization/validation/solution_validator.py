@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from collections.abc import Iterable
+from typing import Any, cast
 
 import pandas as pd
 
@@ -20,7 +21,7 @@ DEFAULT_BLOCKING_CHECKS = frozenset(
 )
 
 
-def _city_dist_slice(dist_dict: Optional[Dict[Any, Any]], city_key: Any) -> Dict[Any, Any]:
+def _city_dist_slice(dist_dict: dict[Any, Any] | None, city_key: Any) -> dict[Any, Any]:
     if not isinstance(dist_dict, dict):
         return {}
     if city_key in dist_dict:
@@ -39,10 +40,12 @@ def validate_solution(
     *,
     model_params: ModelParams,
     dist_method: str = DEFAULT_DISTANCE_METHOD,
-    dist_dict: Optional[Dict[Any, Any]] = None,
+    dist_dict: dict[Any, Any] | None = None,
+    time_method: str = "speed_based",
+    time_dict: dict[Any, Any] | None = None,
     strict_time_check: bool = False,
-    blocking_checks: Optional[Iterable[str]] = None,
-) -> Tuple[Dict[str, Any], pd.DataFrame]:
+    blocking_checks: Iterable[str] | None = None,
+) -> tuple[dict[str, Any], pd.DataFrame]:
     """
     Validate solution feasibility using labors + moves.
 
@@ -50,7 +53,7 @@ def validate_solution(
         report: dict summary (JSON-serializable)
         issues_df: DataFrame of individual issues
     """
-    report: Dict[str, Any] = {}
+    report: dict[str, Any] = {}
 
     if labors_df is None or labors_df.empty:
         report.update(
@@ -86,6 +89,8 @@ def validate_solution(
         model_params=model_params,
         dist_method=dist_method,
         dist_dict=dist_dict,
+        time_method=time_method,
+        time_dict=time_dict,
         strict_time_check=strict_time_check,
     )
 
@@ -115,6 +120,7 @@ def validate_solution(
         "blocking_failed": bool(blocking_issues),
         "strict_time_check": strict_time_check,
         "dist_method": dist_method,
+        "time_method": time_method,
     }
 
     return report, issues_df
@@ -171,8 +177,9 @@ def check_driver_overlaps(
         df["date"] = df["actual_start"].dt.date
 
     df = df.dropna(subset=["assigned_driver", "actual_start", "actual_end"])
+    df = df[df["assigned_driver"].astype(str).str.strip() != ""]  # exclude unassigned (non-transport) labors
 
-    overlaps: List[Dict[str, Any]] = []
+    overlaps: list[dict[str, Any]] = []
 
     for (driver, date), g in df.groupby(["assigned_driver", "date"], group_keys=False):
         g = g.sort_values("actual_start")
@@ -210,11 +217,13 @@ def validate_moves_df(
     *,
     model_params: ModelParams,
     dist_method: str = DEFAULT_DISTANCE_METHOD,
-    dist_dict: Optional[Dict[Any, Any]] = None,
+    dist_dict: dict[Any, Any] | None = None,
+    time_method: str = "speed_based",
+    time_dict: dict[Any, Any] | None = None,
     strict_time_check: bool = True,
     dist_tol_km: float = 1e-3,
     time_tol_min: float = 1e-2,
-) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+) -> tuple[pd.DataFrame, dict[str, Any]]:
     """
     Validates the consistency of move sequences for each driver per day.
     """
@@ -224,8 +233,23 @@ def validate_moves_df(
     df["date"] = df["actual_start"].dt.date
     df = df.sort_values(["assigned_driver", "date", "actual_start"]).reset_index(drop=True)
 
-    inconsistencies: List[Dict[str, Any]] = []
-    stats: Dict[str, Any] = dict(
+    # Derive first/last VT per service to apply prep times correctly:
+    # tiempo_alistar_min → first VT only; tiempo_finalizacion_min → last VT only.
+    if "service_id" in df.columns:
+        vt_rows = df[df["labor_category"] == "VEHICLE_TRANSPORTATION"].dropna(
+            subset=["service_id", "actual_start"]
+        ).sort_values(["service_id", "actual_start"])
+        first_vt_ids: set = set(vt_rows.groupby("service_id")["labor_id"].first())
+        last_vt_ids: set = set(vt_rows.groupby("service_id")["labor_id"].last())
+    else:
+        logger.warning("validate_moves_df: 'service_id' column not found — applying full prep time to all VT labors")
+        all_vt_ids = set(df.loc[df["labor_category"] == "VEHICLE_TRANSPORTATION", "labor_id"])
+        first_vt_ids = last_vt_ids = all_vt_ids
+
+    time_dict = time_dict or {}
+
+    inconsistencies: list[dict[str, Any]] = []
+    stats: dict[str, Any] = dict(
         drivers_checked=0,
         rows_checked=0,
         pairs_checked=0,
@@ -233,27 +257,30 @@ def validate_moves_df(
     )
 
     dist_dict = dist_dict or {}
-    distance_cache: Dict[Tuple[str, str, str, str], float] = {}
+    distance_cache: dict[tuple[str, str, str, str], float] = {}
 
     for (driver, date), g in df.groupby(["assigned_driver", "date"], sort=False):
         stats["drivers_checked"] += 1
         g = g.sort_values(["actual_start", "actual_end"]).reset_index(drop=True)
 
         for i in range(len(g)):
-            row = g.loc[i]
+            row_dict: dict[str, Any] = cast(dict[str, Any], g.loc[i].to_dict())
 
-            city_key = row_location_key(row.to_dict())
+            city_key = row_location_key(row_dict)
             city_dist_dict = _city_dist_slice(dist_dict, city_key)
 
             stats["rows_checked"] += 1
-            labor_id = row.get("labor_id")
-            cat = row.get("labor_category")
-            start_pt, end_pt = row.get("start_point"), row.get("end_point")
-            reported_dist, reported_dur = row.get("distance_km"), row.get("duration_min")
-            actual_start, actual_end = row.get("actual_start"), row.get("actual_end")
+            labor_id: Any = row_dict.get("labor_id")
+            cat: str | None = row_dict.get("labor_category")
+            start_pt: str | None = row_dict.get("start_point")
+            end_pt: str | None = row_dict.get("end_point")
+            reported_dist: float | None = row_dict.get("distance_km")
+            reported_dur: float | None = row_dict.get("duration_min")
+            actual_start: Any = row_dict.get("actual_start")
+            actual_end: Any = row_dict.get("actual_end")
 
             computed_dist = None
-            if pd.notna(start_pt) and pd.notna(end_pt):
+            if start_pt is not None and end_pt is not None:
                 cache_key = (str(city_key), str(start_pt), str(end_pt), dist_method)
                 if cache_key in distance_cache:
                     computed_dist = distance_cache[cache_key]
@@ -279,7 +306,7 @@ def validate_moves_df(
                         )
                         continue
 
-            if cat == "FREE_TIME" and pd.notna(reported_dist) and abs(reported_dist) > dist_tol_km:
+            if cat == "FREE_TIME" and reported_dist is not None and abs(reported_dist) > dist_tol_km:
                 inconsistencies.append(
                     {
                         "check": "free_time_nonzero_distance",
@@ -290,23 +317,31 @@ def validate_moves_df(
                     }
                 )
 
-            if computed_dist is not None and pd.notna(reported_dur):
+            if computed_dist is not None and reported_dur is not None:
                 if cat == "DRIVER_MOVE":
                     speed_kmh = model_params.alfred_speed_kmh
-                    expected_dur_min = (computed_dist / speed_kmh) * 60
                 elif cat == "VEHICLE_TRANSPORTATION":
                     speed_kmh = model_params.vehicle_transport_speed_kmh
-                    expected_dur_min = (
-                        (computed_dist / speed_kmh) * 60
-                        + model_params.tiempo_alistar_min
-                        + model_params.tiempo_finalizacion_min
-                    )
                 else:
                     speed_kmh = model_params.alfred_speed_kmh
-                    expected_dur_min = (computed_dist / speed_kmh) * 60
+
+                # Derive travel time using the same method the solver used.
+                # For osrm_times: look up actual OSRM travel time from time_dict;
+                # fall back to speed-based if the pair is not cached.
+                if time_method == "osrm_times" and cat == "VEHICLE_TRANSPORTATION" and (start_pt, end_pt) in time_dict:
+                    t_min = time_dict[(start_pt, end_pt)]
+                else:
+                    t_min = (computed_dist / speed_kmh) * 60
+
+                if cat == "VEHICLE_TRANSPORTATION":
+                    alistar = model_params.tiempo_alistar_min if labor_id in first_vt_ids else 0.0
+                    fin = model_params.tiempo_finalizacion_min if labor_id in last_vt_ids else 0.0
+                    expected_dur_min = t_min + alistar + fin
+                else:
+                    expected_dur_min = t_min
 
                 expected_dur_min = round(expected_dur_min, 1)
-                diff_min = abs(reported_dur - expected_dur_min)
+                diff_min: float = abs(reported_dur - expected_dur_min)
 
                 if diff_min > time_tol_min and cat != "FREE_TIME":
                     inconsistencies.append(
@@ -321,9 +356,9 @@ def validate_moves_df(
                         }
                     )
 
-            if i > 0 and pd.notna(actual_start) and pd.notna(actual_end):
-                prev = g.loc[i - 1]
-                time_diff = (row["actual_start"] - prev["actual_end"]).total_seconds() / 60
+            if i > 0 and bool(pd.notna(actual_start)) and bool(pd.notna(actual_end)):
+                prev_dict: dict[str, Any] = cast(dict[str, Any], g.loc[i - 1].to_dict())
+                time_diff: float = (row_dict["actual_start"] - prev_dict["actual_end"]).total_seconds() / 60
 
                 if pd.isna(time_diff):
                     continue

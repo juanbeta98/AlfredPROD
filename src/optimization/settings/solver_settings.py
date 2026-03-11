@@ -11,13 +11,15 @@ DEFAULT_DISTANCE_METHOD = "osrm"
 class OptimizationSettings:
     algorithm: str = "OFFLINE"
     distance_method: str = DEFAULT_DISTANCE_METHOD
+    time_method: str = "osrm_times"   # "speed_based" | "osrm_times"
+    # time_method: str = "speed_based"   # "speed_based" | "osrm_times"
 
     # shared hyperparameters
     alpha: float = 0.3
     # max_iterations: int = 1000
     max_iterations: dict[str, int] = field(
         default_factory=lambda: {
-            "25": 5000,  # Cundinamarca (Bogotá)
+            "25": 2000,  # Cundinamarca (Bogotá)
             "5":  2000,   # Antioquia (Medellín)
             "76": 2000,   # Valle del Cauca (Cali)
             "8":  500,    # Atlántico (Barranquilla)
@@ -29,8 +31,6 @@ class OptimizationSettings:
 
     # execution controls
     n_processes: Optional[int] = None
-    # warmup iterations run sequentially before the parallel pool to pre-populate dist_dict
-    n_warmup: int = 1
     # pre-compute the full driver→labor distance matrix via OSRM Table API before iterations
     precompute_distances: bool = True
 
@@ -49,9 +49,9 @@ class OptimizationSettings:
         base = {
             "alpha": self.alpha,
             "distance_method": self.distance_method,
+            "time_method": self.time_method,
             "max_iterations": self.max_iterations,
             "n_processes": self.n_processes,
-            "n_warmup": self.n_warmup,
             "precompute_distances": self.precompute_distances,
             "model_params": self.model_params,
             "master_data": self.master_data,
