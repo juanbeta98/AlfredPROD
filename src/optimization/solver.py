@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 import uuid
 from datetime import datetime
@@ -67,10 +68,20 @@ class OptimizationSolver:
             # ---------------------------------------------
             algo_name = self.settings.algorithm.strip().upper()
 
+            # TODO(cleanup): remove when BUFFER_REACT is fully integrated
+            if algo_name == "BUFFER_REACT" and os.getenv("ALFRED_BUFFER_REACT_AS_INSERT", "0") == "1":
+                algo_name = "INSERT"
+
             algo_params = self.settings.for_algorithm(algo_name)
             algo_params["master_data"] = self.master_data
             algo_params["run_id"] = self.run_id
             algo_params["preassigned"] = self.context.get("preassigned", {})
+            algo_params["decision_time"] = self.context.get("decision_time")
+
+            # TODO(cleanup): remove when BUFFER_REACT is fully integrated
+            # "max_iterations_by_city" is the BUFFER_REACT convention; INSERT reads "max_iterations".
+            if "max_iterations_by_city" in algo_params:
+                algo_params.setdefault("max_iterations", algo_params.pop("max_iterations_by_city"))
 
             logger.info(
                 f"solver_selected algorithm={algo_name}",
@@ -86,6 +97,7 @@ class OptimizationSolver:
             )
 
             algorithm = get_algorithm(algo_name, algo_params)
+            self._algo_name = algo_name
 
             solve_result = algorithm.solve(self.input_df)
             if not isinstance(solve_result, tuple) or len(solve_result) != 3:
@@ -346,8 +358,10 @@ class OptimizationSolver:
             raise SolverExecutionError("Algorithm did not return a DataFrame")
 
         # common expectation: results correspond to input rows
-        # prefer matching by labor_id if it's unique
-        if len(results_df) != len(self.input_df):
+        # BUFFER_REACT intentionally returns fewer rows (frozen labors excluded;
+        # main.py merges them back), so skip the check for that algorithm.
+        _algo = getattr(self, "_algo_name", "")
+        if _algo != "BUFFER_REACT" and len(results_df) != len(self.input_df):
             logger.warning(
                 "Result row count differs from input",
                 extra={"in": len(self.input_df), "out": len(results_df)},

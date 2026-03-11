@@ -61,6 +61,7 @@ from src.pipeline.helpers import (
 from src.pipeline.filters import (
     _filter_df_by_department_code,
     _filter_labors_to_planning_window,
+    filter_canceled_services,
 )
 from src.pipeline.diagnostics import (
     _finalize_assignment_diagnostics,
@@ -303,6 +304,8 @@ def main() -> int:
     if request_filters:
         input_df = _filter_labors_to_planning_window(input_df, request_filters)
 
+    input_df = filter_canceled_services(input_df)
+
     if not use_api and request_filters:
         input_df = apply_request_filters(input_df, request_filters)
 
@@ -516,6 +519,9 @@ def main() -> int:
     preassigned_moves_df = pd.DataFrame()
     preassigned_metrics: Dict[str, Any] = {}
 
+    # Capture full input scope before preassigned split (for run.json reporting)
+    _input_services_total = int(input_df["service_id"].nunique()) if "service_id" in input_df.columns and not input_df.empty else 0
+
     algorithm_name = str(settings.algorithm or "").strip().upper()
     should_reconstruct_preassigned = algorithm_name != "OFFLINE"
     if not should_reconstruct_preassigned:
@@ -644,6 +650,12 @@ def main() -> int:
                 "request": request_payload.raw,
                 "filters": request_payload.filters.as_dict(),
             }
+            ts_raw = request_payload.raw.get("timestamp")
+            if ts_raw:
+                try:
+                    context["decision_time"] = pd.Timestamp(ts_raw)
+                except Exception:
+                    pass
         if not preassigned_df.empty:
             context["preassigned"] = {
                 "labors_df": preassigned_df,
@@ -672,7 +684,35 @@ def main() -> int:
                 results, metrics, algo_artifacts = solver.solve()
 
             if not preassigned_df.empty:
-                results = pd.concat([preassigned_df, results], axis=0, ignore_index=True)
+                # Use INSERT-updated base labors when available: downstream shifts
+                # applied during insertion may have changed actual_start/actual_end
+                # of preassigned labors.  Using the originals would create false
+                # driver_overlap issues in the validator.
+                _updated_base = (
+                    algo_artifacts.get("updated_base_labors_df", pd.DataFrame())
+                    if isinstance(algo_artifacts, dict) else pd.DataFrame()
+                )
+                if not _updated_base.empty:
+                    _shifted_ids = set(_updated_base["labor_id"].tolist())
+                    preassigned_for_concat = pd.concat(
+                        [
+                            preassigned_df[~preassigned_df["labor_id"].isin(_shifted_ids)],
+                            _updated_base,
+                        ],
+                        axis=0,
+                        ignore_index=True,
+                    )
+                else:
+                    preassigned_for_concat = preassigned_df
+                # Exclude any preassigned labors already covered by the algorithm's output
+                # (e.g. BUFFER_REACT re-optimizes reassignable labors and returns them in
+                # results, so concatenating preassigned_df would duplicate those labor_ids).
+                if "labor_id" in results.columns and "labor_id" in preassigned_for_concat.columns:
+                    _algo_labor_ids = set(results["labor_id"].dropna().tolist())
+                    preassigned_for_concat = preassigned_for_concat[
+                        ~preassigned_for_concat["labor_id"].isin(_algo_labor_ids)
+                    ]
+                results = pd.concat([preassigned_for_concat, results], axis=0, ignore_index=True)
 
         results = _finalize_assignment_diagnostics(results)
         results = _stabilize_results_order(results)
@@ -681,7 +721,7 @@ def main() -> int:
 
         # Service-level summary for run.json
         if not results.empty and "service_id" in results.columns:
-            _services_total = int(results["service_id"].nunique())
+            _services_total = _input_services_total
             if "is_infeasible" in results.columns:
                 _svc_all_failed = results.groupby("service_id")["is_infeasible"].all()
                 _services_failed = int(_svc_all_failed.sum())
@@ -727,10 +767,28 @@ def main() -> int:
     dist_dict = algo_artifacts.get("dist_dict") if isinstance(algo_artifacts, dict) else None
 
     if not preassigned_moves_df.empty:
-        if moves_df is None or moves_df.empty:
-            moves_df = preassigned_moves_df
+        # Replace preassigned moves that were updated by the INSERT algorithm
+        # (downstream-shifted moves) with their updated versions.
+        _updated_base_moves = (
+            algo_artifacts.get("updated_base_moves_df", pd.DataFrame())
+            if isinstance(algo_artifacts, dict) else pd.DataFrame()
+        )
+        if not _updated_base_moves.empty and "labor_id" in _updated_base_moves.columns:
+            _shifted_move_ids = set(_updated_base_moves["labor_id"].tolist())
+            preassigned_moves_for_concat = pd.concat(
+                [
+                    preassigned_moves_df[~preassigned_moves_df["labor_id"].isin(_shifted_move_ids)],
+                    _updated_base_moves,
+                ],
+                axis=0,
+                ignore_index=True,
+            )
         else:
-            moves_df = pd.concat([preassigned_moves_df, moves_df], axis=0, ignore_index=True)
+            preassigned_moves_for_concat = preassigned_moves_df
+        if moves_df is None or moves_df.empty:
+            moves_df = preassigned_moves_for_concat
+        else:
+            moves_df = pd.concat([preassigned_moves_for_concat, moves_df], axis=0, ignore_index=True)
 
     # --------------------------------------------------
     # 9. Validate solution
@@ -747,6 +805,12 @@ def main() -> int:
                 if isinstance(algo_artifacts, dict)
                 else settings.distance_method,
                 dist_dict=dist_dict,
+                time_method=str(algo_artifacts.get("time_method", "speed_based"))
+                if isinstance(algo_artifacts, dict)
+                else "speed_based",
+                time_dict=algo_artifacts.get("time_dict")
+                if isinstance(algo_artifacts, dict)
+                else None,
                 strict_time_check=False,
             )
 
@@ -926,6 +990,40 @@ def main() -> int:
     log_info("pipeline_end", status="success")
     elapsed = (datetime.now(timezone.utc) - started_at).total_seconds()
     try:
+        _dept_codes: list[str] = []
+        _start_date: Optional[str] = None
+        _end_date: Optional[str] = None
+        if not results.empty:
+            if "department_code" in results.columns:
+                _dept_codes = sorted(results["department_code"].dropna().astype(str).unique().tolist())
+            if "schedule_date" in results.columns:
+                _dates = pd.to_datetime(results["schedule_date"], errors="coerce").dropna()
+                if not _dates.empty:
+                    _start_date = _dates.min().date().isoformat()
+                    _end_date = _dates.max().date().isoformat()
+        _instance_config = {
+            "department": _dept_codes[0] if len(_dept_codes) == 1 else _dept_codes,
+            "start_date": _start_date,
+            "end_date": _end_date,
+        }
+        _n_proc = settings.n_processes
+        _algorithm_config = {
+            "name": str(settings.algorithm or "default").upper(),
+            "max_iterations": {d: settings.max_iterations[d] for d in _dept_codes if d in settings.max_iterations},
+            "n_processes": _n_proc,
+            "parallel": _n_proc is not None and _n_proc != 1,
+        }
+        _labors_total = int(len(results)) if not results.empty else 0
+        _labors_preassigned = int(len(preassigned_df)) if not preassigned_df.empty else 0
+        _labors_processed = _labors_total - _labors_preassigned
+        _is_infeasible_col = results.get("is_infeasible", pd.Series(False, index=results.index)).fillna(False).astype(bool) if not results.empty else pd.Series(dtype=bool)
+        _labors_assigned = int(results.loc[~_is_infeasible_col, "labor_id"].nunique()) if not results.empty and "labor_id" in results.columns else 0
+        _labors_summary = {
+            "total": _labors_total,
+            "preassigned": _labors_preassigned,
+            "processed": _labors_processed,
+            "assigned": _labors_assigned,
+        }
         finalize_run_manifest(
             run_dir,
             status="success",
@@ -934,6 +1032,9 @@ def main() -> int:
             services_total=_services_total,
             services_planned=_services_planned,
             services_failed=_services_failed,
+            labors_summary=_labors_summary,
+            instance_config=_instance_config,
+            algorithm_config=_algorithm_config,
         )
     except Exception:
         logger.exception("run_manifest_finalization_failed")

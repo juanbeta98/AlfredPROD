@@ -21,7 +21,7 @@ def _finalize_assignment_diagnostics(results_df: pd.DataFrame) -> pd.DataFrame:
             df[col] = default_value
 
     failed_mask = df.get("actual_status", pd.Series(index=df.index, dtype="object")).astype("string").str.upper().eq("FAILED")
-    reassignment_candidate_mask = df["reassignment_candidate"].fillna(False).astype(bool)
+    reassignment_candidate_mask = df["reassignment_candidate"].fillna(False).infer_objects(copy=False).astype(bool)
     reassignment_failed_mask = failed_mask & reassignment_candidate_mask
     generic_failed_mask = failed_mask & ~reassignment_candidate_mask
 
@@ -81,6 +81,7 @@ def _build_assignment_diagnostics_metrics(results_df: pd.DataFrame) -> Dict[str,
     reassignment_candidate = (
         df.get("reassignment_candidate", pd.Series(False, index=df.index))
         .fillna(False)
+        .infer_objects(copy=False)
         .astype(bool)
     )
     is_infeasible = (

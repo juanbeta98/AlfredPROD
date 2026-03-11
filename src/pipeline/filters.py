@@ -116,3 +116,23 @@ def _filter_labors_to_planning_window(
         len(df) - len(result),
     )
     return result
+
+
+def filter_canceled_services(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop all labor rows belonging to services with state == 'CANCELED'."""
+    if df is None or df.empty or "state" not in df.columns:
+        return df
+
+    before_rows = len(df)
+    mask = df["state"].astype("string").str.upper().ne("CANCELED")
+    result = df.loc[mask].copy()
+
+    dropped = before_rows - len(result)
+    if dropped:
+        logger.info(
+            "canceled_services_filtered rows_in=%s rows_out=%s rows_dropped=%s",
+            before_rows,
+            len(result),
+            dropped,
+        )
+    return result
