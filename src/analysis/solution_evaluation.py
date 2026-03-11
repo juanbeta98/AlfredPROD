@@ -63,8 +63,6 @@ _SUMMARY_METRICS: List[Tuple[str, str]] = [
     ("summary.labors_total",                            "Labors total"),
     ("summary.drivers_used",                            "Drivers used"),
     ("summary.services_successfully_assigned",          "Services assigned"),
-    ("summary.service_assignment_rate_pct",             "Service assignment rate (%)"),
-    ("summary.vt_assignment_rate_pct",                  "VT labor assignment rate (%)"),
     ("summary.total_labor_distance_km",                 "Total labor distance (km)"),
     ("summary.total_driver_move_distance_km",           "Total move distance (km)"),
     ("time_allocation.labor_work_pct",                  "Labor work time (%)"),
@@ -192,13 +190,27 @@ def build_coord_lookups(
             key=lambda l: (l.get("labor_sequence") is None, l.get("labor_sequence") or 0),
         )
 
+        # When labor_type is absent (e.g. output-only payloads), fall back to
+        # classifying by addData.labor_distance_km: a labor with distance > 0
+        # is a VT labor (alfred_initial_transport / alfred_transport).
+        def _is_vt(lab: Dict[str, Any]) -> bool:
+            lt = lab.get("labor_type")
+            if lt is not None:
+                return lt in _VT_LABOR_TYPES
+            add = lab.get("addData") or {}
+            dist = add.get("labor_distance_km")
+            try:
+                return float(dist) > 0
+            except (TypeError, ValueError):
+                return False
+
         stops: List[Optional[Tuple[float, float]]] = [_extract_point(svc.get("start_address"))]
-        non_vt = [l for l in labs_sorted if l.get("labor_type") not in _VT_LABOR_TYPES]
+        non_vt = [l for l in labs_sorted if not _is_vt(l)]
         for lab in non_vt:
             stops.append(_extract_point(lab.get("shop_address")))
         stops.append(_extract_point(svc.get("end_address")))
 
-        vt_labs = [l for l in labs_sorted if l.get("labor_type") in _VT_LABOR_TYPES]
+        vt_labs = [l for l in labs_sorted if _is_vt(l)]
         for i, vt_lab in enumerate(vt_labs):
             lid = vt_lab["id"]
             vt_labor_ids.add(lid)
@@ -251,11 +263,7 @@ def recompute_move_distances(
     for driver_id, driver_rows in by_driver.items():
         sorted_rows = sorted(
             driver_rows,
-            key=lambda r: (
-                str(r.get("labor_schedule_date") or ""),
-                r.get("service_labor_index", 0),
-                r.get("labor_id") or 0,
-            ),
+            key=lambda r: r["actual_start"] if r["actual_start"] is not None else datetime.min,
         )
         prev_end_wkt: Optional[str] = (
             driver_home_lookup.get(str(driver_id)) if driver_home_lookup else None
@@ -270,6 +278,29 @@ def recompute_move_distances(
                 prev_end_wkt = end_wkt
 
     return move_dists
+
+
+def build_points_lookup_from_rows(
+    rows: List[Dict[str, Any]],
+) -> Dict[Any, Tuple[Optional[str], Optional[str]]]:
+    """Build points_lookup from stored map_start_wkt/map_end_wkt in flattened rows.
+
+    Used to prefer the exact coordinates the solver used (from addData) over
+    coordinates re-extracted from the input JSON service addresses.  Only labors
+    that carry a non-null map_start_wkt are included; the caller should merge
+    the result with a fallback from build_coord_lookups for remaining labors.
+
+    Returns
+    -------
+    dict : labor_id -> (start_wkt, end_wkt)
+    """
+    result: Dict[Any, Tuple[Optional[str], Optional[str]]] = {}
+    for r in rows:
+        start_wkt: Optional[str] = r.get("map_start_wkt") or None
+        end_wkt: Optional[str] = r.get("map_end_wkt") or None
+        if start_wkt:
+            result[r["labor_id"]] = (start_wkt, end_wkt)
+    return result
 
 
 def infer_missing_durations(
@@ -406,6 +437,8 @@ def flatten_labors(
                 "driver_move_distance_km": add_data.get("driver_move_distance_km") or 0.0,
                 "is_infeasible":          bool(add_data.get("is_infeasible", False)),
                 "reassignment_candidate": bool(add_data.get("reassignment_candidate", False)),
+                "map_start_wkt":          add_data.get("map_start_point") or None,
+                "map_end_wkt":            add_data.get("map_end_point") or None,
             })
 
     return rows, warnings
@@ -507,12 +540,32 @@ def _safe_div(num: float, denom: float) -> float:
     return num / denom if denom else 0.0
 
 
-def compute_payload_summary(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Compute aggregate KPIs directly from flat labor rows."""
+def compute_payload_summary(
+    rows: List[Dict[str, Any]],
+    tiempo_gracia_min: int = 15,
+    segments: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    """Compute aggregate KPIs directly from flat labor rows.
+
+    Parameters
+    ----------
+    tiempo_gracia_min : Grace window (minutes) after schedule_date within which a
+                        driver is still considered on time.  Labors whose actual_start
+                        falls in (schedule_date, schedule_date + tiempo_gracia_min] are
+                        counted in ``labors_in_grace`` / ``total_grace_min``.
+    segments : Optional timeline segments from ``reconstruct_timeline``.  When provided,
+               ``labors_infeasible`` is computed from VEHICLE_TRANSPORTATION segments
+               whose ``is_infeasible`` flag is True — this combines both the solver's
+               own infeasibility flag (from ``addData``) and timeline-overlap
+               infeasibilities detected during reconstruction.  Without segments, only
+               the solver flag (``addData.is_infeasible``) is counted.
+    """
     services: set = set()
     drivers: set = set()
     total_labor_dist = total_move_dist = total_duration = 0.0
     assigned_count = infeasible_count = reassignment_count = vt_count = 0
+    in_grace_count = 0
+    in_grace_total_min = 0.0
     n_labor_dist = n_move_dist = 0
 
     for r in rows:
@@ -534,6 +587,23 @@ def compute_payload_summary(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             infeasible_count += 1
         if r.get("reassignment_candidate"):
             reassignment_count += 1
+        # Grace-period check: VT labors that started after schedule_date but within grace
+        if r.get("labor_type") in _VT_LABOR_TYPES and r["actual_start"] is not None:
+            sched = _parse_dt(r.get("labor_schedule_date"))
+            if sched is not None:
+                delta_min = (r["actual_start"] - sched).total_seconds() / 60.0
+                if 0 < delta_min <= tiempo_gracia_min:
+                    in_grace_count += 1
+                    in_grace_total_min += delta_min
+
+    # When segments are available, use VEHICLE_TRANSPORTATION is_infeasible as the
+    # authoritative count: it combines addData.is_infeasible (solver flag) with
+    # overlaps_prev (timeline-overlap infeasibility detected during reconstruction).
+    if segments is not None:
+        infeasible_count = len({
+            s["labor_id"] for s in segments
+            if s["segment_type"] == "VEHICLE_TRANSPORTATION" and s.get("is_infeasible")
+        })
 
     n = len(rows)
     return {
@@ -545,6 +615,8 @@ def compute_payload_summary(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
         "labors_infeasible":               infeasible_count,
         "labors_infeasible_pct":           round(100.0 * _safe_div(infeasible_count, n), 2),
         "labors_reassignment_candidate":   reassignment_count,
+        "labors_in_grace":                 in_grace_count,
+        "total_grace_min":                 round(in_grace_total_min, 2),
         "total_labor_distance_km":         round(total_labor_dist, 2),
         "total_driver_move_distance_km":   round(total_move_dist, 2),
         "total_distance_km":               round(total_labor_dist + total_move_dist, 2),
@@ -808,6 +880,24 @@ _ROUTE_COLOR: Dict[str, str] = {
     "DRIVER_MOVE":            "orange",
 }
 
+# Per-labor palette: (service_hex, move_hex).
+# service_hex — dark/saturated, used for the VT leg and the start marker.
+# move_hex    — lighter variant of the same hue, used for the driver-move leg.
+_LABOR_PALETTE: List[Tuple[str, str]] = [
+    ("#1a6faf", "#7ab8e0"),   #  0  deep blue      / sky blue
+    ("#b5451b", "#e8956d"),   #  1  brick red       / salmon
+    ("#2e8b57", "#7ecba0"),   #  2  sea green       / mint
+    ("#8b3a9c", "#c98ed4"),   #  3  purple          / lavender
+    ("#b8860b", "#e8c84a"),   #  4  dark goldenrod  / yellow
+    ("#1a7f7f", "#6ec9c9"),   #  5  teal            / light teal
+    ("#cc3366", "#f092b0"),   #  6  crimson         / pink
+    ("#5a6e00", "#a8be40"),   #  7  olive           / lime
+    ("#7a3b10", "#d4916a"),   #  8  brown           / peach
+    ("#006699", "#55b0d4"),   #  9  navy            / cerulean
+    ("#7d4e00", "#d4a840"),   # 10  amber dark      / light amber
+    ("#3d3d8f", "#8f8fd4"),   # 11  indigo          / periwinkle
+]
+
 
 def _wkt_to_latlon(wkt: Optional[str]) -> Optional[Tuple[float, float]]:
     """Parse a WKT POINT(lon lat) string → (lat, lon) tuple for folium."""
@@ -818,6 +908,38 @@ def _wkt_to_latlon(wkt: Optional[str]) -> Optional[Tuple[float, float]]:
         return lat, lon
     except (ValueError, AttributeError):
         return None
+
+
+def _make_finish_icon() -> Any:
+    """Return a purple 'F' DivIcon for the final labor's end waypoint."""
+    import folium as _folium
+    return _folium.DivIcon(
+        html=(
+            "<div style='width:22px;height:22px;border-radius:50%;"
+            "background:#7b35b0;border:2px solid rgba(0,0,0,0.45);"
+            "display:flex;align-items:center;justify-content:center;"
+            "font-size:12px;font-weight:700;color:#fff;"
+            "box-shadow:0 1px 3px rgba(0,0,0,0.35)'>F</div>"
+        ),
+        icon_size=(22, 22),
+        icon_anchor=(11, 11),
+    )
+
+
+def _make_start_icon(labor_num: int, color_hex: str = "#1a6faf") -> Any:
+    """Return a numbered filled-circle DivIcon for a labor start waypoint."""
+    import folium as _folium
+    return _folium.DivIcon(
+        html=(
+            f"<div style='width:22px;height:22px;border-radius:50%;"
+            f"background:{color_hex};border:2px solid rgba(0,0,0,0.45);"
+            f"display:flex;align-items:center;justify-content:center;"
+            f"font-size:11px;font-weight:700;color:#fff;"
+            f"box-shadow:0 1px 3px rgba(0,0,0,0.35)'>{labor_num}</div>"
+        ),
+        icon_size=(22, 22),
+        icon_anchor=(11, 11),
+    )
 
 
 def _osrm_route(
@@ -860,6 +982,7 @@ def build_route_map(
     zoom_start: int = 12,
     points_lookup: Optional[Dict[Any, Tuple[Optional[str], Optional[str]]]] = None,
     colors: Optional[Dict[str, str]] = None,
+    reverse_palette: bool = False,
     map_width: Union[int, str] = "100%",
     map_height: int = 500,
     tiles: str = "CartoDB positron",
@@ -908,7 +1031,12 @@ def build_route_map(
 
     import os as _os
 
-    active_colors = colors if colors is not None else _ROUTE_COLOR
+    _n = len(_LABOR_PALETTE)
+
+    def _pick(labor_index: int) -> Tuple[str, str]:
+        """Return (service_hex, move_hex) for the given 0-based labor index."""
+        i = (_n - 1 - labor_index) % _n if reverse_palette else labor_index % _n
+        return _LABOR_PALETTE[i]
 
     if points_lookup is None:
         if services is None:
@@ -925,22 +1053,17 @@ def build_route_map(
     if not driver_rows:
         raise ValueError(f"No assigned labors found for driver {driver_id!r}")
 
-    # ── Build legs (from, to, color, is_osrm_eligible) ──────────────────────
-    legs: List[Tuple[Tuple[float, float], Tuple[float, float], str]] = []
-    # waypoints: wkt → (latlon, popup_html) for circle markers
-    waypoints: Dict[str, Tuple[Tuple[float, float], str]] = {}
+    # ── Build legs and collect start/end waypoints ───────────────────────────
+    legs: List[Tuple[Tuple[float, float], Tuple[float, float], str, str]] = []
+    # starts: wkt → (latlon, popup_html, labor_num, service_hex)  — numbered filled circle
+    # ends:   wkt → (latlon, popup_html)                         — open ring
+    starts: Dict[str, Tuple[Tuple[float, float], str, int, str]] = {}
+    ends:   Dict[str, Tuple[Tuple[float, float], str]]      = {}
 
     prev_end_wkt: Optional[str] = driver_home_wkt
+    last_end_wkt: Optional[str] = None
 
-    if driver_home_wkt:
-        home_ll = _wkt_to_latlon(driver_home_wkt)
-        if home_ll:
-            waypoints[driver_home_wkt] = (
-                home_ll,
-                f"<b>Home</b><br>Driver: {driver_id}",
-            )
-
-    for row in driver_rows:
+    for labor_num, row in enumerate(driver_rows, start=1):
         lid = row["labor_id"]
         start_wkt, end_wkt = points_lookup.get(lid, (None, None))
         if start_wkt is None and end_wkt is None:
@@ -949,18 +1072,24 @@ def build_route_map(
         start_ll = _wkt_to_latlon(start_wkt)
         end_ll = _wkt_to_latlon(end_wkt)
 
+        service_hex, move_hex = _pick(labor_num - 1)
+        move_km  = row.get("driver_move_distance_km") or 0.0
+        labor_km = row.get("labor_distance_km") or 0.0
+
         # ── Driver-move leg (prev position → this labor's start) ────────────
         if prev_end_wkt and start_wkt and prev_end_wkt != start_wkt:
             prev_ll = _wkt_to_latlon(prev_end_wkt)
             if prev_ll and start_ll:
-                legs.append((prev_ll, start_ll, active_colors["DRIVER_MOVE"]))
+                legs.append((prev_ll, start_ll, move_hex,
+                              f"Move | {move_km:.1f} km"))
 
         # ── Labor leg (start → end) ─────────────────────────────────────────
         is_vt = row.get("labor_type") in _VT_LABOR_TYPES
-        seg_color = active_colors["VEHICLE_TRANSPORTATION"] if is_vt else active_colors["DRIVER_MOVE"]
+        seg_color = service_hex if is_vt else move_hex
 
         if start_ll and end_ll and start_wkt != end_wkt:
-            legs.append((start_ll, end_ll, seg_color))
+            legs.append((start_ll, end_ll, seg_color,
+                         f"Labor {labor_num} | {labor_km:.1f} km"))
 
         # ── Waypoint markers ────────────────────────────────────────────────
         t_start = row["actual_start"].strftime("%H:%M") if row["actual_start"] else "—"
@@ -969,12 +1098,14 @@ def build_route_map(
             f"<b>Labor {lid}</b><br>"
             f"Service: {row['service_id']}<br>"
             f"Type: {row.get('labor_type', '—')}<br>"
-            f"Start: {t_start} &nbsp; End: {t_end}"
+            f"Start: {t_start} &nbsp; End: {t_end}<br>"
+            f"Labor dist: {labor_km:.2f} km &nbsp; Move dist: {move_km:.2f} km"
         )
         if start_ll and start_wkt:
-            waypoints.setdefault(start_wkt, (start_ll, popup_html))
-        if end_ll and end_wkt:
-            waypoints[end_wkt] = (end_ll, popup_html)  # overwrite with latest
+            starts.setdefault(start_wkt, (start_ll, popup_html, labor_num, service_hex))
+        if end_ll and end_wkt and end_wkt != start_wkt:
+            ends[end_wkt] = (end_ll, popup_html)
+            last_end_wkt = end_wkt
 
         prev_end_wkt = end_wkt or prev_end_wkt
 
@@ -985,7 +1116,7 @@ def build_route_map(
         )
 
     # ── Build map ────────────────────────────────────────────────────────────
-    all_latlons = [ll for (from_ll, to_ll, _) in legs for ll in (from_ll, to_ll)]
+    all_latlons = [ll for (from_ll, to_ll, *_) in legs for ll in (from_ll, to_ll)]
     center = [
         sum(ll[0] for ll in all_latlons) / len(all_latlons),
         sum(ll[1] for ll in all_latlons) / len(all_latlons),
@@ -1002,7 +1133,7 @@ def build_route_map(
 
     osrm_url = _os.environ.get("OSRM_URL")
 
-    for from_ll, to_ll, color in legs:
+    for from_ll, to_ll, color, tooltip_text in legs:
         route_coords = None
         if use_osrm:
             try:
@@ -1010,28 +1141,53 @@ def build_route_map(
             except Exception:
                 pass
         if route_coords:
-            folium.PolyLine(route_coords, color=color, weight=4, opacity=0.8).add_to(m)
+            folium.PolyLine(
+                route_coords, color=color, weight=4, opacity=0.8,
+                tooltip=folium.Tooltip(tooltip_text),
+            ).add_to(m)
         else:
             folium.PolyLine(
-                [from_ll, to_ll], color=color, weight=2, dash_array="5,5"
+                [from_ll, to_ll], color=color, weight=2, dash_array="5,5",
+                tooltip=folium.Tooltip(tooltip_text),
             ).add_to(m)
 
-    for wkt, (latlon, popup_html) in waypoints.items():
-        if wkt == driver_home_wkt:
+    # ── Home marker ──────────────────────────────────────────────────────────
+    if driver_home_wkt:
+        home_ll = _wkt_to_latlon(driver_home_wkt)
+        if home_ll:
+            folium.Marker(
+                location=home_ll,
+                popup=folium.Popup(f"<b>Home</b><br>Driver: {driver_id}", max_width=220),
+                icon=folium.Icon(color="green", icon="home", prefix="fa"),
+            ).add_to(m)
+
+    # ── End markers: open ring or finish icon ────────────────────────────────
+    start_wkts = set(starts)
+    for wkt, (latlon, popup_html) in ends.items():
+        if wkt in start_wkts:
+            continue  # start marker will cover this position
+        if wkt == last_end_wkt:
             folium.Marker(
                 location=latlon,
-                popup=folium.Popup(popup_html, max_width=220),
-                icon=folium.Icon(color="green", icon="home", prefix="fa"),
+                popup=folium.Popup(popup_html, max_width=250),
+                icon=_make_finish_icon(),
             ).add_to(m)
         else:
             folium.CircleMarker(
                 location=latlon,
-                radius=6,
-                color="black",
-                fill=True,
-                fill_color="white",
-                fill_opacity=0.9,
+                radius=7,
+                color="#333",
+                weight=2,
+                fill=False,
                 popup=folium.Popup(popup_html, max_width=250),
             ).add_to(m)
+
+    # ── Start markers: numbered filled circle ────────────────────────────────
+    for wkt, (latlon, popup_html, labor_num, service_hex) in starts.items():
+        folium.Marker(
+            location=latlon,
+            popup=folium.Popup(popup_html, max_width=250),
+            icon=_make_start_icon(labor_num, service_hex),
+        ).add_to(m)
 
     return fig

@@ -53,6 +53,7 @@ from src.analysis.solution_evaluation import (
     _to_plotly_dt,
     _wkt_to_latlon,
     build_coord_lookups,
+    build_points_lookup_from_rows,
     filter_by_date,
     flatten_labors,
     infer_missing_durations,
@@ -177,15 +178,25 @@ def load_and_prepare(
     rows_a, warnings_a = flatten_labors(services_a, coord_lookup, metric_warn_threshold_pct, vt_labor_ids)
     rows_b, warnings_b = flatten_labors(services_b, coord_lookup, metric_warn_threshold_pct, vt_labor_ids)
 
-    # Recompute driver move distances from coordinates — apples-to-apples comparison
+    # Recompute driver move distances from coordinates — apples-to-apples comparison.
+    # Priority: stored map endpoints from addData (algorithm solutions) override
+    # input-JSON-derived coordinates, so the recomputed distance matches the solver's
+    # own calculation.  For labors without stored endpoints (e.g. baseline snapshots),
+    # the input-JSON coordinates are used as-is.
+    # The payload-stored driver_move_distance_km is authoritative when present; the
+    # recomputed value is stored separately for reference and fills in missing values.
     if points_lookup or driver_home_lookup:
         for rows in (rows_a, rows_b):
+            stored_pts = build_points_lookup_from_rows(rows)
+            merged_pts = {**(points_lookup or {}), **stored_pts}
             move_dists = recompute_move_distances(
-                rows, points_lookup or {}, distance_method, driver_home_lookup
+                rows, merged_pts, distance_method, driver_home_lookup
             )
             for r in rows:
                 if r["labor_id"] in move_dists:
-                    r["driver_move_distance_km"] = move_dists[r["labor_id"]]
+                    r["driver_move_distance_km_recomputed"] = move_dists[r["labor_id"]]
+                    if not r.get("driver_move_distance_km"):
+                        r["driver_move_distance_km"] = move_dists[r["labor_id"]]
 
     for label, warnings in [("sol_a", warnings_a), ("sol_b", warnings_b)]:
         for w in warnings:
@@ -272,17 +283,13 @@ _PAYLOAD_METRICS = [
     "labors_reassignment_candidate",
     "total_labor_distance_km", "total_driver_move_distance_km", "total_distance_km",
     "avg_labor_distance_km", "avg_driver_move_distance_km",
-    "total_duration_min", "avg_duration_min",
 ]
 
 _EVAL_FLAT_METRICS = [
-    "service_assignment_rate_pct", "vt_assignment_rate_pct",
     "avg_vt_labor_distance_km", "avg_driver_move_distance_km_per_labor",
 ]
 
 _EVAL_ENRICH_MAP: Dict[str, Tuple[str, str]] = {
-    "service_assignment_rate_pct":           ("assignment", "service_assignment_rate_pct"),
-    "vt_assignment_rate_pct":                ("assignment", "vt_assignment_rate_pct"),
     "avg_vt_labor_distance_km":              ("distance",   "avg_vt_labor_distance_km"),
     "avg_driver_move_distance_km_per_labor": ("distance",   "avg_driver_move_distance_km_per_labor"),
 }
@@ -456,21 +463,16 @@ def _comparison_to_csv_rows(
 _CONSOLE_GROUPS: List[Tuple[str, List[str]]] = [
     ("DIMENSIONS",    ["services_count", "labors_count", "labors_vt_count", "drivers_count"]),
     ("ASSIGNMENT",    ["labors_assigned", "labors_infeasible", "labors_infeasible_pct",
-                       "labors_reassignment_candidate", "service_assignment_rate_pct",
-                       "vt_assignment_rate_pct"]),
+                       "labors_reassignment_candidate"]),
     ("DISTANCE (km)", ["total_labor_distance_km", "total_driver_move_distance_km",
                        "total_distance_km", "avg_labor_distance_km",
                        "avg_driver_move_distance_km", "avg_vt_labor_distance_km",
                        "avg_driver_move_distance_km_per_labor"]),
-    ("DURATION (min)", ["total_duration_min", "avg_duration_min"]),
 ]
 _PUNCT_KEYS = ["grace_minutes", "late_services_count", "late_services_pct",
                "total_lateness_min", "avg_lateness_min_all_considered", "normalized_tardiness_pct"]
 _UTIL_KEYS  = ["system.utilization_without_moves_pct", "system.utilization_with_moves_pct",
-               "system.driver_move_utilization_pct", "system.driver_move_share_of_active_pct",
-               "driver_distribution.utilization_without_moves_pct_avg",
-               "driver_distribution.utilization_without_moves_pct_p50",
-               "driver_distribution.utilization_with_moves_pct_avg"]
+               "system.driver_move_utilization_pct", "system.driver_move_share_of_active_pct"]
 _TIME_KEYS  = ["timeline_total_min", "free_time_min", "driver_move_min", "labor_work_min",
                "free_time_pct", "driver_move_pct", "labor_work_pct"]
 _W = 44
@@ -759,24 +761,16 @@ def build_overview_table(
     label_b: str,
 ) -> pd.DataFrame:
     """Side-by-side overview DataFrame with aggregate metrics for both solutions."""
-    sa = compute_payload_summary(pair.rows_a)
-    sb = compute_payload_summary(pair.rows_b)
+    _grace = ModelParams().tiempo_gracia_min
+    # Pass segments so compute_payload_summary merges timeline-overlap infeasibilities
+    # (detected during reconstruct_timeline) into labors_infeasible.
+    sa = compute_payload_summary(pair.rows_a, tiempo_gracia_min=_grace, segments=pair.segments_a)
+    sb = compute_payload_summary(pair.rows_b, tiempo_gracia_min=_grace, segments=pair.segments_b)
 
     sa["labors_non_vt_count"] = sa["labors_count"] - sa["labors_vt_count"]
     sb["labors_non_vt_count"] = sb["labors_count"] - sb["labors_vt_count"]
     sa["labors_unassigned"] = sa["labors_count"] - sa["labors_assigned"]
     sb["labors_unassigned"] = sb["labors_count"] - sb["labors_assigned"]
-
-    # Timeline overlap infeasibilities: labors whose DRIVER_MOVE starts before the
-    # previous labor ends (detected during reconstruct_timeline, not in addData).
-    sa["labors_timeline_overlap"] = len({
-        s["labor_id"] for s in pair.segments_a
-        if s["segment_type"] == "DRIVER_MOVE" and s.get("is_infeasible")
-    })
-    sb["labors_timeline_overlap"] = len({
-        s["labor_id"] for s in pair.segments_b
-        if s["segment_type"] == "DRIVER_MOVE" and s.get("is_infeasible")
-    })
 
     _METRICS: List[Tuple[str, str]] = [
         ("services_count",                "services"),
@@ -787,15 +781,15 @@ def build_overview_table(
         ("labors_assigned",               "labors_assigned"),
         ("labors_unassigned",             "labors_unassigned"),
         ("labors_infeasible",             "labors_infeasible"),
-        ("labors_timeline_overlap",       "labors_timeline_overlap"),
+        ("labors_infeasible_pct",         "labors_infeasible_pct"),
+        ("labors_in_grace",               "labors_in_grace"),
+        ("total_grace_min",               "total_grace_min"),
         ("labors_reassignment_candidate", "reassignment_candidates"),
         ("total_labor_distance_km",       "total_labor_distance_km"),
         ("total_driver_move_distance_km", "total_driver_move_distance_km"),
         ("total_distance_km",             "total_distance_km"),
         ("avg_labor_distance_km",         "avg_labor_distance_km"),
         ("avg_driver_move_distance_km",   "avg_driver_move_distance_km"),
-        ("total_duration_min",            "total_duration_min"),
-        ("avg_duration_min",              "avg_duration_min"),
     ]
 
     rows: List[Dict[str, Any]] = []
