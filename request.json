@@ -1,15 +1,19 @@
 {
   "request_id": "sim-0001",
+  "_comment": "2026-02-18T00:00:00-05:00, 2026-03-05T21:00:00-05:00",
+  "timestamp": "2026-03-11T21:00:00-05:00",
   "filters": {
     "department": "25",
-    "start_date": "2026-02-18T00:00:00-05:00",
-    "end_date": "2026-02-18T23:59:59-05:00"
+    "start_date": "2026-03-12T00:00:00-05:00",
+    "end_date": "2026-03-12T23:59:59-05:00"
   },
   "algorithm": {
-    "name": "OFFLINE",
+    "name": "BUFFER_REACT",
     "params": {
       "n_processes": -1,
       "log_progress": true
+
     }
   }
 }
+
