@@ -1,0 +1,2 @@
+Currently, in the assignment logic there is a parameter in place (model_params) called . It indicates the time after the schedule_date that the driver can still arrive to the service.
+I want to include an indicator of how many labors are started on this tiempo_gracia and how many minutes in total. Particularly for the @compare_solutions.ipynb and @evaluate_solution.ipynb

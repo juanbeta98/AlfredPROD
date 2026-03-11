@@ -1,0 +1,6 @@
+REACT BUFFER
+This will be the implementation of a new algorithm. 
+At it's core, this algorithm takes an already made schedule, then leaves the 'active' labors assigned as are, and then re-assignes everything from thereon. This under the idea that being able to re-schedule the labors in the future will provide flexibility to keep optimizing when receiving new labors. The logic used to reassign is the same as the offline algorithm. 
+There's an important point in this algorithm, and that is what 'active' labor mean. In principle is any labor for which the driver is already moving there or executing. On top of that, a slack should be able to be defined to extend the period by which the frozen horizon begins. For example, don't change any labors 30 minutes before they become 'active'. That can be a model parameter or even be received in the request.
+I've included in the react buffer directory the code I was using to run this algorithm @run_REACT_BUFFER.py. It's just a guide on how the logic and decision making is supposed to look like. It's also smart that you check this code for any bugs or pitfalls. All of this will have to follow the structure of the repo and the implementation of the other algorithms. 
+Validate anything you want to clarify about this implementation. 

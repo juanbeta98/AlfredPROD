@@ -1,0 +1,3 @@
+- Take into account that the multiprocessing (precomputation of distances should work as well). 
+- The insert algorithm use some of the distance logic, check that there are changes needed there.
+- Actually, this should only be taken for the vehicle travel transportation. For teh driver_move this should not be taken into account, they should still be computed with the speed paramter.s

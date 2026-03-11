@@ -1,0 +1,1 @@
+After executing the whole pipeline, the cpu utilization and osrm calls seem to be working. Now, theres another issue. The solution_validation indicates that there are 32 issues, some (or all) of driver_overlap. THis is causing the validation to fail. What is going on?s

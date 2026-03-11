@@ -1,0 +1,1 @@
+The idea of this exercise is to check what happens when we use the distances of osrm and an average speed to deduce the times or 
