@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-from ...common.distance_utils import parse_point, distance
+from ...common.distance_utils import parse_point, distance, travel_time_minutes
 from ...common.utils import compute_workday_end
 from ...common.movements import (
     build_driver_movements,
@@ -40,6 +40,8 @@ def run_assignment_algorithm(
     city_key: str,
     dist_method: str = DEFAULT_DISTANCE_METHOD,
     dist_dict: Optional[DistDict] = None,
+    time_method: str = "speed_based",
+    time_dict: Optional[Dict[Any, Any]] = None,
     alpha: float = 1.0,
     **kwargs: Any,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, List[Dict[str, Any]]]:
@@ -63,6 +65,10 @@ def run_assignment_algorithm(
         model_params = ModelParams()
     model_params.validate()
     iteration_index = kwargs.pop("iter_idx", 0)
+    # Pop BUFFER_REACT driver-state overrides before forwarding kwargs downstream.
+    # When provided, each entry overrides the position/available of that driver
+    # to reflect the end-state of their frozen labors.
+    initial_drivers_override = kwargs.pop("initial_drivers", None)
     seed_material = f"{model_params.seed}|{day_str}|{city_key}|{iteration_index}"
     run_seed = int(hashlib.sha256(seed_material.encode("utf-8")).hexdigest()[:16], 16)
     rng = random.Random(run_seed)
@@ -92,6 +98,12 @@ def run_assignment_algorithm(
     service_end_times: Dict[Any, Optional[pd.Timestamp]] = {}
 
     drivers = init_drivers(df_sorted, directorio_df=directorio_df, city=city_key, **kwargs)
+    if initial_drivers_override:
+        for drv_key, state_override in initial_drivers_override.items():
+            if drv_key in drivers:
+                drivers[drv_key] = {**drivers[drv_key], **state_override}
+            else:
+                drivers[drv_key] = state_override
 
     workday_end_dt = compute_workday_end(
         day_str=day_str,
@@ -184,14 +196,16 @@ def run_assignment_algorithm(
                 drivers[drv],
                 pick['arrival'],
                 prev_end or (row['schedule_date'] - timedelta(minutes=tiempo_previo)),
-                row['map_start_point'], 
-                row['map_end_point'], 
-                is_last, 
-                tiempo_alistar, 
+                row['map_start_point'],
+                row['map_end_point'],
+                is_last,
+                tiempo_alistar,
                 tiempo_finalizacion,
-                vehicle_transport_speed, 
-                dist_method, 
-                dist_dict, 
+                vehicle_transport_speed,
+                dist_method,
+                dist_dict,
+                time_method=time_method,
+                time_dict=time_dict,
                 **kwargs
             )
             
@@ -345,11 +359,12 @@ def _get_overtime_fallback(
 ) -> Optional[Dict[str, Any]]:
     """
     When no driver can arrive within the normal time window, select the one
-    requiring the least overtime (earliest start relative to their shift start).
+    requiring the least overtime.
 
-    The selected driver is assumed to depart before their shift to arrive exactly
-    at the grace deadline (`late`). Returns arrival=late so assign_task_to_driver
-    places astart=late.
+    Returns arrival=actual computed arrival time so assign_task_to_driver places
+    astart at the driver's real earliest possible start. This keeps the assignment
+    physically consistent with the validation (move_start = actual_start - travel_time
+    >= driver's previous labor end).
 
     Returns None only if there are no drivers at all.
     """
@@ -380,7 +395,7 @@ def _get_overtime_fallback(
 
         if overtime < best_overtime:
             best_overtime = overtime
-            best = {'drv': name, 'arrival': late, 'dist_km': dkm, 'overtime_minutes': overtime}
+            best = {'drv': name, 'arrival': arrival, 'dist_km': dkm, 'overtime_minutes': overtime}
 
     return best
 
@@ -564,6 +579,8 @@ def assign_task_to_driver(
     vehicle_speed: float,
     method: str,
     dist_dict: Optional[DistDict] = None,
+    time_method: str = "speed_based",
+    time_dict: Optional[Dict[Any, Any]] = None,
     **kwargs: Any,
 ) -> Tuple[pd.Timestamp, pd.Timestamp, float]:
     """
@@ -574,8 +591,16 @@ def assign_task_to_driver(
     (inicio, fin) : tuple of pd.Timestamp
     """
     astart = max(arrival, early)
-    dist_km, _ = distance(start_point, end_point, method=method, dist_dict=dist_dict, **kwargs)
-    dur = tiempo_alistar + (0 if math.isnan(dist_km) else dist_km/vehicle_speed*60) \
+    dist_km, t_min, _, _ = travel_time_minutes(
+        start_point, end_point,
+        speed_kmh=vehicle_speed,
+        time_method=time_method,
+        dist_method=method,
+        dist_dict=dist_dict,
+        time_dict=time_dict,
+        **kwargs,
+    )
+    dur = tiempo_alistar + (0.0 if math.isnan(t_min) else t_min) \
           + (tiempo_finalizacion if not is_last_in_service else 0)
     aend = astart + timedelta(minutes=dur)
 

@@ -31,13 +31,16 @@ def _init_worker(shared_args: Dict[str, Any]) -> None:
 
 
 def _run_single_iteration_shared(slim_args: Dict[str, Any]) -> Dict[str, Any]:
-    return _run_single_iteration({**_WORKER_SHARED, **slim_args})
+    result = _run_single_iteration({**_WORKER_SHARED, **slim_args})
+    result.pop("dist_dict", None)
+    return result
 
 
 # Keys that are constant for every iteration within one city call.
 _SHARED_KEYS = frozenset({
-    "labors_df", "dist_dict", "directorio_df", "duraciones_df",
-    "distance_method", "alpha", "model_params", "master_data",
+    "labors_df", "dist_dict", "time_dict", "directorio_df", "duraciones_df",
+    "distance_method", "time_method", "alpha", "model_params", "master_data",
+    "initial_drivers",  # BUFFER_REACT: per-city driver state override (constant across iterations)
 })
 
 
@@ -86,8 +89,8 @@ class OfflineAlgoConfig:
     Keep this minimal and expand as you migrate experiment knobs.
     """
     distance_method: str = DEFAULT_DISTANCE_METHOD
+    time_method: str = "speed_based"   # "speed_based" | "osrm_times"
     n_processes: Optional[int] = None
-    n_warmup: int = 5
     precompute_distances: bool = True  # use OSRM Table API to batch-compute all distances before iterations
     max_iterations_by_city: Optional[Dict[Any, int]] = None  # city_key -> max_iter
     log_progress: bool = False  # show tqdm bar per city; set via request.json algorithm.params.log_progress
@@ -111,8 +114,8 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         max_iterations = params.get("max_iterations_by_city", params.get("max_iterations"))
         self.config = OfflineAlgoConfig(
             distance_method=params.get("distance_method") or DEFAULT_DISTANCE_METHOD,
+            time_method=params.get("time_method", "speed_based"),
             n_processes=_resolve_n_processes(params.get("n_processes")),
-            n_warmup=int(params.get("n_warmup", 5)),
             precompute_distances=bool(params.get("precompute_distances", True)),
             max_iterations_by_city=max_iterations,
             log_progress=bool(params.get("log_progress", False)),
@@ -145,6 +148,7 @@ class OfflineAlgorithm(OptimizationAlgorithm):
 
         run_results: List[Tuple[pd.DataFrame, pd.DataFrame]] = []
         postponed_labors: List[Any] = []
+        merged_time_dict: Dict[Any, Any] = {}
 
         for city_key in cities:
             df_city = df[city_keys == city_key]
@@ -156,6 +160,8 @@ class OfflineAlgorithm(OptimizationAlgorithm):
             # --- OSRM batch pre-computation ---
             # Compute the full driver→labor distance matrix in one Table API call so
             # all iterations start with a warm dist_dict and make zero OSRM HTTP calls.
+            # When time_method="osrm_times", also fetch the duration matrix.
+            time_dict: Dict[Any, Any] = {}
             if self.config.distance_method == "osrm" and self.config.precompute_distances:
                 _osrm_url = os.environ.get("OSRM_URL", "")
                 if _osrm_url:
@@ -165,14 +171,24 @@ class OfflineAlgorithm(OptimizationAlgorithm):
                     ]
                     _labor_starts = df_city["map_start_point"].dropna().unique().tolist()
                     _labor_ends   = df_city["map_end_point"].dropna().unique().tolist()
-                    _origins      = list(dict.fromkeys(_driver_positions + _labor_starts))
-                    _destinations = list(dict.fromkeys(_labor_starts + _labor_ends))
-                    _precomp = batch_distance_matrix(_origins, _destinations, _osrm_url)
-                    if _precomp:
-                        dist_dict = {**_precomp, **dist_dict}   # existing entries take priority
+                    # Full square matrix: after each assignment, assign_task_to_driver()
+                    # sets driver["position"] = map_end_point (evolved driver position).
+                    # Labor end points must be in origins to cover every subsequent
+                    # distance(evolved_driver_pos → next_labor_start) call.
+                    _all_points = list(dict.fromkeys(
+                        _driver_positions + _labor_starts + _labor_ends
+                    ))
+                    _precomp_dist, _precomp_time = batch_distance_matrix(
+                        _all_points, _all_points, _osrm_url,
+                        include_times=(self.config.time_method == "osrm_times"),
+                    )
+                    if _precomp_dist:
+                        dist_dict = {**_precomp_dist, **dist_dict}   # existing entries take priority
+                        time_dict = _precomp_time
+                        merged_time_dict.update(time_dict)
                         logger.info(
-                            "osrm_precompute city=%s origins=%d destinations=%d pairs=%d",
-                            city_key, len(_origins), len(_destinations), len(_precomp),
+                            "osrm_precompute city=%s unique_points=%d pairs=%d time_pairs=%d",
+                            city_key, len(_all_points), len(_precomp_dist), len(_precomp_time),
                         )
                     else:
                         logger.warning(
@@ -192,9 +208,11 @@ class OfflineAlgorithm(OptimizationAlgorithm):
                     "iter_idx": i,
                     "labors_df": df_city,
                     "dist_dict": dist_dict,
+                    "time_dict": time_dict,
                     "directorio_df": directorio_df,
                     "duraciones_df": duraciones_df,
                     "distance_method": self.config.distance_method,
+                    "time_method": self.config.time_method,
                     "alpha": alpha,
                     "model_params": self.params.get("model_params"),
                     "master_data": master_data,
@@ -240,6 +258,8 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         artifacts = {
             "moves_df": moves_df,
             "distance_method": self.config.distance_method,
+            "time_method": self.config.time_method,
+            "time_dict": merged_time_dict,
         }
 
         return results_df, metrics, artifacts
@@ -302,7 +322,6 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         - multiprocessing + pandas can be expensive.
         - keep this optional via config.
         - set log_progress=True (via request.json algorithm.params) to show a tqdm bar.
-        - n_warmup sequential iterations run before the pool only when distance_method='osrm'.
         """
         if not iter_args:
             return []
@@ -310,40 +329,15 @@ class OfflineAlgorithm(OptimizationAlgorithm):
         city_key = iter_args[0].get("city_key", "?")
 
         if self.config.n_processes and self.config.n_processes > 1:
-            warmup_results: List[Dict[str, Any]] = []
-            warm_dist_dict: Dict[str, Any] = {}
+            # Start from the pre-computed dict (populated by batch pre-computation in solve()).
+            dist_dict: Dict[str, Any] = dict(iter_args[0].get("dist_dict") or {})
 
-            if self.config.distance_method == "osrm":
-                # --- Warmup: run n_warmup iterations sequentially to build the distance cache ---
-                # Only needed for OSRM; haversine/manhattan compute distances in-process
-                # and never populate dist_dict, so warmup would add overhead with no benefit.
-                warmup_list = iter_args[:self.config.n_warmup]
-                remaining   = iter_args[self.config.n_warmup:]
-
-                warmup_iterable = warmup_list
-                if self.config.log_progress:
-                    from tqdm import tqdm
-                    warmup_iterable = tqdm(
-                        warmup_list,
-                        desc=f"city={city_key} [warmup]",
-                        unit="iter",
-                    )
-                for w_args in warmup_iterable:
-                    result = _run_single_iteration({**w_args, "dist_dict": warm_dist_dict})
-                    warm_dist_dict = result.get("dist_dict") or warm_dist_dict
-                    warmup_results.append(result)
-
-                if not remaining:
-                    return warmup_results
-            else:
-                remaining = iter_args
-
-            # --- Parallel: all workers start with the (possibly pre-populated) cache ---
+            # --- Parallel: all workers start with the pre-computed distance cache ---
             shared = {k: v for k, v in iter_args[0].items() if k in _SHARED_KEYS}
-            shared["dist_dict"] = warm_dist_dict
+            shared["dist_dict"] = dist_dict
             slim = [
                 {k: v for k, v in args.items() if k not in _SHARED_KEYS}
-                for args in remaining
+                for args in iter_args
             ]
             chunksize = max(1, len(slim) // (self.config.n_processes * 4))
             with mp.Pool(
@@ -367,10 +361,10 @@ class OfflineAlgorithm(OptimizationAlgorithm):
                 else:
                     pool_results = pool.map(_run_single_iteration_shared, slim, chunksize=chunksize)
 
-            return warmup_results + pool_results
+            return pool_results
 
         # --- Sequential: thread the cache forward across all iterations ---
-        accumulated_dist_dict: Dict[str, Any] = {}
+        accumulated_dist_dict: Dict[str, Any] = dict(iter_args[0].get("dist_dict") or {})
         results: List[Dict[str, Any]] = []
 
         if self.config.log_progress:
@@ -477,10 +471,13 @@ def _run_single_iteration(args: Dict[str, Any]) -> Dict[str, Any]:
         city_key=city_key,
         dist_method=args.get("distance_method"),
         dist_dict=args.get("dist_dict"),
+        time_method=args.get("time_method", "speed_based"),
+        time_dict=args.get("time_dict"),
         alpha=args.get("alpha", 1),
         iter_idx=args.get("iter_idx", 0),
         model_params=args.get("model_params"),
-        master_data=args.get("master_data")
+        master_data=args.get("master_data"),
+        initial_drivers=args.get("initial_drivers"),  # BUFFER_REACT: frozen driver state override
     )
 
     return {
